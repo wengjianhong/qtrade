@@ -13,7 +13,7 @@
 ## 快速开始
 
 ### 环境要求
-- C++11及以上
+- C++20及以上
 - CMake 3.15+
 - Boost 1.70+
 - 操作系统：Linux (推荐Ubuntu 22.04+)
@@ -34,7 +34,7 @@ mkdir build && cd build
 cmake ..
 
 #### 编译
-make -j4
+make -j
 ```
 
 

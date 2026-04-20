@@ -6,7 +6,7 @@
 
 ## 整体设计
 
-- 详见`release/docs/Architecture.md`文档
+- 详见`docs/Architecture.md`文档
 
 
 
@@ -47,4 +47,4 @@ make -j
 
 ## 开发指南
 
-- 详见`release/docs/Guide.md`
+- 详见`docs/Guide.md`

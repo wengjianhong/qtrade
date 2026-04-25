@@ -19,10 +19,10 @@ public:
     static EventBus& instance();
     
     // 禁止拷贝和移动
-    EventBus(const EventBus&) = delete;
-    EventBus& operator=(const EventBus&) = delete;
     EventBus(EventBus&&) = delete;
+    EventBus(const EventBus&) = delete;
     EventBus& operator=(EventBus&&) = delete;
+    EventBus& operator=(const EventBus&) = delete;
     
     // 订阅事件
     template <typename EventType>

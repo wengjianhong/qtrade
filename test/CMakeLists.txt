@@ -1,68 +1,33 @@
-# 最低CMake版本要求
-cmake_minimum_required(VERSION 3.10)
+# GTest-based unit tests (aligned with cpp-utils test layout)
+find_package(GTest REQUIRED CONFIG)
 
-# 测试目标名称
-project(qt_gtest)
+file(GLOB_RECURSE ALL_TEST_FILES "*.cpp")
+set(ALL_TEST_FILES 
+    ${ALL_TEST_FILES}
+)
+add_executable(quant_trading_tests ${ALL_TEST_FILES})
 
-# 设置C++标准
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# 编译选项：启用警告、调试信息，优化测试性能
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -g -O2")
-# 多线程支持
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-
-# 查找GTest库
-find_package(GTest REQUIRED)
-if(GTEST_FOUND)
-    include_directories(${GTEST_INCLUDE_DIRS})
-else()
-    message(FATAL_ERROR "GTest library not found!")
-endif()
-
-# 收集测试源文件
-set(TEST_SOURCES
-    base/safe_queue/test_safe_queue.cpp
-    base/thread_pool/test_thread_pool.cpp
+# Project root + parent (for includes like base/common/... when base lives next to this repo)
+target_include_directories(quant_trading_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/..
 )
 
-# 添加测试可执行文件
-add_executable(${PROJECT_NAME} ${TEST_SOURCES})
-
-# 包含项目根目录（确保测试能引用到base/下的头文件）
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/..  # 项目根目录
+target_link_directories(quant_trading_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/release/lib
 )
 
-# 为当前目标（${PROJECT_NAME}）设置库搜索目录
-target_link_directories(${PROJECT_NAME}
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/../release/lib  # qtbase 库所在目录
+target_link_libraries(quant_trading_tests PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+    qtbase
+    atomic
+    Threads::Threads
 )
 
-# 链接依赖库：GTest、无锁队列和线程池的实现库
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        GTest::GTest
-        GTest::Main
-        qtbase  # 依赖前面实现的基础库（无锁队列+线程池）
-        atomic
-)
-
-# 自动发现测试用例并添加到CTest
 include(GoogleTest)
-gtest_discover_tests(${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+gtest_discover_tests(quant_trading_tests
     PROPERTIES
         LABELS "unit"
-        DISCOVERY_TIMEOUT  # 超时时间（秒）
-        60
-)
-
-# 安装测试目标（可选）
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/tests
+        DISCOVERY_TIMEOUT 60
 )

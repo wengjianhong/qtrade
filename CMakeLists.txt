@@ -1,42 +1,44 @@
-cmake_minimum_required(VERSION 3.15)
-project(QuantTrading VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.22)
+project(quant-trading VERSION 1.0.0 LANGUAGES CXX)
 
-# 定义根目录下的release目录路径
-set(RELEASE_DIR ${CMAKE_SOURCE_DIR}/release)
-# 共享库（.so）输出路径
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${RELEASE_DIR}/lib)
-# 可执行文件输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${RELEASE_DIR}/bin)
-
-
-# 设置C++标准
+# C++ Standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 编译选项
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -O0")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -fsanitize=address")
+# Compiler & Linker Options
+add_compile_options(-fPIC -Wall -Wextra -O2)
 
-# 查找依赖
-find_package(Boost 1.70 REQUIRED COMPONENTS system thread filesystem)
-find_package(nlohmann_json REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(GTest REQUIRED)
+# Debug mode flags
+add_compile_options($<$<CONFIG:Debug>:-g>)
+add_link_options($<$<CONFIG:Debug>:-fsanitize=address>)
 
-# 包含目录
-include_directories(
-    ${PROJECT_SOURCE_DIR}/core
-    ${PROJECT_SOURCE_DIR}/plugins
-    ${PROJECT_SOURCE_DIR}/service
-    ${PROJECT_SOURCE_DIR}/shared
-    ${PROJECT_SOURCE_DIR}/api
+# Dependencies
+find_package(Threads REQUIRED)
+# find_package(spdlog REQUIRED)
+# find_package(nlohmann_json REQUIRED)
+
+# Build submodules
+#add_subdirectory(core)
+#add_subdirectory(plugins)
+#add_subdirectory(service)
+file(GLOB_RECURSE ALL_SRC_FILES "*.cpp")
+set(ALL_SRC_FILES 
+    ${ALL_SRC_FILES}
 )
 
-# 子目录
-add_subdirectory(core)
-add_subdirectory(plugins)
-add_subdirectory(service)
-add_subdirectory(api)
+# Install quant-trading executable
+add_executable(quant-trading ${ALL_SRC_FILES})
+target_link_libraries(quant-trading PUBLIC Threads::Threads)
+# target_link_libraries(quant-trading PUBLIC spdlog::spdlog)
+# target_link_libraries(quant-trading PUBLIC nlohmann_json::nlohmann_json)
+
+# Output Directories
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Install
+install(DIRECTORY include/ DESTINATION ${CMAKE_SOURCE_DIR}/release/include)
+
+# Tests
 add_subdirectory(test)
-add_subdirectory(infrastructure)

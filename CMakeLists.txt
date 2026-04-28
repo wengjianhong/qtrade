@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(quant-trading VERSION 1.0.0 LANGUAGES CXX)
+project(quant-trading VERSION 0.1.0 LANGUAGES CXX)
 
 # C++ Standard
 set(CMAKE_CXX_STANDARD 20)
@@ -9,27 +9,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Compiler & Linker Options
 add_compile_options(-fPIC -Wall -Wextra -O2)
 
-# Debug mode flags
-add_compile_options($<$<CONFIG:Debug>:-g>)
-add_link_options($<$<CONFIG:Debug>:-fsanitize=address>)
-
 # Dependencies
-find_package(Threads REQUIRED)
-# find_package(spdlog REQUIRED)
-# find_package(nlohmann_json REQUIRED)
+# find_package(Threads REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 # Build submodules
 #add_subdirectory(core)
 #add_subdirectory(plugins)
 #add_subdirectory(service)
-file(GLOB_RECURSE ALL_SRC_FILES "*.cpp")
+file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 set(ALL_SRC_FILES 
-    ${ALL_SRC_FILES}
+    ${SRC_FILES}
 )
 
 # Install quant-trading executable
 add_executable(quant-trading ${ALL_SRC_FILES})
-target_link_libraries(quant-trading PUBLIC Threads::Threads)
+# target_link_libraries(quant-trading PUBLIC Threads::Threads)
 # target_link_libraries(quant-trading PUBLIC spdlog::spdlog)
 # target_link_libraries(quant-trading PUBLIC nlohmann_json::nlohmann_json)
 

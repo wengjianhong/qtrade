@@ -2,9 +2,7 @@
 
 License: CC BY-NC-SA 4.0 (禁止商用，仅供学习研究) 
 
-
 高性能C++量化交易系统，支持多数据源、多策略和多交易所接入，采用模块化设计与可插拔架构。
-
 
 
 ## 整体设计
@@ -12,14 +10,12 @@ License: CC BY-NC-SA 4.0 (禁止商用，仅供学习研究)
 - 详见`docs/Architecture.md`文档
 
 
-
 ## 快速开始
 
 ### 环境要求
 - C++20及以上
-- CMake 3.15+
-- Boost 1.70+
-- 操作系统：Linux (推荐Ubuntu 22.04+)
+- CMake 3.22+x'sxs
+- 操作系统：Linux (推荐Ubuntu 24.04+)
 
 
 
@@ -27,8 +23,8 @@ License: CC BY-NC-SA 4.0 (禁止商用，仅供学习研究)
 
 ```shell
 #### 克隆仓库
-git clone https://github.com/example/quant-trading-system.git
-cd QuantTrading/
+git clone git@github.com:wengjianhong/quant-trading.git
+cd quant-trading/
 
 #### 创建构建目录
 mkdir build && cd build
@@ -41,11 +37,7 @@ make -j
 ```
 
 
-
 ## 模块说明
-
-
-
 
 
 ## 开发指南

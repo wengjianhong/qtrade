@@ -27,14 +27,14 @@ find_package(nlohmann_json 3.11.3 REQUIRED)
 file(GLOB_RECURSE ADAPTER_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/adapter/*.cpp)
 file(GLOB_RECURSE ENGINE_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/engine/*.cpp)
 file(GLOB_RECURSE CLIENT_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/client/*.cpp)
-list(APPEND ALL_SRC_FILES ${ADAPTER_SRC} ${ENGINE_SRC} ${CLIENT_SRC})
+list(APPEND CORE_SRC_FILES ${ADAPTER_SRC} ${ENGINE_SRC} ${CLIENT_SRC})
 
 # Build Core Library
-add_library(quant_trading_core STATIC ${ALL_SRC_FILES})
+add_library(quant_trading_core STATIC ${CORE_SRC_FILES})
 target_include_directories(quant_trading_core PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(quant_trading_core PUBLIC 
-    Threads::Threads 
-    spdlog::spdlog 
+    Threads::Threads
+    spdlog::spdlog
     nlohmann_json::nlohmann_json
 )
 

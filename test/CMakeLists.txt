@@ -1,28 +1,15 @@
-# GTest-based unit tests (aligned with cpp-utils test layout)
-find_package(GTest REQUIRED CONFIG)
+find_package(GTest 1.14.0 REQUIRED)
 
-file(GLOB_RECURSE ALL_TEST_FILES "*.cpp")
-set(ALL_TEST_FILES 
-    ${ALL_TEST_FILES}
-)
+file(GLOB_RECURSE ALL_TEST_FILES CONFIGURE_DEPENDS "*.cpp")
+
 add_executable(quant_trading_tests ${ALL_TEST_FILES})
 
-# Project root + parent (for includes like base/common/... when base lives next to this repo)
-target_include_directories(quant_trading_tests PRIVATE
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/..
-)
-
-target_link_directories(quant_trading_tests PRIVATE
-    ${CMAKE_SOURCE_DIR}/release/lib
-)
+target_include_directories(quant_trading_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(quant_trading_tests PRIVATE
+    quant_trading_core
     GTest::gtest
     GTest::gtest_main
-    qtbase
-    atomic
-    Threads::Threads
 )
 
 include(GoogleTest)

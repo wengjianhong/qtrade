@@ -43,3 +43,6 @@
 */build/
 release/lib/*
 release/bin/*
+
+.vscode
+build/

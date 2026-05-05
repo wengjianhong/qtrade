@@ -4,12 +4,10 @@
 #include <cstdint>
 #include <chrono>
 
-namespace quant {
-namespace base {
-namespace data_types {
+namespace quant::trading {
 
 // 标准化Tick数据结构
-struct TickData {
+struct MarketTick {
     std::string instrument;          // 合约代码
     std::chrono::system_clock::time_point timestamp;  // 时间戳
     double last_price;               // 最新价
@@ -26,11 +24,9 @@ struct TickData {
 };
 
 // 原始Tick数据（未标准化）
-struct RawTickData {
+struct OriginalMarketTick {
     std::string data_source;         // 数据源名称
     std::string raw_data;            // 原始数据
 };
 
-} // namespace data_types
-} // namespace base
-} // namespace quant
+} // namespace quant::trading

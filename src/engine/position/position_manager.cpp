@@ -1,4 +1,4 @@
-#include "engine/position_manager.h"
+#include <quant-trading/engine/position_manager.hpp>
 
 namespace quant::trading::engine::position {
 

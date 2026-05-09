@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUANT_TRADING_STRUCTS_ORDER_HPP_
+#define QUANT_TRADING_STRUCTS_ORDER_HPP_
 
 #include <cstdint>
 #include <string>
@@ -33,3 +34,5 @@ struct Trade {
 };
 
 }  // namespace quant::trading
+
+#endif  // QUANT_TRADING_STRUCTS_ORDER_HPP_

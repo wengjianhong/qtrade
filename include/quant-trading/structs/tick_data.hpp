@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUANT_TRADING_STRUCTS_TICK_DATA_HPP_
+#define QUANT_TRADING_STRUCTS_TICK_DATA_HPP_
 
 #include <chrono>
 #include <cstdint>
@@ -29,3 +30,5 @@ struct OriginalMarketTick {
 };
 
 }  // namespace quant::trading
+
+#endif  // QUANT_TRADING_STRUCTS_TICK_DATA_HPP_

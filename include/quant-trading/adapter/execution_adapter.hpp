@@ -1,11 +1,12 @@
-#pragma once
+#ifndef QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
+#define QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
 
 #include <functional>
 #include <string>
 #include <vector>
 
-#include "common/error_code.h"
-#include "common/order.h"
+#include <quant-trading/structs/error_code.hpp>
+#include <quant-trading/structs/order.hpp>
 
 namespace quant::trading::adapter {
 
@@ -38,3 +39,5 @@ class IExecutionAdapter {
 };
 
 }  // namespace quant::trading::adapter
+
+#endif  // QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_

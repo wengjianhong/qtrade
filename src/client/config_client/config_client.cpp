@@ -1,4 +1,4 @@
-#include "client/config_client.h"
+#include <quant-trading/client/config_client.hpp>
 
 namespace quant::trading::client {
 

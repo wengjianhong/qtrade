@@ -1,4 +1,4 @@
-#include "engine/risk_manager.h"
+#include <quant-trading/engine/risk_manager.hpp>
 
 namespace quant::trading::engine::risk {
 

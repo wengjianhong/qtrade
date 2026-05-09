@@ -20,7 +20,7 @@ add_compile_options(-fPIC -Wall -Wextra -Wpedantic -O2)
 
 # Dependencies
 find_package(Threads REQUIRED)
-find_package(spdlog 1.12.0 REQUIRED)
+find_package(spdlog 1.17.0 REQUIRED)
 find_package(nlohmann_json 3.11.3 REQUIRED)
 
 # Source Files
@@ -31,7 +31,10 @@ list(APPEND CORE_SRC_FILES ${ADAPTER_SRC} ${ENGINE_SRC} ${CLIENT_SRC})
 
 # Build Core Library
 add_library(quant_trading_core STATIC ${CORE_SRC_FILES})
-target_include_directories(quant_trading_core PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(quant_trading_core PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}
+)
 target_link_libraries(quant_trading_core PUBLIC 
     Threads::Threads
     spdlog::spdlog

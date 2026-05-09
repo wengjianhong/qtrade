@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_
+#define QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_
 
 #include <cstdint>
 
@@ -16,3 +17,5 @@ enum class ErrorCode : std::int32_t {
 };
 
 }  // namespace quant::trading
+
+#endif  // QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_

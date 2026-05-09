@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "strategy/strategy.h"
+#include <quant-trading/strategy/strategy.hpp>
 
 TEST(StrategySmoke, InterfaceVisible) {
   SUCCEED();

@@ -4,8 +4,6 @@ file(GLOB_RECURSE ALL_TEST_FILES CONFIGURE_DEPENDS "*.cpp")
 
 add_executable(quant_trading_tests ${ALL_TEST_FILES})
 
-target_include_directories(quant_trading_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
-
 target_link_libraries(quant_trading_tests PRIVATE
     quant_trading_core
     GTest::gtest

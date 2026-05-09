@@ -1,6 +1,8 @@
-#pragma once
+#ifndef QUANT_TRADING_STRUCTS_BAR_DATA_HPP_
+#define QUANT_TRADING_STRUCTS_BAR_DATA_HPP_
 
 #include <chrono>
+#include <cstdint>
 #include <string>
 
 namespace quant::trading {
@@ -17,3 +19,5 @@ struct Bar {
 };
 
 }  // namespace quant::trading
+
+#endif  // QUANT_TRADING_STRUCTS_BAR_DATA_HPP_

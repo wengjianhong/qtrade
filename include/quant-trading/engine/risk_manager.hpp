@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_
+#define QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_
 
 namespace quant::trading::engine::risk {
 
@@ -9,3 +10,5 @@ class RiskManager {
 };
 
 }  // namespace quant::trading::engine::risk
+
+#endif  // QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_

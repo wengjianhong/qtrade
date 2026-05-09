@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "client/log_client.h"
+#include <quant-trading/client/log_client.hpp>
 
 TEST(ClientSmoke, LogClientInit) {
   quant::trading::client::LogClient client;

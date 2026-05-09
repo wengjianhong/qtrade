@@ -1,16 +1,16 @@
-#pragma once
+#ifndef QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
+#define QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
 
-#include "engine/account_manager.h"
-#include "engine/compliance_manager.h"
-#include "engine/event_bus.h"
-#include "engine/execution_manager.h"
-#include "engine/market_handler.h"
-#include "engine/order_manager.h"
-#include "engine/position_manager.h"
-#include "engine/risk_manager.h"
-#include "engine/strategy_engine.h"
-
-#include "common/error_code.h"
+#include <quant-trading/structs/error_code.hpp>
+#include <quant-trading/engine/account_manager.hpp>
+#include <quant-trading/engine/compliance_manager.hpp>
+#include <quant-trading/engine/event_bus.hpp>
+#include <quant-trading/engine/execution_manager.hpp>
+#include <quant-trading/engine/market_handler.hpp>
+#include <quant-trading/engine/order_manager.hpp>
+#include <quant-trading/engine/position_manager.hpp>
+#include <quant-trading/engine/risk_manager.hpp>
+#include <quant-trading/engine/strategy_engine.hpp>
 
 namespace quant::trading::engine {
 
@@ -46,3 +46,5 @@ class TradingEngine {
 };
 
 }  // namespace quant::trading::engine
+
+#endif  // QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_

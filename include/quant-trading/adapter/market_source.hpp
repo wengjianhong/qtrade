@@ -1,12 +1,13 @@
-#pragma once
+#ifndef QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
+#define QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
 
 #include <functional>
 #include <string>
 #include <vector>
 
-#include "common/bar_data.h"
-#include "common/error_code.h"
-#include "common/tick_data.h"
+#include <quant-trading/structs/bar_data.hpp>
+#include <quant-trading/structs/error_code.hpp>
+#include <quant-trading/structs/tick_data.hpp>
 
 namespace quant::trading::adapter {
 
@@ -40,3 +41,5 @@ class IMarketSource {
 };
 
 }  // namespace quant::trading::adapter
+
+#endif  // QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_

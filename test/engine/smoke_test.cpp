@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "common/tick_data.h"
-#include "engine/trading_engine.h"
+#include <quant-trading/structs/tick_data.hpp>
+#include <quant-trading/engine/trading_engine.hpp>
 
 TEST(EngineSmoke, TradingEngineStartStop) {
   quant::trading::engine::TradingEngineConfig cfg;

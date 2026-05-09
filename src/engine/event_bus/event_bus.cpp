@@ -1,4 +1,4 @@
-#include "engine/event_bus.h"
+#include <quant-trading/engine/event_bus.hpp>
 
 namespace quant::trading::engine::event_bus {
 

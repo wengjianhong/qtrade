@@ -1,4 +1,4 @@
-#include "engine/strategy_engine.h"
+#include <quant-trading/engine/strategy_engine.hpp>
 
 namespace quant::trading::engine::strategy {
 

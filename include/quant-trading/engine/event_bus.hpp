@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUANT_TRADING_ENGINE_EVENT_BUS_HPP_
+#define QUANT_TRADING_ENGINE_EVENT_BUS_HPP_
 
 namespace quant::trading::engine::event_bus {
 
@@ -9,3 +10,5 @@ class EventBus {
 };
 
 }  // namespace quant::trading::engine::event_bus
+
+#endif  // QUANT_TRADING_ENGINE_EVENT_BUS_HPP_

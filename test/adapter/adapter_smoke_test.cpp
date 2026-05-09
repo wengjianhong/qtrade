@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "adapter/execution_adapter.h"
-#include "adapter/market_source.h"
+#include <quant-trading/adapter/execution_adapter.hpp>
+#include <quant-trading/adapter/market_source.hpp>
 
 TEST(AdapterSmoke, MockTypesCompile) {
   static_assert(true);

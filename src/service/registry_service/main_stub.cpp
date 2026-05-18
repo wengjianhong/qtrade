@@ -1,5 +1,5 @@
-namespace quant::trading::service::registry_service {
+namespace qtrade::trading::service::registry_service {
 
 void BootstrapStub() {}
 
-}  // namespace quant::trading::service::registry_service
+}  // namespace qtrade::trading::service::registry_service

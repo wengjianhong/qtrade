@@ -6,12 +6,12 @@
 
 #include <cstdio>
 
-namespace quant::common {
-bool init_spdlog(const std::string& log_dir = "logs",
-                 const std::string& log_filename = "trading-engine.log",
-                 size_t max_size_mb = 20,
-                 size_t max_files = 10,
-                 spdlog::level::level_enum level = spdlog::level::info) {
+namespace qtrade::common {
+bool init_spdlog_logger(const std::string& log_dir,
+                 const std::string& log_filename,
+                 size_t max_size_mb,
+                 size_t max_files,
+                 spdlog::level::level_enum level) {
   try {
     // 单个文件大小
     size_t rotate_size = max_size_mb * 1024 * 1024;
@@ -49,4 +49,4 @@ bool init_spdlog(const std::string& log_dir = "logs",
 
   return true;
 }
-}  // namespace quant::common
+}  // namespace qtrade::common

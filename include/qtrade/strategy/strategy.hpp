@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_STRATEGY_STRATEGY_HPP_
-#define QUANT_TRADING_STRATEGY_STRATEGY_HPP_
+#ifndef QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
+#define QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
 
 #include <string>
 
@@ -8,7 +8,7 @@
 #include <qtrade/structs/order.hpp>
 #include <qtrade/structs/tick_data.hpp>
 
-namespace quant::trading::strategy {
+namespace qtrade::trading::strategy {
 
 struct StrategyConfig {
   std::string name;
@@ -41,6 +41,6 @@ class IStrategy {
   virtual ErrorCode SetParameter(const std::string& key, const std::string& value) = 0;
 };
 
-}  // namespace quant::trading::strategy
+}  // namespace qtrade::trading::strategy
 
-#endif  // QUANT_TRADING_STRATEGY_STRATEGY_HPP_
+#endif  // QTRADE_TRADING_STRATEGY_STRATEGY_HPP_

@@ -1,5 +1,5 @@
-namespace quant::trading::service::backtest_service {
+namespace qtrade::trading::service::backtest_service {
 
 void BootstrapStub() {}
 
-}  // namespace quant::trading::service::backtest_service
+}  // namespace qtrade::trading::service::backtest_service

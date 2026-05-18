@@ -1,7 +1,7 @@
 #include <qtrade/engine/event_bus.hpp>
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::engine::event_bus {
+namespace qtrade::trading::engine::event_bus {
 
 EventBus::EventBus() : running_(false) {}
 
@@ -117,4 +117,4 @@ void EventBus::PublishTrade(const Trade& trade) {
   }
 }
 
-}  // namespace quant::trading::engine::event_bus
+}  // namespace qtrade::trading::engine::event_bus

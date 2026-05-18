@@ -1,7 +1,7 @@
 #include <qtrade/engine/order_manager.hpp>
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::engine::oms {
+namespace qtrade::trading::engine::oms {
 
 OrderManager::OrderManager() : running_(false), order_id_counter_(0) {}
 
@@ -71,4 +71,4 @@ void OrderManager::UpdateOrderStatus(const std::string& order_id, OrderStatus st
   }
 }
 
-}  // namespace quant::trading::engine::oms
+}  // namespace qtrade::trading::engine::oms

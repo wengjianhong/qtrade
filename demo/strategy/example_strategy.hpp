@@ -1,11 +1,11 @@
-#ifndef QUANT_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
-#define QUANT_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
+#ifndef QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
+#define QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
 
 #include <qtrade/strategy/strategy.hpp>
 #include <memory>
 #include <functional>
 
-namespace quant::trading::demo {
+namespace qtrade::trading::demo {
 
 // 简单的趋势跟踪策略
 class ExampleStrategy final : public strategy::IStrategy {
@@ -43,6 +43,6 @@ class ExampleStrategy final : public strategy::IStrategy {
 // 工厂函数
 std::unique_ptr<strategy::IStrategy> CreateExampleStrategy();
 
-}  // namespace quant::trading::demo
+}  // namespace qtrade::trading::demo
 
-#endif  // QUANT_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
+#endif  // QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP

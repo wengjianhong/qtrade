@@ -1,7 +1,7 @@
 #include <qtrade/engine/trading_engine.hpp>
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::engine {
+namespace qtrade::trading::engine {
 
 TradingEngine::TradingEngine(TradingEngineConfig config) 
     : config_(config)
@@ -56,4 +56,4 @@ void TradingEngine::Stop() {
 
 bool TradingEngine::IsRunning() const { return running_; }
 
-}  // namespace quant::trading::engine
+}  // namespace qtrade::trading::engine

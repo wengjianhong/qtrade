@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ENGINE_MARKET_HANDLER_HPP_
-#define QUANT_TRADING_ENGINE_MARKET_HANDLER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
+#define QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
 
 #include <qtrade/adapter/market_source.hpp>
 #include <qtrade/engine/event_bus.hpp>
@@ -7,7 +7,7 @@
 #include <mutex>
 #include <vector>
 
-namespace quant::trading::engine::market {
+namespace qtrade::trading::engine::market {
 
 class MarketHandler {
  public:
@@ -38,6 +38,6 @@ class MarketHandler {
   void OnBar(const Bar& bar);
 };
 
-}  // namespace quant::trading::engine::market
+}  // namespace qtrade::trading::engine::market
 
-#endif  // QUANT_TRADING_ENGINE_MARKET_HANDLER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_

@@ -1,10 +1,10 @@
-#ifndef QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_
-#define QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_
+#ifndef QTRADE_TRADING_STRUCTS_ERROR_CODE_HPP_
+#define QTRADE_TRADING_STRUCTS_ERROR_CODE_HPP_
 
 #include <cstdint>
 #include <string>
 
-namespace quant::trading {
+namespace qtrade::trading {
 
 enum class ErrorCode : std::int32_t {
   kOk = 0,
@@ -43,6 +43,6 @@ inline std::string ErrorCodeToString(ErrorCode code) {
   }
 }
 
-}  // namespace quant::trading
+}  // namespace qtrade::trading
 
-#endif  // QUANT_TRADING_STRUCTS_ERROR_CODE_HPP_
+#endif  // QTRADE_TRADING_STRUCTS_ERROR_CODE_HPP_

@@ -1,9 +1,9 @@
 #include <qtrade/engine/position_manager.hpp>
 
-namespace quant::trading::engine::position {
+namespace qtrade::trading::engine::position {
 
 void PositionManager::Start() {}
 
 void PositionManager::Stop() {}
 
-}  // namespace quant::trading::engine::position
+}  // namespace qtrade::trading::engine::position

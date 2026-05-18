@@ -1,6 +1,6 @@
 #include <qtrade/adapter/execution_adapter.hpp>
 
-namespace quant::trading::adapter {
+namespace qtrade::trading::adapter {
 
 namespace {
 
@@ -33,4 +33,4 @@ void LinkMockExecutionAdapterForBuild() {
   (void)adapter;
 }
 
-}  // namespace quant::trading::adapter
+}  // namespace qtrade::trading::adapter

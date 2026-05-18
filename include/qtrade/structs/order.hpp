@@ -1,10 +1,10 @@
-#ifndef QUANT_TRADING_STRUCTS_ORDER_HPP_
-#define QUANT_TRADING_STRUCTS_ORDER_HPP_
+#ifndef QTRADE_TRADING_STRUCTS_ORDER_HPP_
+#define QTRADE_TRADING_STRUCTS_ORDER_HPP_
 
 #include <cstdint>
 #include <string>
 
-namespace quant::trading {
+namespace qtrade::trading {
 
 enum class OrderSide : std::uint8_t { kBuy = 0, kSell = 1 };
 
@@ -33,6 +33,6 @@ struct Trade {
   int64_t volume{};
 };
 
-}  // namespace quant::trading
+}  // namespace qtrade::trading
 
-#endif  // QUANT_TRADING_STRUCTS_ORDER_HPP_
+#endif  // QTRADE_TRADING_STRUCTS_ORDER_HPP_

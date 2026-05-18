@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ENGINE_EVENT_BUS_HPP_
-#define QUANT_TRADING_ENGINE_EVENT_BUS_HPP_
+#ifndef QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
+#define QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
 
 #include <qtrade/structs/tick_data.hpp>
 #include <qtrade/structs/bar_data.hpp>
@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace quant::trading::engine::event_bus {
+namespace qtrade::trading::engine::event_bus {
 
 // 事件类型枚举
 enum class EventType {
@@ -98,6 +98,6 @@ class EventBus {
   std::vector<TradeCallback> trade_callbacks_;
 };
 
-}  // namespace quant::trading::engine::event_bus
+}  // namespace qtrade::trading::engine::event_bus
 
-#endif  // QUANT_TRADING_ENGINE_EVENT_BUS_HPP_
+#endif  // QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_

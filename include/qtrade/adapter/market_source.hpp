@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
-#define QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
+#ifndef QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_
+#define QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_
 
 #include <functional>
 #include <memory>
@@ -10,7 +10,7 @@
 #include <qtrade/structs/error_code.hpp>
 #include <qtrade/structs/tick_data.hpp>
 
-namespace quant::trading::adapter {
+namespace qtrade::trading::adapter {
 
 struct MarketSourceConfig {
   std::string name;
@@ -44,6 +44,6 @@ class IMarketSource {
 // 工厂函数：创建模拟行情源
 std::unique_ptr<IMarketSource> CreateMockMarketSource();
 
-}  // namespace quant::trading::adapter
+}  // namespace qtrade::trading::adapter
 
-#endif  // QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
+#endif  // QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_

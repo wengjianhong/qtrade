@@ -1,7 +1,7 @@
-#ifndef QUANT_TRADING_ENGINE_POSITION_MANAGER_HPP_
-#define QUANT_TRADING_ENGINE_POSITION_MANAGER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_POSITION_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_POSITION_MANAGER_HPP_
 
-namespace quant::trading::engine::position {
+namespace qtrade::trading::engine::position {
 
 class PositionManager {
  public:
@@ -9,6 +9,6 @@ class PositionManager {
   void Stop();
 };
 
-}  // namespace quant::trading::engine::position
+}  // namespace qtrade::trading::engine::position
 
-#endif  // QUANT_TRADING_ENGINE_POSITION_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_POSITION_MANAGER_HPP_

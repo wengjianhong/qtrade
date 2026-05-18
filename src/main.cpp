@@ -17,11 +17,7 @@ int main(int argc, char** argv) {
   (void)argv;
 
   // ====================== 初始化纯文件日志 ======================
-  quant::common::InitLogger("logs",
-                            "trading-engine.log",
-                            20,  // 单个文件最大 20MB
-                            10,  // 保留 10 个文件
-                            spdlog::level::info);
+  quant::common::InitLogger("logs", "trading-engine.log");
 
   spdlog::info("==================================================");
   spdlog::info("qtrade engine starting...");

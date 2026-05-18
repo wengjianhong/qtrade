@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
-#define QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
+#ifndef QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
+#define QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
 
 #include <functional>
 #include <string>
@@ -8,7 +8,7 @@
 #include <qtrade/structs/error_code.hpp>
 #include <qtrade/structs/order.hpp>
 
-namespace quant::trading::adapter {
+namespace qtrade::trading::adapter {
 
 struct ExecutionAdapterConfig {
   std::string broker_id;
@@ -38,6 +38,6 @@ class IExecutionAdapter {
   TradeCallback on_trade_;
 };
 
-}  // namespace quant::trading::adapter
+}  // namespace qtrade::trading::adapter
 
-#endif  // QUANT_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
+#endif  // QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_

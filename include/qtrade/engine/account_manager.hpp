@@ -1,7 +1,7 @@
-#ifndef QUANT_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_
-#define QUANT_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_
 
-namespace quant::trading::engine::account {
+namespace qtrade::trading::engine::account {
 
 class AccountManager {
  public:
@@ -9,6 +9,6 @@ class AccountManager {
   void Stop();
 };
 
-}  // namespace quant::trading::engine::account
+}  // namespace qtrade::trading::engine::account
 
-#endif  // QUANT_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_ACCOUNT_MANAGER_HPP_

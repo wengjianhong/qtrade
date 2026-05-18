@@ -1,12 +1,12 @@
-#ifndef QUANT_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
-#define QUANT_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
+#ifndef QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
+#define QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
 
 #include <string>
 #include <string_view>
 
 #include <qtrade/structs/error_code.hpp>
 
-namespace quant::trading::client {
+namespace qtrade::trading::client {
 
 class RegistryClient {
  public:
@@ -20,6 +20,6 @@ class RegistryClient {
   bool initialized_{false};
 };
 
-}  // namespace quant::trading::client
+}  // namespace qtrade::trading::client
 
-#endif  // QUANT_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
+#endif  // QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_

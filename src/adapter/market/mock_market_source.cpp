@@ -5,7 +5,7 @@
 #include <random>
 #include <chrono>
 
-namespace quant::trading::adapter {
+namespace qtrade::trading::adapter {
 
 namespace {
 
@@ -133,4 +133,4 @@ void LinkMockMarketSourceForBuild() {
   (void)src;
 }
 
-}  // namespace quant::trading::adapter
+}  // namespace qtrade::trading::adapter

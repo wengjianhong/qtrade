@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
-#define QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
+#ifndef QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_
+#define QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_
 
 #include <qtrade/structs/error_code.hpp>
 #include <qtrade/engine/account_manager.hpp>
@@ -12,7 +12,7 @@
 #include <qtrade/engine/risk_manager.hpp>
 #include <qtrade/engine/strategy_engine.hpp>
 
-namespace quant::trading::engine {
+namespace qtrade::trading::engine {
 
 struct TradingEngineConfig {
   bool dry_run{true};
@@ -50,6 +50,6 @@ class TradingEngine {
   risk::RiskManager risk_manager_;
 };
 
-}  // namespace quant::trading::engine
+}  // namespace qtrade::trading::engine
 
-#endif  // QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
+#endif  // QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_

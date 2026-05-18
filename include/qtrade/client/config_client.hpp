@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_CLIENT_CONFIG_CLIENT_HPP_
-#define QUANT_TRADING_CLIENT_CONFIG_CLIENT_HPP_
+#ifndef QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
+#define QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
 
 #include <functional>
 #include <string>
@@ -7,7 +7,7 @@
 
 #include <qtrade/structs/error_code.hpp>
 
-namespace quant::trading::client {
+namespace qtrade::trading::client {
 
 class ConfigClient {
  public:
@@ -23,6 +23,6 @@ class ConfigClient {
   bool initialized_{false};
 };
 
-}  // namespace quant::trading::client
+}  // namespace qtrade::trading::client
 
-#endif  // QUANT_TRADING_CLIENT_CONFIG_CLIENT_HPP_
+#endif  // QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_

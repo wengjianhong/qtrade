@@ -1,7 +1,7 @@
-#ifndef QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_
-#define QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_RISK_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_RISK_MANAGER_HPP_
 
-namespace quant::trading::engine::risk {
+namespace qtrade::trading::engine::risk {
 
 class RiskManager {
  public:
@@ -9,6 +9,6 @@ class RiskManager {
   void Stop();
 };
 
-}  // namespace quant::trading::engine::risk
+}  // namespace qtrade::trading::engine::risk
 
-#endif  // QUANT_TRADING_ENGINE_RISK_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_RISK_MANAGER_HPP_

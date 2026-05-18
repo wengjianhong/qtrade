@@ -1,7 +1,7 @@
-#ifndef QUANT_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_
-#define QUANT_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_
 
-namespace quant::trading::engine::cms {
+namespace qtrade::trading::engine::cms {
 
 class ComplianceManager {
  public:
@@ -9,6 +9,6 @@ class ComplianceManager {
   void Stop();
 };
 
-}  // namespace quant::trading::engine::cms
+}  // namespace qtrade::trading::engine::cms
 
-#endif  // QUANT_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_COMPLIANCE_MANAGER_HPP_

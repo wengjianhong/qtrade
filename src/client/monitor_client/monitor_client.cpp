@@ -1,6 +1,6 @@
 #include <qtrade/client/monitor_client.hpp>
 
-namespace quant::trading::client {
+namespace qtrade::trading::client {
 
 ErrorCode MonitorClient::Init(std::string_view endpoint) {
   (void)endpoint;
@@ -20,4 +20,4 @@ void MonitorClient::Gauge(std::string_view name, double value) {
   (void)value;
 }
 
-}  // namespace quant::trading::client
+}  // namespace qtrade::trading::client

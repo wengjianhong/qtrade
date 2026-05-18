@@ -1,5 +1,5 @@
-namespace quant::trading::service::config_service {
+namespace qtrade::trading::service::config_service {
 
 void BootstrapStub() {}
 
-}  // namespace quant::trading::service::config_service
+}  // namespace qtrade::trading::service::config_service

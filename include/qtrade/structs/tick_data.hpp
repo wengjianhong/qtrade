@@ -1,11 +1,11 @@
-#ifndef QUANT_TRADING_STRUCTS_TICK_DATA_HPP_
-#define QUANT_TRADING_STRUCTS_TICK_DATA_HPP_
+#ifndef QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_
+#define QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_
 
 #include <chrono>
 #include <cstdint>
 #include <string>
 
-namespace quant::trading {
+namespace qtrade::trading {
 
 // 标准化 Tick（进程内热路径传递）
 struct MarketTick {
@@ -29,6 +29,6 @@ struct OriginalMarketTick {
   std::string raw_data;
 };
 
-}  // namespace quant::trading
+}  // namespace qtrade::trading
 
-#endif  // QUANT_TRADING_STRUCTS_TICK_DATA_HPP_
+#endif  // QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_

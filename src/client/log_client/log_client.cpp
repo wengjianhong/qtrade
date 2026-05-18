@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::client {
+namespace qtrade::trading::client {
 
 ErrorCode LogClient::Init(std::string_view topic) {
   (void)topic;
@@ -25,4 +25,4 @@ void LogClient::Emit(std::string_view level, std::string_view message) {
   }
 }
 
-}  // namespace quant::trading::client
+}  // namespace qtrade::trading::client

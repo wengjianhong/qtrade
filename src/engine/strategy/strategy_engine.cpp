@@ -1,7 +1,7 @@
 #include <qtrade/engine/strategy_engine.hpp>
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::engine::strategy {
+namespace qtrade::trading::engine::strategy {
 
 StrategyEngine::StrategyEngine(event_bus::EventBus& event_bus)
     : event_bus_(event_bus), running_(false) {}
@@ -44,7 +44,7 @@ void StrategyEngine::Stop() {
   spdlog::info("[StrategyEngine] stopped cleanly");
 }
 
-void StrategyEngine::RegisterStrategy(std::unique_ptr<quant::trading::strategy::IStrategy> strategy) {
+void StrategyEngine::RegisterStrategy(std::unique_ptr<qtrade::trading::strategy::IStrategy> strategy) {
   std::lock_guard<std::mutex> lock(mutex_);
   strategies_.push_back(std::move(strategy));
   spdlog::info("[StrategyEngine] registered new strategy");
@@ -99,4 +99,4 @@ void StrategyEngine::OnTradeEvent(const Trade& trade) {
   }
 }
 
-}  // namespace quant::trading::engine::strategy
+}  // namespace qtrade::trading::engine::strategy

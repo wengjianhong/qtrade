@@ -1,5 +1,5 @@
-#ifndef QUANT_TRADING_ENGINE_ORDER_MANAGER_HPP
-#define QUANT_TRADING_ENGINE_ORDER_MANAGER_HPP
+#ifndef QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP
+#define QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP
 
 #include <qtrade/structs/error_code.hpp>
 #include <qtrade/structs/order.hpp>
@@ -9,7 +9,7 @@
 #include <vector>
 #include <atomic>
 
-namespace quant::trading::engine::oms {
+namespace qtrade::trading::engine::oms {
 
 class OrderManager {
  public:
@@ -38,6 +38,6 @@ class OrderManager {
   std::atomic<uint64_t> order_id_counter_;
 };
 
-}  // namespace quant::trading::engine::oms
+}  // namespace qtrade::trading::engine::oms
 
-#endif  // QUANT_TRADING_ENGINE_ORDER_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_

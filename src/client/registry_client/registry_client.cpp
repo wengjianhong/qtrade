@@ -1,6 +1,6 @@
 #include <qtrade/client/registry_client.hpp>
 
-namespace quant::trading::client {
+namespace qtrade::trading::client {
 
 ErrorCode RegistryClient::Init(std::string_view etcd_endpoints) {
   (void)etcd_endpoints;
@@ -21,4 +21,4 @@ ErrorCode RegistryClient::Register(std::string_view service_name, std::string_vi
   return ErrorCode::kOk;
 }
 
-}  // namespace quant::trading::client
+}  // namespace qtrade::trading::client

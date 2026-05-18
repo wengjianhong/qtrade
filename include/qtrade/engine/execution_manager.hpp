@@ -1,7 +1,7 @@
-#ifndef QUANT_TRADING_ENGINE_EXECUTION_MANAGER_HPP_
-#define QUANT_TRADING_ENGINE_EXECUTION_MANAGER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_EXECUTION_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_EXECUTION_MANAGER_HPP_
 
-namespace quant::trading::engine::ems {
+namespace qtrade::trading::engine::ems {
 
 class ExecutionManager {
  public:
@@ -9,6 +9,6 @@ class ExecutionManager {
   void Stop();
 };
 
-}  // namespace quant::trading::engine::ems
+}  // namespace qtrade::trading::engine::ems
 
-#endif  // QUANT_TRADING_ENGINE_EXECUTION_MANAGER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_EXECUTION_MANAGER_HPP_

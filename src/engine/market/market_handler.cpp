@@ -1,7 +1,7 @@
 #include <qtrade/engine/market_handler.hpp>
 #include <spdlog/spdlog.h>
 
-namespace quant::trading::engine::market {
+namespace qtrade::trading::engine::market {
 
 MarketHandler::MarketHandler(event_bus::EventBus& event_bus)
     : event_bus_(event_bus), running_(false) {}
@@ -80,4 +80,4 @@ void MarketHandler::OnBar(const Bar& bar) {
   event_bus_.PublishBar(bar);
 }
 
-}  // namespace quant::trading::engine::market
+}  // namespace qtrade::trading::engine::market

@@ -3,7 +3,7 @@ project(qtrade VERSION 0.1.0 LANGUAGES CXX)
 
 # Default Build Type
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
 endif()
 
 # C++ Standard Settings
@@ -18,42 +18,32 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Compiler & Linker Options for Release Build
 add_compile_options(-fPIC -Wall -Wextra -Wpedantic -O2)
 
-# Dependencies - FetchContent to automatically get them
-include(FetchContent)
-
-# Threads
+# Dependencies
 find_package(Threads REQUIRED)
-
-# spdlog
-FetchContent_Declare(
-  spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG v1.14.1
-)
-FetchContent_MakeAvailable(spdlog)
-
-# nlohmann/json
-FetchContent_Declare(
-  nlohmann_json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.11.3
-)
-FetchContent_MakeAvailable(nlohmann_json)
+find_package(spdlog 1.17.0 REQUIRED)
+find_package(nlohmann_json 3.11.3 REQUIRED)
 
 # Source Files
 file(GLOB_RECURSE ADAPTER_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/adapter/*.cpp)
 file(GLOB_RECURSE ENGINE_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/engine/*.cpp)
 file(GLOB_RECURSE CLIENT_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/client/*.cpp)
+file(GLOB_RECURSE COMMON_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB_RECURSE DEMO_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/demo/strategy/*.cpp)
-list(APPEND CORE_SRC_FILES ${ADAPTER_SRC} ${ENGINE_SRC} ${CLIENT_SRC} ${DEMO_SRC})
+list(APPEND CORE_SRC_FILES 
+    ${ADAPTER_SRC} 
+    ${ENGINE_SRC} 
+    ${CLIENT_SRC} 
+    ${COMMON_SRC} 
+    ${DEMO_SRC}
+)
 
 # Build Core Library
-add_library(quant_trading_core STATIC ${CORE_SRC_FILES})
-target_include_directories(quant_trading_core PUBLIC
+add_library(qtrade_core STATIC ${CORE_SRC_FILES})
+target_include_directories(qtrade_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}
 )
-target_link_libraries(quant_trading_core PUBLIC 
+target_link_libraries(qtrade_core PUBLIC 
     Threads::Threads
     spdlog::spdlog
     nlohmann_json::nlohmann_json
@@ -61,12 +51,12 @@ target_link_libraries(quant_trading_core PUBLIC
 
 # Build Main Executable
 add_executable(qtrade ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(qtrade PRIVATE quant_trading_core)
+target_link_libraries(qtrade PRIVATE qtrade_core)
 
 # Install
 install(TARGETS qtrade RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/release/bin)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION ${CMAKE_SOURCE_DIR}/release/include)
 
-# Build Tests - temporarily disabled
-# enable_testing()
-# add_subdirectory(test)
+# Build Tests
+enable_testing()
+add_subdirectory(test)

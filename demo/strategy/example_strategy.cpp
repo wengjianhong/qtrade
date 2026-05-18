@@ -2,7 +2,7 @@
 #include <spdlog/spdlog.h>
 #include <cmath>
 
-namespace quant::trading::demo {
+namespace qtrade::trading::demo {
 
 ExampleStrategy::ExampleStrategy() 
     : running_(false), last_price_(0.0), position_(0) {}
@@ -116,5 +116,5 @@ std::unique_ptr<strategy::IStrategy> CreateExampleStrategy() {
   return std::make_unique<ExampleStrategy>();
 }
 
-}  // namespace quant::trading::demo
+}  // namespace qtrade::trading::demo
 

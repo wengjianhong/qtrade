@@ -2,49 +2,49 @@
 # C++: 基于 Google Style + 你的个性化配置
 # ----------------------------------------------
 ---
-Language:        Cpp
-BasedOnStyle:    Google
+Language:       Cpp
+BasedOnStyle:   Google
 
 # 自定义配置
-ColumnLimit:                     120
-IndentWidth:                     2
-ConstructorInitializerIndentWidth: 2
-ContinuationIndentWidth:         2
-PointerAlignment:                Left
-IndentCaseLabels:                true
-AlignTrailingComments:           true
-BinPackParameters:               false
-BinPackArguments:                false
-Cpp11BracedListStyle:            true
-SpacesBeforeTrailingComments:    2
-SortIncludes:                    false
+ColumnLimit:                        120
+IndentWidth:                        2
+ConstructorInitializerIndentWidth:  2
+ContinuationIndentWidth:            2
+PointerAlignment:                   Left
+IndentCaseLabels:                   true
+AlignTrailingComments:              true
+BinPackParameters:                  false
+BinPackArguments:                   false
+Cpp11BracedListStyle:               true
+SpacesBeforeTrailingComments:       2
+SortIncludes:                       false
 
 
 # ----------------------------------------------
 # Protobuf (proto): 直接复用 Google，仅改语言
 # ----------------------------------------------
 ---
-Language:        Proto
-BasedOnStyle:    Google
-ColumnLimit:     120
-IndentWidth:     4
-SortIncludes:     true
+Language:       Proto
+BasedOnStyle:   Google
+ColumnLimit:    120
+IndentWidth:    4
+SortIncludes:   true
 
 # ----------------------------------------------
 # Java: 复用 Google
 # ----------------------------------------------
 ---
-Language:        Java
-BasedOnStyle:    Google
-ColumnLimit:     120
-IndentWidth:     4
-SortIncludes:     true
+Language:       Java
+BasedOnStyle:   Google
+ColumnLimit:    120
+IndentWidth:    4
+SortIncludes:   true
 
 # ----------------------------------------------
 # Objective-C
 # ----------------------------------------------
 ---
-Language:        ObjC
-BasedOnStyle:    Google
-ColumnLimit:     120
-IndentWidth:     2
+Language:       ObjC
+BasedOnStyle:   Google
+ColumnLimit:    120
+IndentWidth:    2

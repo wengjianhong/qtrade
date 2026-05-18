@@ -2,12 +2,13 @@
 #define QUANT_TRADING_ADAPTER_MARKET_SOURCE_HPP_
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include <quant-trading/structs/bar_data.hpp>
-#include <quant-trading/structs/error_code.hpp>
-#include <quant-trading/structs/tick_data.hpp>
+#include <qtrade/structs/bar_data.hpp>
+#include <qtrade/structs/error_code.hpp>
+#include <qtrade/structs/tick_data.hpp>
 
 namespace quant::trading::adapter {
 
@@ -39,6 +40,9 @@ class IMarketSource {
   TickCallback on_tick_;
   BarCallback on_bar_;
 };
+
+// 工厂函数：创建模拟行情源
+std::unique_ptr<IMarketSource> CreateMockMarketSource();
 
 }  // namespace quant::trading::adapter
 

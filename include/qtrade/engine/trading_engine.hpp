@@ -1,16 +1,16 @@
 #ifndef QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
 #define QUANT_TRADING_ENGINE_TRADING_ENGINE_HPP_
 
-#include <quant-trading/structs/error_code.hpp>
-#include <quant-trading/engine/account_manager.hpp>
-#include <quant-trading/engine/compliance_manager.hpp>
-#include <quant-trading/engine/event_bus.hpp>
-#include <quant-trading/engine/execution_manager.hpp>
-#include <quant-trading/engine/market_handler.hpp>
-#include <quant-trading/engine/order_manager.hpp>
-#include <quant-trading/engine/position_manager.hpp>
-#include <quant-trading/engine/risk_manager.hpp>
-#include <quant-trading/engine/strategy_engine.hpp>
+#include <qtrade/structs/error_code.hpp>
+#include <qtrade/engine/account_manager.hpp>
+#include <qtrade/engine/compliance_manager.hpp>
+#include <qtrade/engine/event_bus.hpp>
+#include <qtrade/engine/execution_manager.hpp>
+#include <qtrade/engine/market_handler.hpp>
+#include <qtrade/engine/order_manager.hpp>
+#include <qtrade/engine/position_manager.hpp>
+#include <qtrade/engine/risk_manager.hpp>
+#include <qtrade/engine/strategy_engine.hpp>
 
 namespace quant::trading::engine {
 
@@ -29,10 +29,15 @@ class TradingEngine {
   ErrorCode Start();
   void Stop();
   bool IsRunning() const;
+  
+  // 获取组件引用（用于初始化）
+  event_bus::EventBus& GetEventBus() { return event_bus_; }
+  market::MarketHandler& GetMarketHandler() { return market_handler_; }
+  strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
 
  private:
   TradingEngineConfig config_;
-  bool running_{false};
+  bool running_;
 
   event_bus::EventBus event_bus_;
   market::MarketHandler market_handler_;

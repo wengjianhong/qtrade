@@ -3,10 +3,10 @@
 
 #include <string>
 
-#include <quant-trading/structs/bar_data.hpp>
-#include <quant-trading/structs/error_code.hpp>
-#include <quant-trading/structs/order.hpp>
-#include <quant-trading/structs/tick_data.hpp>
+#include <qtrade/structs/bar_data.hpp>
+#include <qtrade/structs/error_code.hpp>
+#include <qtrade/structs/order.hpp>
+#include <qtrade/structs/tick_data.hpp>
 
 namespace quant::trading::strategy {
 

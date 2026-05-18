@@ -1,4 +1,4 @@
-# 量化交易系统(QuantTrading)
+# 量化交易系统(QTrade)
 
 License: CC BY-NC-SA 4.0 (禁止商用，仅供学习研究) 
 
@@ -23,8 +23,8 @@ License: CC BY-NC-SA 4.0 (禁止商用，仅供学习研究)
 
 ```shell
 #### 克隆仓库
-git clone git@github.com:wengjianhong/quant-trading.git
-cd quant-trading/
+git clone git@github.com:wengjianhong/qtrade.git
+cd qtrade/
 
 #### 创建构建目录
 mkdir build && cd build

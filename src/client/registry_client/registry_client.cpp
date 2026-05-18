@@ -1,4 +1,4 @@
-#include <quant-trading/client/registry_client.hpp>
+#include <qtrade/client/registry_client.hpp>
 
 namespace quant::trading::client {
 

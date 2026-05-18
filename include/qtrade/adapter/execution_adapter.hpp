@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <quant-trading/structs/error_code.hpp>
-#include <quant-trading/structs/order.hpp>
+#include <qtrade/structs/error_code.hpp>
+#include <qtrade/structs/order.hpp>
 
 namespace quant::trading::adapter {
 

@@ -1,8 +1,13 @@
-#include <quant-trading/engine/trading_engine.hpp>
+#include <qtrade/engine/trading_engine.hpp>
+#include <spdlog/spdlog.h>
 
 namespace quant::trading::engine {
 
-TradingEngine::TradingEngine(TradingEngineConfig config) : config_(config) {}
+TradingEngine::TradingEngine(TradingEngineConfig config) 
+    : config_(config)
+    , running_(false)
+    , market_handler_(event_bus_)
+    , strategy_engine_(event_bus_) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 
@@ -11,6 +16,8 @@ ErrorCode TradingEngine::Start() {
     return ErrorCode::kInvalidArgument;
   }
 
+  spdlog::info("[TradingEngine] starting components...");
+  
   event_bus_.Start();
   market_handler_.Start();
   strategy_engine_.Start();
@@ -22,6 +29,7 @@ ErrorCode TradingEngine::Start() {
   execution_manager_.Start();
 
   running_ = true;
+  spdlog::info("[TradingEngine] started successfully");
   return ErrorCode::kOk;
 }
 
@@ -29,6 +37,8 @@ void TradingEngine::Stop() {
   if (!running_) {
     return;
   }
+
+  spdlog::info("[TradingEngine] stopping components...");
 
   execution_manager_.Stop();
   risk_manager_.Stop();
@@ -41,6 +51,7 @@ void TradingEngine::Stop() {
   event_bus_.Stop();
 
   running_ = false;
+  spdlog::info("[TradingEngine] stopped cleanly");
 }
 
 bool TradingEngine::IsRunning() const { return running_; }

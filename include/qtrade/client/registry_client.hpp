@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-#include <quant-trading/structs/error_code.hpp>
+#include <qtrade/structs/error_code.hpp>
 
 namespace quant::trading::client {
 

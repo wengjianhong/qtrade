@@ -29,10 +29,15 @@ class TradingEngine {
   ErrorCode Start();
   void Stop();
   bool IsRunning() const;
+  
+  // 获取组件引用（用于初始化）
+  event_bus::EventBus& GetEventBus() { return event_bus_; }
+  market::MarketHandler& GetMarketHandler() { return market_handler_; }
+  strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
 
  private:
   TradingEngineConfig config_;
-  bool running_{false};
+  bool running_;
 
   event_bus::EventBus event_bus_;
   market::MarketHandler market_handler_;

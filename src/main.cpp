@@ -6,11 +6,15 @@
 /// @copyright Copyright (c) 2026 qtrade
 /// @note This file is part of the qtrade engine
 #include <qtrade/engine/trading_engine.hpp>
+#include <qtrade/adapter/market_source.hpp>
+#include <demo/strategy/example_strategy.hpp>
 #include <src/common/logger.hpp>
 
 #include <spdlog/spdlog.h>
 
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 
 int main(int argc, char** argv) {
   (void)argc;
@@ -34,6 +38,42 @@ int main(int argc, char** argv) {
   quant::trading::engine::TradingEngine engine(cfg);
   spdlog::info("[main] trading engine instance created successfully");
 
+  // ====================== 设置组件 ======================
+  auto& market_handler = engine.GetMarketHandler();
+  auto& strategy_engine = engine.GetStrategyEngine();
+
+  // 设置模拟行情源
+  auto market_source = quant::trading::adapter::CreateMockMarketSource();
+  market_handler.SetMarketSource(std::move(market_source));
+  
+  // 创建并设置示例策略
+  auto strategy = quant::trading::demo::CreateExampleStrategy();
+  
+  // 初始化策略
+  quant::trading::strategy::StrategyConfig strategy_cfg;
+  strategy_cfg.name = "ExampleStrategy";
+  strategy->Init(strategy_cfg);
+  
+  // 设置策略的订单发送器
+  auto* example_strategy = static_cast<quant::trading::demo::ExampleStrategy*>(strategy.get());
+  
+  // 简单的订单发送器（直接打印日志）
+  auto order_sender = [](const quant::trading::Order& order) {
+    spdlog::info("[OrderSender] sending order: {} {} {} @ {}", 
+                 order.instrument,
+                 order.side == quant::trading::OrderSide::kBuy ? "BUY" : "SELL",
+                 order.volume,
+                 order.price);
+    return quant::trading::ErrorCode::kOk;
+  };
+  example_strategy->SetOrderSender(order_sender);
+  
+  // 注册策略
+  strategy_engine.RegisterStrategy(std::move(strategy));
+  
+  // 设置策略引擎的订单发送器
+  strategy_engine.SetOrderSender(order_sender);
+
   // 启动引擎
   spdlog::info("[main] starting trading engine main loop...");
   const auto rc = engine.Start();
@@ -47,6 +87,31 @@ int main(int argc, char** argv) {
 
   spdlog::info("[main] trading engine started successfully");
   spdlog::info("[main] engine is running...");
+
+  // 创建并设置模拟行情源
+  {
+    // 先创建行情源
+    auto market_source = quant::trading::adapter::CreateMockMarketSource();
+    
+    // 设置到市场处理器（这样会自动设置回调函数）
+    market_handler.SetMarketSource(std::move(market_source));
+    
+    // 获取设置后的行情源并连接
+    auto* source_ptr = market_handler.GetMarketSource();
+    if (source_ptr) {
+      quant::trading::adapter::MarketSourceConfig source_cfg;
+      source_cfg.name = "MockDataSource";
+      source_cfg.connection_string = "mock://localhost";
+      source_ptr->Connect(source_cfg);
+    }
+    
+    // 订阅一些合约
+    market_handler.Subscribe({"IF2401", "IC2401"});
+  }
+
+  // 让引擎运行一段时间
+  spdlog::info("[main] engine running for 5 seconds...");
+  std::this_thread::sleep_for(std::chrono::seconds(5));
 
   // 停止引擎
   spdlog::warn("[main] preparing to stop trading engine...");

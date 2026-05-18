@@ -3,7 +3,7 @@
 /// @author wengjianhong
 /// @date 2026-05-05
 /// @version 0.1.0
-/// @copyright Copyright (c) 2026 quant-trading
+/// @copyright Copyright (c) 2026 qtrade
 #ifndef QUANT_TRADING_COMMON_LOGGER_H_
 #define QUANT_TRADING_COMMON_LOGGER_H_
 

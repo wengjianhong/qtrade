@@ -1,11 +1,11 @@
 /// @file main.cpp
-/// @brief Main entry point for the quant-trading engine
+/// @brief Main entry point for the qtrade engine
 /// @author wengjianhong
 /// @date 2026-05-05
 /// @version 0.1.0
-/// @copyright Copyright (c) 2026 quant-trading
-/// @note This file is part of the quant-trading engine
-#include <quant-trading/engine/trading_engine.hpp>
+/// @copyright Copyright (c) 2026 qtrade
+/// @note This file is part of the qtrade engine
+#include <qtrade/engine/trading_engine.hpp>
 #include <src/common/logger.hpp>
 
 #include <spdlog/spdlog.h>
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
                             spdlog::level::info);
 
   spdlog::info("==================================================");
-  spdlog::info("quant-trading engine starting...");
+  spdlog::info("qtrade engine starting...");
   spdlog::info("==================================================");
   spdlog::info("[main] system bootstrap start");
   spdlog::info("[main] running in dry-run mode");

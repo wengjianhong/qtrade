@@ -1,4 +1,4 @@
-#include <quant-trading/client/log_client.hpp>
+#include <qtrade/client/log_client.hpp>
 
 #include <spdlog/spdlog.h>
 

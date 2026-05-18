@@ -1,4 +1,4 @@
-#include <quant-trading/engine/strategy_engine.hpp>
+#include <qtrade/engine/strategy_engine.hpp>
 
 namespace quant::trading::engine::strategy {
 

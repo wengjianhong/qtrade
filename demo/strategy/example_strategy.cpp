@@ -1,4 +1,4 @@
-#include <quant-trading/strategy/strategy.hpp>
+#include <qtrade/strategy/strategy.hpp>
 
 namespace quant::trading::demo {
 

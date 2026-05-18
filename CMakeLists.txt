@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(quant-trading VERSION 0.1.0 LANGUAGES CXX)
+project(qtrade VERSION 0.1.0 LANGUAGES CXX)
 
 # Default Build Type
 if(NOT CMAKE_BUILD_TYPE)
@@ -42,11 +42,11 @@ target_link_libraries(quant_trading_core PUBLIC
 )
 
 # Build Main Executable
-add_executable(quant-trading ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(quant-trading PRIVATE quant_trading_core)
+add_executable(qtrade ${CMAKE_SOURCE_DIR}/src/main.cpp)
+target_link_libraries(qtrade PRIVATE quant_trading_core)
 
 # Install
-install(TARGETS quant-trading RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/release/bin)
+install(TARGETS qtrade RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/release/bin)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION ${CMAKE_SOURCE_DIR}/release/include)
 
 # Build Tests

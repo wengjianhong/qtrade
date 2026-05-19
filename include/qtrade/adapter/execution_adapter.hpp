@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <string>
-#include <vector>
 
 #include <qtrade/error_code/error_code.hpp>
 #include <qtrade/structs/order.hpp>

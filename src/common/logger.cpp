@@ -1,5 +1,3 @@
-
-
 #include "logger.hpp"
 
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -8,10 +6,10 @@
 
 namespace qtrade::common {
 bool init_spdlog_logger(const std::string& log_dir,
-                 const std::string& log_filename,
-                 size_t max_size_mb,
-                 size_t max_files,
-                 spdlog::level::level_enum level) {
+                        const std::string& log_filename,
+                        size_t max_size_mb,
+                        size_t max_files,
+                        spdlog::level::level_enum level) {
   try {
     // 单个文件大小
     size_t rotate_size = max_size_mb * 1024 * 1024;

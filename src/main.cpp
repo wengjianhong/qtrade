@@ -13,8 +13,6 @@
 #include <spdlog/spdlog.h>
 
 #include <cstdlib>
-#include <chrono>
-#include <thread>
 
 int main(int argc, char** argv) {
   (void)argc;
@@ -45,21 +43,21 @@ int main(int argc, char** argv) {
   // 设置模拟行情源
   auto market_source = qtrade::trading::adapter::CreateMockMarketSource();
   market_handler.SetMarketSource(std::move(market_source));
-  
+
   // 创建并设置示例策略
   auto strategy = qtrade::trading::demo::CreateExampleStrategy();
-  
+
   // 初始化策略
   qtrade::trading::strategy::StrategyConfig strategy_cfg;
   strategy_cfg.name = "ExampleStrategy";
   strategy->Init(strategy_cfg);
-  
+
   // 设置策略的订单发送器
   auto* example_strategy = static_cast<qtrade::trading::demo::ExampleStrategy*>(strategy.get());
-  
+
   // 简单的订单发送器（直接打印日志）
   auto order_sender = [](const qtrade::trading::Order& order) {
-    spdlog::info("[OrderSender] sending order: {} {} {} @ {}", 
+    spdlog::info("[OrderSender] sending order: {} {} {} @ {}",
                  order.instrument,
                  order.side == qtrade::trading::OrderSide::kBuy ? "BUY" : "SELL",
                  order.volume,
@@ -67,10 +65,10 @@ int main(int argc, char** argv) {
     return qtrade::trading::ErrorCode::kOk;
   };
   example_strategy->SetOrderSender(order_sender);
-  
+
   // 注册策略
   strategy_engine.RegisterStrategy(std::move(strategy));
-  
+
   // 设置策略引擎的订单发送器
   strategy_engine.SetOrderSender(order_sender);
 
@@ -92,10 +90,10 @@ int main(int argc, char** argv) {
   {
     // 先创建行情源
     auto market_source = qtrade::trading::adapter::CreateMockMarketSource();
-    
+
     // 设置到市场处理器（这样会自动设置回调函数）
     market_handler.SetMarketSource(std::move(market_source));
-    
+
     // 获取设置后的行情源并连接
     auto* source_ptr = market_handler.GetMarketSource();
     if (source_ptr) {
@@ -104,7 +102,7 @@ int main(int argc, char** argv) {
       source_cfg.connection_string = "mock://localhost";
       source_ptr->Connect(source_cfg);
     }
-    
+
     // 订阅一些合约
     market_handler.Subscribe({"IF2401", "IC2401"});
   }

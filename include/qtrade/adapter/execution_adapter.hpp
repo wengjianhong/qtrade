@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 #include <qtrade/structs/order.hpp>
 
-namespace qtrade::trading::adapter {
+namespace qtrade::adapter {
 
 struct ExecutionAdapterConfig {
   std::string broker_id;
@@ -19,8 +19,8 @@ class IExecutionAdapter {
  public:
   virtual ~IExecutionAdapter() = default;
 
-  using OrderCallback = std::function<void(const Order&)>;
-  using TradeCallback = std::function<void(const Trade&)>;
+  using OrderCallback = std::function<void(const qtrade::Order&)>;
+  using TradeCallback = std::function<void(const qtrade::Trade&)>;
 
   virtual ErrorCode Connect(const ExecutionAdapterConfig& config) = 0;
   virtual void Disconnect() = 0;
@@ -38,6 +38,6 @@ class IExecutionAdapter {
   TradeCallback on_trade_;
 };
 
-}  // namespace qtrade::trading::adapter
+}  // namespace qtrade::adapter
 
 #endif  // QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_

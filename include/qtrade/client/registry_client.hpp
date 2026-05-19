@@ -4,22 +4,21 @@
 #include <string>
 #include <string_view>
 
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 
-namespace qtrade::trading::client {
+namespace qtrade::client {
 
 class RegistryClient {
  public:
   ErrorCode Init(std::string_view etcd_endpoints);
   void Shutdown();
 
-  ErrorCode Register(std::string_view service_name, std::string_view instance_id,
-                     std::string_view address);
+  ErrorCode Register(std::string_view service_name, std::string_view instance_id, std::string_view address);
 
  private:
   bool initialized_{false};
 };
 
-}  // namespace qtrade::trading::client
+}  // namespace qtrade::client
 
 #endif  // QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_

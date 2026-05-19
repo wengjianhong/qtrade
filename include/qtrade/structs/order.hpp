@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-namespace qtrade::trading {
+namespace qtrade {
 
 enum class OrderSide : std::uint8_t { kBuy = 0, kSell = 1 };
 
@@ -33,6 +33,6 @@ struct Trade {
   int64_t volume{};
 };
 
-}  // namespace qtrade::trading
+}  // namespace qtrade
 
 #endif  // QTRADE_TRADING_STRUCTS_ORDER_HPP_

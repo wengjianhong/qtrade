@@ -1,10 +1,9 @@
-#include <qtrade/engine/market_handler.hpp>
+#include "engine/market/market_handler.hpp"
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::engine::market {
+namespace qtrade::engine::market {
 
-MarketHandler::MarketHandler(event_bus::EventBus& event_bus)
-    : event_bus_(event_bus), running_(false) {}
+MarketHandler::MarketHandler(event_bus::EventBus& event_bus) : event_bus_(event_bus), running_(false) {}
 
 MarketHandler::~MarketHandler() { Stop(); }
 
@@ -32,13 +31,11 @@ void MarketHandler::Stop() {
 void MarketHandler::SetMarketSource(std::unique_ptr<adapter::IMarketSource> source) {
   std::lock_guard<std::mutex> lock(mutex_);
   market_source_ = std::move(source);
-  
+
   if (market_source_) {
     // 设置回调
-    market_source_->SetTickCallback(
-        [this](const MarketTick& tick) { OnTick(tick); });
-    market_source_->SetBarCallback(
-        [this](const Bar& bar) { OnBar(bar); });
+    market_source_->SetTickCallback([this](const MarketTick& tick) { OnTick(tick); });
+    market_source_->SetBarCallback([this](const Bar& bar) { OnBar(bar); });
     spdlog::info("[MarketHandler] market source set successfully");
   }
 }
@@ -56,7 +53,7 @@ void MarketHandler::Subscribe(const std::vector<std::string>& instruments) {
     return;
   }
   auto rc = market_source_->Subscribe(instruments);
-  if (rc == ErrorCode::kOk) {
+  if (rc == ErrorCode::kSuccess) {
     spdlog::info("[MarketHandler] subscribed to {} instruments", instruments.size());
   } else {
     spdlog::error("[MarketHandler] subscription failed: {}", ErrorCodeToString(rc));
@@ -72,12 +69,8 @@ void MarketHandler::Unsubscribe(const std::vector<std::string>& instruments) {
   spdlog::info("[MarketHandler] unsubscribed from {} instruments", instruments.size());
 }
 
-void MarketHandler::OnTick(const MarketTick& tick) {
-  event_bus_.PublishTick(tick);
-}
+void MarketHandler::OnTick(const MarketTick& tick) { event_bus_.PublishTick(tick); }
 
-void MarketHandler::OnBar(const Bar& bar) {
-  event_bus_.PublishBar(bar);
-}
+void MarketHandler::OnBar(const Bar& bar) { event_bus_.PublishBar(bar); }
 
-}  // namespace qtrade::trading::engine::market
+}  // namespace qtrade::engine::market

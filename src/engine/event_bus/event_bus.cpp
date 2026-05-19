@@ -1,7 +1,7 @@
-#include <qtrade/engine/event_bus.hpp>
+#include "engine/event_bus/event_bus.hpp"
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::engine::event_bus {
+namespace qtrade::engine::event_bus {
 
 EventBus::EventBus() : running_(false) {}
 
@@ -56,7 +56,7 @@ void EventBus::PublishTick(const MarketTick& tick) {
     if (!running_) return;
     callbacks = tick_callbacks_;
   }
-  
+
   for (const auto& callback : callbacks) {
     try {
       callback(tick);
@@ -73,7 +73,7 @@ void EventBus::PublishBar(const Bar& bar) {
     if (!running_) return;
     callbacks = bar_callbacks_;
   }
-  
+
   for (const auto& callback : callbacks) {
     try {
       callback(bar);
@@ -90,7 +90,7 @@ void EventBus::PublishOrder(const Order& order) {
     if (!running_) return;
     callbacks = order_callbacks_;
   }
-  
+
   for (const auto& callback : callbacks) {
     try {
       callback(order);
@@ -107,7 +107,7 @@ void EventBus::PublishTrade(const Trade& trade) {
     if (!running_) return;
     callbacks = trade_callbacks_;
   }
-  
+
   for (const auto& callback : callbacks) {
     try {
       callback(trade);
@@ -117,4 +117,4 @@ void EventBus::PublishTrade(const Trade& trade) {
   }
 }
 
-}  // namespace qtrade::trading::engine::event_bus
+}  // namespace qtrade::engine::event_bus

@@ -1,13 +1,10 @@
-#include <qtrade/engine/trading_engine.hpp>
+#include "engine/trading_engine.hpp"
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::engine {
+namespace qtrade::engine {
 
-TradingEngine::TradingEngine(TradingEngineConfig config) 
-    : config_(config)
-    , running_(false)
-    , market_handler_(event_bus_)
-    , strategy_engine_(event_bus_) {}
+TradingEngine::TradingEngine(TradingEngineConfig config)
+  : config_(config), running_(false), market_handler_(event_bus_), strategy_engine_(event_bus_) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 
@@ -17,7 +14,7 @@ ErrorCode TradingEngine::Start() {
   }
 
   spdlog::info("[TradingEngine] starting components...");
-  
+
   event_bus_.Start();
   market_handler_.Start();
   strategy_engine_.Start();
@@ -30,7 +27,7 @@ ErrorCode TradingEngine::Start() {
 
   running_ = true;
   spdlog::info("[TradingEngine] started successfully");
-  return ErrorCode::kOk;
+  return ErrorCode::kSuccess;
 }
 
 void TradingEngine::Stop() {
@@ -56,4 +53,4 @@ void TradingEngine::Stop() {
 
 bool TradingEngine::IsRunning() const { return running_; }
 
-}  // namespace qtrade::trading::engine
+}  // namespace qtrade::engine

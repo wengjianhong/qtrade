@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <string>
 
-namespace qtrade::trading {
+namespace qtrade {
 
 // 标准化 Tick（进程内热路径传递）
 struct MarketTick {
@@ -29,6 +29,6 @@ struct OriginalMarketTick {
   std::string raw_data;
 };
 
-}  // namespace qtrade::trading
+}  // namespace qtrade
 
 #endif  // QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_

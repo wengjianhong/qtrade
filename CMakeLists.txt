@@ -41,7 +41,10 @@ list(APPEND CORE_SRC_FILES
 add_library(qtrade_core STATIC ${CORE_SRC_FILES})
 target_include_directories(qtrade_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}
+)
+target_include_directories(qtrade_core PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/demo
 )
 target_link_libraries(qtrade_core PUBLIC 
     Threads::Threads
@@ -51,6 +54,10 @@ target_link_libraries(qtrade_core PUBLIC
 
 # Build Main Executable
 add_executable(qtrade ${CMAKE_SOURCE_DIR}/src/main.cpp)
+target_include_directories(qtrade PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/demo
+)
 target_link_libraries(qtrade PRIVATE qtrade_core)
 
 # Install

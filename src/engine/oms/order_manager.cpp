@@ -1,7 +1,7 @@
-#include <qtrade/engine/order_manager.hpp>
+#include "engine/oms/order_manager.hpp"
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::engine::oms {
+namespace qtrade::engine::oms {
 
 OrderManager::OrderManager() : running_(false), order_id_counter_(0) {}
 
@@ -24,7 +24,7 @@ ErrorCode OrderManager::SendOrder(const Order& order) {
   if (!running_) {
     return ErrorCode::kNotInitialized;
   }
-  
+
   // 简单实现：直接保存订单
   std::string order_id;
   if (order.order_id.empty()) {
@@ -32,14 +32,14 @@ ErrorCode OrderManager::SendOrder(const Order& order) {
   } else {
     order_id = order.order_id;
   }
-  
+
   Order new_order = order;
   new_order.order_id = order_id;
   new_order.status = OrderStatus::kNew;
-  
+
   orders_[order_id] = new_order;
   spdlog::info("[OrderManager] order created: {}", order_id);
-  return ErrorCode::kOk;
+  return ErrorCode::kSuccess;
 }
 
 ErrorCode OrderManager::CancelOrder(const std::string& order_id) {
@@ -50,7 +50,7 @@ ErrorCode OrderManager::CancelOrder(const std::string& order_id) {
   }
   it->second.status = OrderStatus::kCanceled;
   spdlog::info("[OrderManager] order canceled: {}", order_id);
-  return ErrorCode::kOk;
+  return ErrorCode::kSuccess;
 }
 
 Order* OrderManager::GetOrder(const std::string& order_id) {
@@ -71,4 +71,4 @@ void OrderManager::UpdateOrderStatus(const std::string& order_id, OrderStatus st
   }
 }
 
-}  // namespace qtrade::trading::engine::oms
+}  // namespace qtrade::engine::oms

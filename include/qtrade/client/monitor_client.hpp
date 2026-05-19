@@ -3,9 +3,9 @@
 
 #include <string_view>
 
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 
-namespace qtrade::trading::client {
+namespace qtrade::client {
 
 class MonitorClient {
  public:
@@ -19,6 +19,6 @@ class MonitorClient {
   bool initialized_{false};
 };
 
-}  // namespace qtrade::trading::client
+}  // namespace qtrade::client
 
 #endif  // QTRADE_TRADING_CLIENT_MONITOR_CLIENT_HPP_

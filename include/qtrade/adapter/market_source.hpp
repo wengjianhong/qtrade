@@ -7,10 +7,10 @@
 #include <vector>
 
 #include <qtrade/structs/bar_data.hpp>
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 #include <qtrade/structs/tick_data.hpp>
 
-namespace qtrade::trading::adapter {
+namespace qtrade::adapter {
 
 struct MarketSourceConfig {
   std::string name;
@@ -44,6 +44,6 @@ class IMarketSource {
 // 工厂函数：创建模拟行情源
 std::unique_ptr<IMarketSource> CreateMockMarketSource();
 
-}  // namespace qtrade::trading::adapter
+}  // namespace qtrade::adapter
 
 #endif  // QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_

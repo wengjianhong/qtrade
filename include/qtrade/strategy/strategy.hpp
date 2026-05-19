@@ -4,11 +4,11 @@
 #include <string>
 
 #include <qtrade/structs/bar_data.hpp>
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 #include <qtrade/structs/order.hpp>
 #include <qtrade/structs/tick_data.hpp>
 
-namespace qtrade::trading::strategy {
+namespace qtrade::strategy {
 
 struct StrategyConfig {
   std::string name;
@@ -41,6 +41,6 @@ class IStrategy {
   virtual ErrorCode SetParameter(const std::string& key, const std::string& value) = 0;
 };
 
-}  // namespace qtrade::trading::strategy
+}  // namespace qtrade::strategy
 
 #endif  // QTRADE_TRADING_STRATEGY_STRATEGY_HPP_

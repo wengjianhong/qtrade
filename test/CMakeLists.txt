@@ -4,6 +4,11 @@ file(GLOB_RECURSE ALL_TEST_FILES CONFIGURE_DEPENDS "*.cpp")
 
 add_executable(qtrade_tests ${ALL_TEST_FILES})
 
+target_include_directories(qtrade_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/demo
+)
+
 target_link_libraries(qtrade_tests PRIVATE
     qtrade_core
     GTest::gtest

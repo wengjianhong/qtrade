@@ -5,13 +5,13 @@
 #include <memory>
 #include <functional>
 
-namespace qtrade::trading::demo {
+namespace qtrade::demo {
 
 // 简单的趋势跟踪策略
 class ExampleStrategy final : public strategy::IStrategy {
  public:
   using OrderSender = std::function<ErrorCode(const Order&)>;
-  
+
   ExampleStrategy();
   ~ExampleStrategy() override;
 
@@ -29,7 +29,7 @@ class ExampleStrategy final : public strategy::IStrategy {
   ErrorCode SendSignal(const strategy::Signal& signal) override;
   std::string GetParameter(const std::string& key) const override;
   ErrorCode SetParameter(const std::string& key, const std::string& value) override;
-  
+
   // 设置订单发送器
   void SetOrderSender(OrderSender sender);
 
@@ -43,6 +43,6 @@ class ExampleStrategy final : public strategy::IStrategy {
 // 工厂函数
 std::unique_ptr<strategy::IStrategy> CreateExampleStrategy();
 
-}  // namespace qtrade::trading::demo
+}  // namespace qtrade::demo
 
 #endif  // QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP

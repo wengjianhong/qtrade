@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <string>
 
-namespace qtrade::trading {
+namespace qtrade {
 
 struct Bar {
   std::string instrument;
@@ -18,6 +18,6 @@ struct Bar {
   int64_t volume{};
 };
 
-}  // namespace qtrade::trading
+}  // namespace qtrade
 
 #endif  // QTRADE_TRADING_STRUCTS_BAR_DATA_HPP_

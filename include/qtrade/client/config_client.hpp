@@ -5,9 +5,9 @@
 #include <string>
 #include <string_view>
 
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/error_code.hpp>
 
-namespace qtrade::trading::client {
+namespace qtrade::client {
 
 class ConfigClient {
  public:
@@ -23,6 +23,6 @@ class ConfigClient {
   bool initialized_{false};
 };
 
-}  // namespace qtrade::trading::client
+}  // namespace qtrade::client
 
 #endif  // QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_

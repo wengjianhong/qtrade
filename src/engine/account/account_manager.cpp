@@ -1,9 +1,9 @@
-#include <qtrade/engine/account_manager.hpp>
+#include "engine/account/account_manager.hpp"
 
-namespace qtrade::trading::engine::account {
+namespace qtrade::engine::account {
 
 void AccountManager::Start() {}
 
 void AccountManager::Stop() {}
 
-}  // namespace qtrade::trading::engine::account
+}  // namespace qtrade::engine::account

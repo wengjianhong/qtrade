@@ -1,15 +1,17 @@
+/// @file    strategy_engine.hpp
+/// @brief   策略引擎
+/// @details 负责策略的注册、生命周期管理，接收市场数据并分发给策略
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
 #define QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
 
-#include <qtrade/error_code/error_code.hpp>
-#include <qtrade/strategy/strategy.hpp>
-
+#include "qtrade/error_code/code_define.hpp"
+#include "qtrade/strategy/strategy.hpp"
 #include "engine/event_bus/event_bus.hpp"
 
-#include <functional>
-#include <memory>
 #include <mutex>
-#include <vector>
 
 namespace qtrade::engine::strategy {
 

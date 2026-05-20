@@ -1,4 +1,4 @@
-#include "engine/cms/compliance_manager.hpp"
+#include "compliance_manager.hpp"
 
 namespace qtrade::engine::cms {
 

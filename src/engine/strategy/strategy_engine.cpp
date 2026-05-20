@@ -1,4 +1,4 @@
-#include "engine/strategy/strategy_engine.hpp"
+#include "strategy_engine.hpp"
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine::strategy {

@@ -1,3 +1,9 @@
+/// @file    config_client.hpp
+/// @brief   配置管理客户端
+/// @details 提供配置订阅功能，支持配置变更的实时推送
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
 #define QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
 
@@ -5,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-#include <qtrade/error_code/error_code.hpp>
+#include <qtrade/error_code/code_define.hpp>
 
 namespace qtrade::client {
 

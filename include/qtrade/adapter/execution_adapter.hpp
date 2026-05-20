@@ -1,11 +1,16 @@
+/// @file    execution_adapter.hpp
+/// @brief   交易执行适配器接口
+/// @details 定义交易执行适配器的抽象接口，用于对接不同券商的交易通道
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
 #define QTRADE_TRADING_ADAPTER_EXECUTION_ADAPTER_HPP_
+#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/structs/order.hpp>
 
 #include <functional>
 #include <string>
-
-#include <qtrade/error_code/error_code.hpp>
-#include <qtrade/structs/order.hpp>
 
 namespace qtrade::adapter {
 

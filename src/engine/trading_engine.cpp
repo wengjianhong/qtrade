@@ -1,4 +1,4 @@
-#include "engine/trading_engine.hpp"
+#include "trading_engine.hpp"
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine {
@@ -10,7 +10,7 @@ TradingEngine::~TradingEngine() { Stop(); }
 
 ErrorCode TradingEngine::Start() {
   if (running_) {
-    return ErrorCode::kInvalidArgument;
+    return ErrorCode::kSystemError;
   }
 
   spdlog::info("[TradingEngine] starting components...");

@@ -1,8 +1,9 @@
-/// @file logger.h
-/// @brief High-performance global logger for quant trading engine (file only)
-/// @author wengjianhong
-/// @date 2026-05-05
-/// @copyright Copyright (c) 2026 qtrade
+/// @file    logger.hpp
+/// @brief   日志模块
+/// @details 基于 spdlog 的高性能全局日志系统
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_COMMON_LOGGER_H_
 #define QTRADE_TRADING_COMMON_LOGGER_H_
 #include <spdlog/spdlog.h>

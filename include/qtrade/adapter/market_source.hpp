@@ -1,14 +1,19 @@
+/// @file    market_source.hpp
+/// @brief   行情源适配器接口
+/// @details 定义行情源适配器的抽象接口，用于接收市场数据
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_
 #define QTRADE_TRADING_ADAPTER_MARKET_SOURCE_HPP_
+#include <qtrade/structs/bar_data.hpp>
+#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/structs/tick_data.hpp>
 
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <qtrade/structs/bar_data.hpp>
-#include <qtrade/error_code/error_code.hpp>
-#include <qtrade/structs/tick_data.hpp>
 
 namespace qtrade::adapter {
 
@@ -37,8 +42,8 @@ class IMarketSource {
   virtual std::vector<std::string> GetSupportedInstruments() const = 0;
 
  protected:
-  TickCallback on_tick_;
   BarCallback on_bar_;
+  TickCallback on_tick_;
 };
 
 // 工厂函数：创建模拟行情源

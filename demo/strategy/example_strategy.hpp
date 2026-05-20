@@ -1,7 +1,13 @@
+/// @file    example_strategy.hpp
+/// @brief   示例策略
+/// @details 实现一个简单的趋势跟踪策略作为示例
+/// @author  wengjianhong
+/// @date    2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
 #define QTRADE_TRADE_DEMO_EXAMPLE_STRATEGY_HPP
-
 #include <qtrade/strategy/strategy.hpp>
+
 #include <memory>
 #include <functional>
 

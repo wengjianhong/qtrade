@@ -1,16 +1,16 @@
-/// @file    event_bus.hpp
-/// @brief   事件总线
-/// @details 提供事件发布订阅机制，用于模块间解耦通信
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      event_bus.hpp
+/// @brief     事件总线
+/// @details   提供事件发布订阅机制，用于模块间解耦通信
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 
 #ifndef QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
 #define QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
 
-#include "qtrade/structs/bar_data.hpp"
-#include "qtrade/structs/order.hpp"
-#include "qtrade/structs/tick_data.hpp"
+#include <qtrade/structs/bar_data.hpp>
+#include <qtrade/structs/order.hpp>
+#include <qtrade/structs/tick_data.hpp>
 
 #include <chrono>
 #include <functional>

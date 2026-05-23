@@ -1,8 +1,8 @@
-/// @file    constants.hpp
-/// @brief   系统常量定义
-/// @details 定义交易引擎使用的各类常量参数
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      constants.hpp
+/// @brief     系统常量定义
+/// @details   定义交易引擎使用的各类常量参数
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_STRUCTS_CONSTANTS_HPP_
 #define QTRADE_TRADING_STRUCTS_CONSTANTS_HPP_

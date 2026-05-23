@@ -1,8 +1,8 @@
-/// @file    code_segment.hpp
-/// @brief   错误码分段定义
-/// @details 定义错误码的 AA 系统编号和 BBB 模块编号
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      code_segment.hpp
+/// @brief     错误码分段定义
+/// @details   定义错误码的 AA 系统编号和 BBB 模块编号
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_ERROR_CODE_CODE_SEGMENT_HPP_
 #define QTRADE_ERROR_CODE_CODE_SEGMENT_HPP_

@@ -1,14 +1,14 @@
-/// @file    market_handler.hpp
-/// @brief   行情处理器
-/// @details 负责行情数据的接收、分发以及转换
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      market_handler.hpp
+/// @brief     行情处理器
+/// @details   负责行情数据的接收、分发以及转换
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 
 #ifndef QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
 #define QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
 
-#include "qtrade/adapter/market_source.hpp"
+#include <qtrade/adapter/market_source.hpp>
 
 #include "engine/event_bus/event_bus.hpp"
 

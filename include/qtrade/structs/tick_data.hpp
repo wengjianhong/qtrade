@@ -1,8 +1,8 @@
-/// @file    tick_data.hpp
-/// @brief   Tick 数据结构
-/// @details 定义标准化 Tick 数据结构，用于进程内热路径数据传递
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      tick_data.hpp
+/// @brief     Tick 数据结构
+/// @details   定义标准化 Tick 数据结构，用于进程内热路径数据传递
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_
 #define QTRADE_TRADING_STRUCTS_TICK_DATA_HPP_

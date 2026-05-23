@@ -1,14 +1,14 @@
-/// @file    order_manager.hpp
-/// @brief   订单管理器
-/// @details 负责订单的创建、修改、撤销以及状态跟踪
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      order_manager.hpp
+/// @brief     订单管理器
+/// @details   负责订单的创建、修改、撤销以及状态跟踪
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_
 #define QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_
 
-#include "qtrade/error_code/code_define.hpp"
-#include "qtrade/structs/order.hpp"
+#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/structs/order.hpp>
 
 #include <atomic>
 #include <mutex>

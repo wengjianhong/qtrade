@@ -1,7 +1,7 @@
-/// @file    code_message.hpp
-/// @brief   错误码描述映射表
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      code_message.hpp
+/// @brief     错误码描述映射表
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_ERROR_CODE_CODE_MESSAGE_HPP_
 #define QTRADE_ERROR_CODE_CODE_MESSAGE_HPP_
@@ -15,13 +15,13 @@ namespace qtrade {
 
 enum class ErrorCode : int32_t;
 
-/// @brief 获取错误码描述
+/// @brief   获取错误码描述
 /// @param code 错误码
 /// @return 错误码对应的字符串描述
-std::string GetErrorCodeMessage(ErrorCode code);
+const std::string_view GetErrorCodeMessage(ErrorCode code);
 
-/// @brief 错误码描述
-const std::unordered_map<ErrorCode, std::string_view> kErrorCodeMessages = {
+/// @brief   错误码描述
+const std::unordered_map<ErrorCode, const std::string_view> kErrorCodeMessages = {
   {ErrorCode::kSuccess, "Success"},
 
   /// 系统层（BBB=000~099）

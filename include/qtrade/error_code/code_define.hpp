@@ -1,8 +1,8 @@
-/// @file    code_define.hpp
-/// @brief   错误码定义
-/// @details 定义所有错误码的枚举类型，采用 AA BBB CCC 八位整数编码方案
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      code_define.hpp
+/// @brief     错误码定义
+/// @details   定义所有错误码的枚举类型，采用 AA BBB CCC 八位整数编码方案
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_ERROR_CODE_CODE_DEFINE_HPP_
 #define QTRADE_ERROR_CODE_CODE_DEFINE_HPP_

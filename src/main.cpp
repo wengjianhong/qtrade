@@ -1,14 +1,14 @@
-/// @file main.cpp
-/// @brief Main entry point for the qtrade engine
-/// @author wengjianhong
-/// @date 2026-05-05
+/// @file   main.cpp
+/// @brief   Main entry point for the qtrade engine
+/// @author   wengjianhong
+/// @date   2026-05-05
 /// @version 0.1.0
 /// @copyright Copyright (c) 2026 qtrade
 /// @note This file is part of the qtrade engine
-#include "engine/trading_engine.hpp"
-#include <qtrade/adapter/market_source.hpp>
-#include "strategy/example_strategy.hpp"
 #include "common/logger.hpp"
+#include "engine/trading_engine.hpp"
+#include "strategy/example_strategy.hpp"
+#include <qtrade/adapter/market_source.hpp>
 
 #include <spdlog/spdlog.h>
 

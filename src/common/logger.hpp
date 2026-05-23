@@ -1,8 +1,8 @@
-/// @file    logger.hpp
-/// @brief   日志模块
-/// @details 基于 spdlog 的高性能全局日志系统
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      logger.hpp
+/// @brief     日志模块
+/// @details   基于 spdlog 的高性能全局日志系统
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_COMMON_LOGGER_H_
 #define QTRADE_TRADING_COMMON_LOGGER_H_
@@ -12,7 +12,7 @@
 
 namespace qtrade::common {
 
-/// @brief 初始化 spdlog 日志
+/// @brief   初始化 spdlog 日志
 /// @param log_dir      日志目录
 /// @param log_filename 日志文件名
 /// @param max_size_mb  单个文件最大大小(MB)

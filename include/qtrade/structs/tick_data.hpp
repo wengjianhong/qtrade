@@ -17,17 +17,17 @@ namespace qtrade {
 struct MarketTick {
   std::string instrument;                           /// 合约代码
   std::chrono::system_clock::time_point timestamp;  /// 时间戳
-  double last_price{};                              /// 最新价
-  int64_t volume{};                                 /// 成交量
-  double open_interest{};                           /// 持仓量
-  double bid_price[5]{};                            /// 买一价
-  int32_t bid_volume[5]{};                          /// 买一量
-  double ask_price[5]{};                            /// 卖一价
-  int32_t ask_volume[5]{};                          /// 卖一量
-  double open_price{};                              /// 开盘价
-  double high_price{};                              /// 最高价
-  double low_price{};                               /// 最低价
-  double pre_close_price{};                         /// 昨收价
+  double last_price = 0.0;                          /// 最新价
+  int64_t volume = 0;                               /// 成交量
+  double open_interest = 0.0;                       /// 持仓量
+  double open_price = 0.0;                          /// 开盘价
+  double high_price = 0.0;                          /// 最高价
+  double low_price = 0.0;                           /// 最低价
+  double pre_close_price = 0.0;                     /// 昨收价
+  double bid_price[5] = {0.0};                      /// 买一价
+  int32_t bid_volume[5] = {0};                      /// 买一量
+  double ask_price[5] = {0.0};                      /// 卖一价
+  int32_t ask_volume[5] = {0};                      /// 卖一量
 };
 
 /// 原始行情Tick

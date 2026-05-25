@@ -29,12 +29,12 @@ enum class OrderStatus : std::uint8_t {
 
 /// 订单
 struct Order {
-  std::string order_id;                   /// 订单ID
-  std::string instrument;                 /// 合约代码
-  OrderSide side{OrderSide::kBuy};        /// 订单方向
-  double price{};                         /// 订单价格
-  int64_t volume{};                       /// 订单数量
-  OrderStatus status{OrderStatus::kNew};  /// 订单状态
+  std::string order_id;                    /// 订单ID
+  std::string instrument;                  /// 合约代码
+  double price = 0.0;                      /// 订单价格
+  int64_t volume = 0;                      /// 订单数量
+  OrderSide side = OrderSide::kBuy;        /// 订单方向
+  OrderStatus status = OrderStatus::kNew;  /// 订单状态
 };
 
 /// 成交
@@ -42,8 +42,8 @@ struct Trade {
   std::string trade_id;    /// 成交ID
   std::string order_id;    /// 订单ID
   std::string instrument;  /// 合约代码
-  double price{};          /// 成交价格
-  int64_t volume{};        /// 成交数量
+  double price = 0.0;      /// 成交价格
+  int64_t volume = 0;      /// 成交数量
 };
 
 }  // namespace qtrade

@@ -1,11 +1,11 @@
 #include <qtrade/client/monitor_client.hpp>
 
-namespace qtrade::trading::client {
+namespace qtrade::client {
 
 ErrorCode MonitorClient::Init(std::string_view endpoint) {
   (void)endpoint;
   initialized_ = true;
-  return ErrorCode::kOk;
+  return ErrorCode::kSuccess;
 }
 
 void MonitorClient::Shutdown() { initialized_ = false; }
@@ -20,4 +20,4 @@ void MonitorClient::Gauge(std::string_view name, double value) {
   (void)value;
 }
 
-}  // namespace qtrade::trading::client
+}  // namespace qtrade::client

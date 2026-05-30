@@ -1,5 +1,5 @@
-namespace qtrade::trading::service::backup_service {
+namespace qtrade::service::backup_service {
 
 void BootstrapStub() {}
 
-}  // namespace qtrade::trading::service::backup_service
+}  // namespace qtrade::service::backup_service

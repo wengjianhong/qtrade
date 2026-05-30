@@ -1,34 +1,34 @@
-#ifndef QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP
-#define QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP
+/// @file      order_manager.hpp
+/// @brief     订单管理器
+/// @details   负责订单的创建、修改、撤销以及状态跟踪
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
+#ifndef QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_
+#define QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_
 
-#include <qtrade/structs/error_code.hpp>
+#include <qtrade/error_code/code_define.hpp>
 #include <qtrade/structs/order.hpp>
+
+#include <atomic>
 #include <mutex>
 #include <string>
 #include <unordered_map>
-#include <vector>
-#include <atomic>
 
-namespace qtrade::trading::engine::oms {
+namespace qtrade::engine::oms {
 
 class OrderManager {
  public:
   OrderManager();
   ~OrderManager();
-  
+
   void Start();
   void Stop();
-  
-  // 发送订单
+
   ErrorCode SendOrder(const Order& order);
-  
-  // 取消订单
   ErrorCode CancelOrder(const std::string& order_id);
-  
-  // 获取订单
+
   Order* GetOrder(const std::string& order_id);
-  
-  // 更新订单状态
   void UpdateOrderStatus(const std::string& order_id, OrderStatus status);
 
  private:
@@ -38,6 +38,6 @@ class OrderManager {
   std::atomic<uint64_t> order_id_counter_;
 };
 
-}  // namespace qtrade::trading::engine::oms
+}  // namespace qtrade::engine::oms
 
 #endif  // QTRADE_TRADING_ENGINE_ORDER_MANAGER_HPP_

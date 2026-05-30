@@ -1,14 +1,20 @@
+/// @file      strategy.hpp
+/// @brief     策略接口定义
+/// @details   定义策略接口 IStrategy 以及相关数据结构
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
 #define QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
 
 #include <string>
 
+#include <qtrade/error_code/code_define.hpp>
 #include <qtrade/structs/bar_data.hpp>
-#include <qtrade/structs/error_code.hpp>
 #include <qtrade/structs/order.hpp>
 #include <qtrade/structs/tick_data.hpp>
 
-namespace qtrade::trading::strategy {
+namespace qtrade::strategy {
 
 struct StrategyConfig {
   std::string name;
@@ -41,6 +47,6 @@ class IStrategy {
   virtual ErrorCode SetParameter(const std::string& key, const std::string& value) = 0;
 };
 
-}  // namespace qtrade::trading::strategy
+}  // namespace qtrade::strategy
 
 #endif  // QTRADE_TRADING_STRATEGY_STRATEGY_HPP_

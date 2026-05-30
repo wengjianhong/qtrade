@@ -1,20 +1,18 @@
-/// @file main.cpp
-/// @brief Main entry point for the qtrade engine
-/// @author wengjianhong
-/// @date 2026-05-05
+/// @file   main.cpp
+/// @brief   Main entry point for the qtrade engine
+/// @author   wengjianhong
+/// @date   2026-05-05
 /// @version 0.1.0
 /// @copyright Copyright (c) 2026 qtrade
 /// @note This file is part of the qtrade engine
-#include <qtrade/engine/trading_engine.hpp>
+#include "common/logger.hpp"
+#include "engine/trading_engine.hpp"
+#include "strategy/example_strategy.hpp"
 #include <qtrade/adapter/market_source.hpp>
-#include <demo/strategy/example_strategy.hpp>
-#include <src/common/logger.hpp>
 
 #include <spdlog/spdlog.h>
 
 #include <cstdlib>
-#include <chrono>
-#include <thread>
 
 int main(int argc, char** argv) {
   (void)argc;
@@ -30,12 +28,12 @@ int main(int argc, char** argv) {
   spdlog::info("[main] running in dry-run mode");
 
   // 加载引擎配置
-  qtrade::trading::engine::TradingEngineConfig cfg;
+  qtrade::engine::TradingEngineConfig cfg;
   cfg.dry_run = true;
   spdlog::info("[main] trading engine config initialized");
 
   // 创建交易引擎实例
-  qtrade::trading::engine::TradingEngine engine(cfg);
+  qtrade::engine::TradingEngine engine(cfg);
   spdlog::info("[main] trading engine instance created successfully");
 
   // ====================== 设置组件 ======================
@@ -43,34 +41,34 @@ int main(int argc, char** argv) {
   auto& strategy_engine = engine.GetStrategyEngine();
 
   // 设置模拟行情源
-  auto market_source = qtrade::trading::adapter::CreateMockMarketSource();
+  auto market_source = qtrade::adapter::CreateMockMarketSource();
   market_handler.SetMarketSource(std::move(market_source));
-  
+
   // 创建并设置示例策略
-  auto strategy = qtrade::trading::demo::CreateExampleStrategy();
-  
+  auto strategy = qtrade::demo::CreateExampleStrategy();
+
   // 初始化策略
-  qtrade::trading::strategy::StrategyConfig strategy_cfg;
+  qtrade::strategy::StrategyConfig strategy_cfg;
   strategy_cfg.name = "ExampleStrategy";
   strategy->Init(strategy_cfg);
-  
+
   // 设置策略的订单发送器
-  auto* example_strategy = static_cast<qtrade::trading::demo::ExampleStrategy*>(strategy.get());
-  
+  auto* example_strategy = static_cast<qtrade::demo::ExampleStrategy*>(strategy.get());
+
   // 简单的订单发送器（直接打印日志）
-  auto order_sender = [](const qtrade::trading::Order& order) {
-    spdlog::info("[OrderSender] sending order: {} {} {} @ {}", 
+  auto order_sender = [](const qtrade::Order& order) {
+    spdlog::info("[OrderSender] sending order: {} {} {} @ {}",
                  order.instrument,
-                 order.side == qtrade::trading::OrderSide::kBuy ? "BUY" : "SELL",
+                 order.side == qtrade::OrderSide::kBuy ? "BUY" : "SELL",
                  order.volume,
                  order.price);
-    return qtrade::trading::ErrorCode::kOk;
+    return qtrade::ErrorCode::kSuccess;
   };
   example_strategy->SetOrderSender(order_sender);
-  
+
   // 注册策略
   strategy_engine.RegisterStrategy(std::move(strategy));
-  
+
   // 设置策略引擎的订单发送器
   strategy_engine.SetOrderSender(order_sender);
 
@@ -79,7 +77,7 @@ int main(int argc, char** argv) {
   const auto rc = engine.Start();
 
   // 启动失败处理
-  if (rc != qtrade::trading::ErrorCode::kOk) {
+  if (rc != qtrade::ErrorCode::kSuccess) {
     spdlog::error("[main] engine start failed! error code: {}", static_cast<int>(rc));
     spdlog::critical("[main] system aborting due to start failure");
     return EXIT_FAILURE;
@@ -91,20 +89,20 @@ int main(int argc, char** argv) {
   // 创建并设置模拟行情源
   {
     // 先创建行情源
-    auto market_source = qtrade::trading::adapter::CreateMockMarketSource();
-    
+    auto market_source = qtrade::adapter::CreateMockMarketSource();
+
     // 设置到市场处理器（这样会自动设置回调函数）
     market_handler.SetMarketSource(std::move(market_source));
-    
+
     // 获取设置后的行情源并连接
     auto* source_ptr = market_handler.GetMarketSource();
     if (source_ptr) {
-      qtrade::trading::adapter::MarketSourceConfig source_cfg;
+      qtrade::adapter::MarketSourceConfig source_cfg;
       source_cfg.name = "MockDataSource";
       source_cfg.connection_string = "mock://localhost";
       source_ptr->Connect(source_cfg);
     }
-    
+
     // 订阅一些合约
     market_handler.Subscribe({"IF2401", "IC2401"});
   }

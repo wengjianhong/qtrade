@@ -1,9 +1,9 @@
-#include <qtrade/engine/risk_manager.hpp>
+#include "engine/risk/risk_manager.hpp"
 
-namespace qtrade::trading::engine::risk {
+namespace qtrade::engine::risk {
 
 void RiskManager::Start() {}
 
 void RiskManager::Stop() {}
 
-}  // namespace qtrade::trading::engine::risk
+}  // namespace qtrade::engine::risk

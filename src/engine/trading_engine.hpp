@@ -1,18 +1,23 @@
+/// @file      trading_engine.hpp
+/// @brief     交易引擎主入口
+/// @details   整合各个子模块（账户、风控、订单、持仓等），协调整个交易流程
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_
 #define QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_
+#include "engine/account/account_manager.hpp"
+#include "engine/cms/compliance_manager.hpp"
+#include "engine/ems/execution_manager.hpp"
+#include "engine/event_bus/event_bus.hpp"
+#include "engine/market/market_handler.hpp"
+#include "engine/oms/order_manager.hpp"
+#include "engine/position/position_manager.hpp"
+#include "engine/risk/risk_manager.hpp"
+#include "engine/strategy/strategy_engine.hpp"
+#include <qtrade/error_code/code_define.hpp>
 
-#include <qtrade/structs/error_code.hpp>
-#include <qtrade/engine/account_manager.hpp>
-#include <qtrade/engine/compliance_manager.hpp>
-#include <qtrade/engine/event_bus.hpp>
-#include <qtrade/engine/execution_manager.hpp>
-#include <qtrade/engine/market_handler.hpp>
-#include <qtrade/engine/order_manager.hpp>
-#include <qtrade/engine/position_manager.hpp>
-#include <qtrade/engine/risk_manager.hpp>
-#include <qtrade/engine/strategy_engine.hpp>
-
-namespace qtrade::trading::engine {
+namespace qtrade::engine {
 
 struct TradingEngineConfig {
   bool dry_run{true};
@@ -29,8 +34,7 @@ class TradingEngine {
   ErrorCode Start();
   void Stop();
   bool IsRunning() const;
-  
-  // 获取组件引用（用于初始化）
+
   event_bus::EventBus& GetEventBus() { return event_bus_; }
   market::MarketHandler& GetMarketHandler() { return market_handler_; }
   strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
@@ -50,6 +54,6 @@ class TradingEngine {
   risk::RiskManager risk_manager_;
 };
 
-}  // namespace qtrade::trading::engine
+}  // namespace qtrade::engine
 
 #endif  // QTRADE_TRADING_ENGINE_TRADING_ENGINE_HPP_

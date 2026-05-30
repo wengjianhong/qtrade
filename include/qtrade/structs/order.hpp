@@ -1,38 +1,51 @@
+/// @file      order.hpp
+/// @brief     订单数据结构
+/// @details   定义订单、成交等交易相关数据结构
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_STRUCTS_ORDER_HPP_
 #define QTRADE_TRADING_STRUCTS_ORDER_HPP_
 
 #include <cstdint>
 #include <string>
 
-namespace qtrade::trading {
+namespace qtrade {
 
-enum class OrderSide : std::uint8_t { kBuy = 0, kSell = 1 };
+/// 订单方向
+enum class OrderSide : std::uint8_t {
+  kBuy = 0,   /// 买入
+  kSell = 1,  /// 卖出
+};
 
+/// 订单状态
 enum class OrderStatus : std::uint8_t {
-  kNew = 0,
-  kPartiallyFilled,
-  kFilled,
-  kCanceled,
-  kRejected,
+  kNew = 0,          /// 新订单
+  kPartiallyFilled,  /// 部分成交
+  kFilled,           /// 已成交
+  kCanceled,         /// 已取消
+  kRejected,         /// 已拒绝
 };
 
+/// 订单
 struct Order {
-  std::string order_id;
-  std::string instrument;
-  OrderSide side{OrderSide::kBuy};
-  double price{};
-  int64_t volume{};
-  OrderStatus status{OrderStatus::kNew};
+  std::string order_id;                    /// 订单ID
+  std::string instrument;                  /// 合约代码
+  double price = 0.0;                      /// 订单价格
+  int64_t volume = 0;                      /// 订单数量
+  OrderSide side = OrderSide::kBuy;        /// 订单方向
+  OrderStatus status = OrderStatus::kNew;  /// 订单状态
 };
 
+/// 成交
 struct Trade {
-  std::string trade_id;
-  std::string order_id;
-  std::string instrument;
-  double price{};
-  int64_t volume{};
+  std::string trade_id;    /// 成交ID
+  std::string order_id;    /// 订单ID
+  std::string instrument;  /// 合约代码
+  double price = 0.0;      /// 成交价格
+  int64_t volume = 0;      /// 成交数量
 };
 
-}  // namespace qtrade::trading
+}  // namespace qtrade
 
 #endif  // QTRADE_TRADING_STRUCTS_ORDER_HPP_

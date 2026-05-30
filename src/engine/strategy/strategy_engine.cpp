@@ -1,10 +1,9 @@
-#include <qtrade/engine/strategy_engine.hpp>
+#include "strategy_engine.hpp"
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::engine::strategy {
+namespace qtrade::engine::strategy {
 
-StrategyEngine::StrategyEngine(event_bus::EventBus& event_bus)
-    : event_bus_(event_bus), running_(false) {}
+StrategyEngine::StrategyEngine(event_bus::EventBus& event_bus) : event_bus_(event_bus), running_(false) {}
 
 StrategyEngine::~StrategyEngine() { Stop(); }
 
@@ -14,18 +13,18 @@ void StrategyEngine::Start() {
     return;
   }
   running_ = true;
-  
+
   // 订阅事件总线
   event_bus_.SubscribeTick([this](const MarketTick& tick) { OnTickEvent(tick); });
   event_bus_.SubscribeBar([this](const Bar& bar) { OnBarEvent(bar); });
   event_bus_.SubscribeOrder([this](const Order& order) { OnOrderEvent(order); });
   event_bus_.SubscribeTrade([this](const Trade& trade) { OnTradeEvent(trade); });
-  
+
   // 启动所有策略
   for (auto& strategy : strategies_) {
     strategy->Start();
   }
-  
+
   spdlog::info("[StrategyEngine] started successfully with {} strategies", strategies_.size());
 }
 
@@ -34,17 +33,17 @@ void StrategyEngine::Stop() {
   if (!running_) {
     return;
   }
-  
+
   // 停止所有策略
   for (auto& strategy : strategies_) {
     strategy->Stop();
   }
-  
+
   running_ = false;
   spdlog::info("[StrategyEngine] stopped cleanly");
 }
 
-void StrategyEngine::RegisterStrategy(std::unique_ptr<qtrade::trading::strategy::IStrategy> strategy) {
+void StrategyEngine::RegisterStrategy(std::unique_ptr<qtrade::strategy::IStrategy> strategy) {
   std::lock_guard<std::mutex> lock(mutex_);
   strategies_.push_back(std::move(strategy));
   spdlog::info("[StrategyEngine] registered new strategy");
@@ -99,4 +98,4 @@ void StrategyEngine::OnTradeEvent(const Trade& trade) {
   }
 }
 
-}  // namespace qtrade::trading::engine::strategy
+}  // namespace qtrade::engine::strategy

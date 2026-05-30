@@ -2,12 +2,12 @@
 
 #include <spdlog/spdlog.h>
 
-namespace qtrade::trading::client {
+namespace qtrade::client {
 
 ErrorCode LogClient::Init(std::string_view topic) {
   (void)topic;
   initialized_ = true;
-  return ErrorCode::kOk;
+  return ErrorCode::kSuccess;
 }
 
 void LogClient::Shutdown() { initialized_ = false; }
@@ -25,4 +25,4 @@ void LogClient::Emit(std::string_view level, std::string_view message) {
   }
 }
 
-}  // namespace qtrade::trading::client
+}  // namespace qtrade::client

@@ -1,4 +1,8 @@
+
 #include "engine/market/market_handler.hpp"
+
+#include <qtrade/error_code/code_message.hpp>
+
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine::market {
@@ -56,7 +60,7 @@ void MarketHandler::Subscribe(const std::vector<std::string>& instruments) {
   if (rc == ErrorCode::kSuccess) {
     spdlog::info("[MarketHandler] subscribed to {} instruments", instruments.size());
   } else {
-    spdlog::error("[MarketHandler] subscription failed: {}", ErrorCodeToString(rc));
+    spdlog::error("[MarketHandler] subscription failed: {}", GetErrorCodeMessage(rc));
   }
 }
 

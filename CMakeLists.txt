@@ -24,19 +24,21 @@ add_compile_options(-fPIC -Wall -Wextra -Wpedantic -O2)
 # Dependencies
 find_package(Threads REQUIRED)
 find_package(spdlog 1.17.0 REQUIRED)
-find_package(nlohmann_json 3.11.3 REQUIRED)
+find_package(nlohmann_json 3.11.0 REQUIRED)
 
 # Source Files
 file(GLOB_RECURSE ADAPTER_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/adapter/*.cpp)
 file(GLOB_RECURSE ENGINE_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/engine/*.cpp)
 file(GLOB_RECURSE CLIENT_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/client/*.cpp)
 file(GLOB_RECURSE COMMON_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/common/*.cpp)
+file(GLOB_RECURSE QTRADE_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/qtrade/*.cpp)
 file(GLOB_RECURSE DEMO_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/demo/strategy/*.cpp)
 list(APPEND CORE_SRC_FILES 
     ${ADAPTER_SRC} 
     ${ENGINE_SRC} 
     ${CLIENT_SRC} 
     ${COMMON_SRC} 
+    ${QTRADE_SRC}
     ${DEMO_SRC}
 )
 

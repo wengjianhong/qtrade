@@ -25,6 +25,14 @@
 
 ```shell
 qtrade/
+├── CMakeLists.txt                  # 根构建入口：全局选项、依赖、include(cmake/...)
+├── cmake/                          # 构建脚本（qtrade_ 前缀 + snake_case，与 src/ 分离）
+│   ├── qtrade_paths.cmake          # 工程路径变量
+│   ├── lib/qtrade_common.cmake     # 库：qtrade_common
+│   ├── lib/qtrade_core.cmake       # 库：qtrade_core
+│   ├── app/qtrade_engine.cmake     # 可执行文件 qtrade_engine
+│   ├── app/qtrade_services.cmake   # include 各支撑服务
+│   └── app/services/qtrade_*.cmake # 每个微服务独立构建脚本
 ├── docs/
 │   ├── architecture.md             # 系统架构权威文档：架构总览、模块设计、交互方式、容灾方案、安全合规
 │   ├── guide.md                    # 开发指南：编码规范、插件开发流程、部署步骤、调试方法、协作规则
@@ -36,11 +44,16 @@ qtrade/
 │   ├── client/                     # 支撑服务客户端接口：日志、配置、监控、服务发现
 │   └── strategy/                   # 策略基类接口：IStrategy
 ├── src/
-│   ├── adapter/                    # 【可插拔适配器层】外部系统协议转换层，编译为独立动态库
-│   │   ├── market/                 # 行情源适配器：CTP、东方财富、模拟、回放等实现
-│   │   └── executor/               # 交易通道适配器：各券商/交易所柜台实现
-│   ├── engine/                     # 【核心交易引擎层】单进程封闭运行，纯行情驱动，无外部控制接口
-│   │   ├── event_bus/              # 事件总线：进程内无锁队列，模块间消息传递核心基础设施
+│   ├── apps/                       # 【可部署二进制入口】仅含 main，目录名 = 产物名
+│   │   ├── qtrade_engine/main.cpp  # → build/bin/qtrade_engine
+│   │   ├── qtrade_config_service/main.cpp
+│   │   └── ...
+│   ├── common/                     # 公共基础：日志、进程 bootstrap（app_runner / service_main）
+│   ├── adapter/                    # 【可插拔适配器层】
+│   │   ├── market/
+│   │   └── executor/
+│   ├── engine/                     # 【核心交易引擎层】库代码，无 main
+│   │   ├── event_bus/              # 事件总线
 │   │   ├── market/                 # 行情处理：接收、清洗、标准化、分发行情数据，多数据源融合
 │   │   ├── strategy/               # 策略引擎：加载、运行、管理策略插件，沙箱隔离，资源限制
 │   │   ├── cms/                    # 合规管理：实时交易合规校验（限仓、限购、日内频次）
@@ -48,23 +61,16 @@ qtrade/
 │   │   ├── oms/                    # 订单管理：订单全生命周期、状态机、幂等性、WAL持久化
 │   │   ├── account/                # 账户管理：资金、资产、可用额度实时核算，多租户隔离
 │   │   ├── position/               # 持仓管理：持仓、开平、冻结、盈亏实时核算，异常校验
-│   │   └── risk/                   # 风控管理：事前/事中风控拦截，熔断机制，阈值异步更新
-│   ├── client/                     # 【支撑服务轻量级客户端】异步单向推送，不阻塞交易，不等待响应
+│   │   └── risk/                   # 风控管理
+│   ├── client/                     # 【支撑服务轻量级客户端】
 │   │   ├── log_client/             # 日志客户端：A段仅内存队列；异步批量上报 Kafka；P0 本地 spool（B 段线程）
 │   │   ├── config_client/          # 配置客户端：启动时拉取配置，运行时监听Kafka配置更新
 │   │   ├── monitor_client/         # 监控客户端：异步上报业务指标，不影响交易延迟
 │   │   └── registry_client/        # 服务发现客户端：仅用于支撑服务间，交易引擎不使用
-│   └── service/                    # 【支撑服务层】独立部署在非交易服务器，与交易引擎完全物理隔离
-│       ├── log_service/            # 日志分析服务：接收、存储、检索日志，不可篡改，分级存储
-│       ├── config_service/         # 配置管理服务：集中管理配置，灰度发布，版本管理，审计日志
-│       ├── backup_service/         # 容灾备份服务：核心数据备份，跨机房同步，一键恢复
-│       ├── history_market_service/ # 历史数据服务：行情数据持久化，时序数据库，自动归档
-│       ├── history_order_service/  # 历史数据服务：订单/成交持久化，时序数据库，自动归档
-│       ├── monitor_service/        # 业务监控服务：指标采集，告警，可视化，趋势分析
-│       ├── registry_service/       # 服务发现服务：微服务注册、发现、健康检查，基于etcd
-│       ├── audit_service/          # 交易审计服务：盘后合规审计，异常分析，监管报表生成
-│       ├── backtest_service/       # 历史回测服务：基于历史数据验证策略，并行回测，绩效分析
-│       └── strategy_service/       # 策略管理服务：策略代码管理、编译、测试、版本控制（沙箱环境）
+│   └── service/                    # 【支撑服务层】业务实现（无 main；入口在 src/apps/）
+│       ├── config_service/         # 配置管理服务实现
+│       ├── log_service/
+│       └── ...
 ├── api/                            # 【接入层】仅提供查询与配置提交功能，无任何交易操作权限
 │   ├── gateway/                    # API 网关：统一接入入口，认证，限流，路由，协议转换
 │   └── console/                    # 前端控制台：可视化查看（持仓/订单/绩效/日志/监控），配置提交
@@ -83,11 +89,20 @@ qtrade/
 
 **说明**：
 
-1. 尚未创建的目录（如 `api/`、部分 `service/*`）可在对应里程碑落地时补齐；《架构》**§2.2** 允许一期先合并「可观测 + 日志管道」等边界，避免过早拆分空目录。
+1. **进程模型**：可执行入口在 **`src/apps/`**（仅 `main.cpp`）；**构建定义在 `cmake/`**（`src/` 下不放 CMakeLists）。`qtrade_core` 供引擎与测试链接；`qtrade_common` 供支撑服务链接。
 
-2. 策略代码**由独立仓库维护**，本仓库仅保留 `demo/strategy/` 作为开发示例；策略独立仓库规范见 **§7.2**。
+2. **本地运行示例**（`build/bin/`）：
+   ```shell
+   ./qtrade_engine --demo-seconds 5          # 引擎 demo，默认 dry-run
+   ./qtrade_config_service                   # 支撑服务，Ctrl+C 退出
+   ./qtrade_engine --live --demo-seconds 10  # 非 dry-run demo
+   ```
 
-3. 若日后将通用基础组件（线程池、无锁结构、工具函数等）从 `include/` + `src/` 中独立为 `base/` 目录，保持与《架构》「共享基础代码」职责一致即可。
+3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。
+
+4. 策略代码**由独立仓库维护**，本仓库仅保留 `demo/strategy/` 作为开发示例；策略独立仓库规范见 **§7.2**。
+
+5. 若日后将通用基础组件（线程池、无锁结构、工具函数等）从 `include/` + `src/` 中独立为 `base/` 目录，保持与《架构》「共享基础代码」职责一致即可。
 
 ---
 

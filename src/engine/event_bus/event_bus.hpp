@@ -8,89 +8,68 @@
 #ifndef QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
 #define QTRADE_TRADING_ENGINE_EVENT_BUS_HPP_
 
-#include <qtrade/structs/bar_data.hpp>
-#include <qtrade/structs/order.hpp>
-#include <qtrade/structs/tick_data.hpp>
+#include "engine/event_bus/event_types.hpp"
 
-#include <chrono>
-#include <functional>
-#include <memory>
 #include <mutex>
-#include <unordered_map>
 #include <vector>
 
 namespace qtrade::engine::event_bus {
 
-enum class EventType {
-  kTickData = 0,
-  kBarData = 1,
-  kOrderUpdate = 2,
-  kTradeUpdate = 3,
-};
-
-struct Event {
-  EventType type;
-  std::chrono::system_clock::time_point timestamp;
-
-  explicit Event(EventType t) : type(t), timestamp(std::chrono::system_clock::now()) {}
-  virtual ~Event() = default;
-};
-
-struct TickEvent : public Event {
-  MarketTick tick;
-
-  explicit TickEvent(const MarketTick& t) : Event(EventType::kTickData), tick(t) {}
-};
-
-struct BarEvent : public Event {
-  Bar bar;
-
-  explicit BarEvent(const Bar& b) : Event(EventType::kBarData), bar(b) {}
-};
-
-struct OrderEvent : public Event {
-  Order order;
-
-  explicit OrderEvent(const Order& o) : Event(EventType::kOrderUpdate), order(o) {}
-};
-
-struct TradeEvent : public Event {
-  Trade trade;
-
-  explicit TradeEvent(const Trade& t) : Event(EventType::kTradeUpdate), trade(t) {}
-};
-
-using TickCallback = std::function<void(const MarketTick&)>;
-using BarCallback = std::function<void(const Bar&)>;
-using OrderCallback = std::function<void(const Order&)>;
-using TradeCallback = std::function<void(const Trade&)>;
-
+/// @brief 事件总线类
+/// @details 提供事件发布订阅机制，实现模块间解耦通信
 class EventBus {
  public:
+  /// @brief 构造函数
   EventBus();
+
+  /// @brief 析构函数
   ~EventBus();
 
+  /// @brief 启动事件总线
   void Start();
+
+  /// @brief 停止事件总线
   void Stop();
 
+  /// @brief 订阅Tick数据事件
+  /// @param callback 回调函数
   void SubscribeTick(TickCallback callback);
+
+  /// @brief 订阅Bar数据事件
+  /// @param callback 回调函数
   void SubscribeBar(BarCallback callback);
+
+  /// @brief 订阅订单更新事件
+  /// @param callback 回调函数
   void SubscribeOrder(OrderCallback callback);
+
+  /// @brief 订阅成交更新事件
+  /// @param callback 回调函数
   void SubscribeTrade(TradeCallback callback);
 
+  /// @brief 发布Tick数据事件
+  /// @param tick Tick数据
   void PublishTick(const MarketTick& tick);
+
+  /// @brief 发布Bar数据事件
+  /// @param bar Bar数据
   void PublishBar(const Bar& bar);
+
+  /// @brief 发布订单更新事件
+  /// @param order 订单信息
   void PublishOrder(const Order& order);
+
+  /// @brief 发布成交更新事件
+  /// @param trade 成交信息
   void PublishTrade(const Trade& trade);
 
  private:
-  bool running_;
-  std::mutex mutex_;
-
-  std::vector<TickCallback> tick_callbacks_;
-  std::vector<BarCallback> bar_callbacks_;
-  std::vector<OrderCallback> order_callbacks_;
-  std::vector<TradeCallback> trade_callbacks_;
+  bool running_;                                /// 运行状态标志
+  std::mutex mutex_;                            /// 互斥锁
+  std::vector<TickCallback> tick_callbacks_;    /// Tick回调列表
+  std::vector<BarCallback> bar_callbacks_;      /// Bar回调列表
+  std::vector<OrderCallback> order_callbacks_;  /// 订单回调列表
+  std::vector<TradeCallback> trade_callbacks_;  /// 成交回调列表
 };
 
 }  // namespace qtrade::engine::event_bus

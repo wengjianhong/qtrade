@@ -1,4 +1,7 @@
 #include "engine/oms/order_manager.hpp"
+
+#include <qtrade/error_code/code_define.hpp>
+
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine::oms {
@@ -46,7 +49,7 @@ ErrorCode OrderManager::CancelOrder(const std::string& order_id) {
   std::lock_guard<std::mutex> lock(mutex_);
   auto it = orders_.find(order_id);
   if (it == orders_.end()) {
-    return ErrorCode::kInvalidArgument;
+    return ErrorCode::kNotFound;
   }
   it->second.status = OrderStatus::kCanceled;
   spdlog::info("[OrderManager] order canceled: {}", order_id);

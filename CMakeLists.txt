@@ -24,47 +24,22 @@ add_compile_options(-fPIC -Wall -Wextra -Wpedantic -O2)
 # Dependencies
 find_package(Threads REQUIRED)
 find_package(spdlog 1.17.0 REQUIRED)
-find_package(nlohmann_json 3.11.3 REQUIRED)
+find_package(nlohmann_json 3.11.0 REQUIRED)
 
-# Source Files
-file(GLOB_RECURSE ADAPTER_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/adapter/*.cpp)
-file(GLOB_RECURSE ENGINE_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/engine/*.cpp)
-file(GLOB_RECURSE CLIENT_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/client/*.cpp)
-file(GLOB_RECURSE COMMON_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/common/*.cpp)
-file(GLOB_RECURSE DEMO_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/demo/strategy/*.cpp)
-list(APPEND CORE_SRC_FILES 
-    ${ADAPTER_SRC} 
-    ${ENGINE_SRC} 
-    ${CLIENT_SRC} 
-    ${COMMON_SRC} 
-    ${DEMO_SRC}
-)
-
-# Build Core Library
-add_library(qtrade_core STATIC ${CORE_SRC_FILES})
-target_include_directories(qtrade_core PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-)
-target_include_directories(qtrade_core PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/demo
-)
-target_link_libraries(qtrade_core PUBLIC 
-    Threads::Threads
-    spdlog::spdlog
-    nlohmann_json::nlohmann_json
-)
-
-# Build Main Executable
-add_executable(qtrade ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_include_directories(qtrade PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/demo
-)
-target_link_libraries(qtrade PRIVATE qtrade_core)
+# 工程路径与构建脚本（构建逻辑集中在 cmake/，src/ 仅保留源码）
+include(${CMAKE_SOURCE_DIR}/cmake/qtrade_paths.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/lib/qtrade_common.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/lib/qtrade_core.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/app/qtrade_engine.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/app/qtrade_services.cmake)
 
 # Install
-install(TARGETS qtrade RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/release/bin)
+install(TARGETS qtrade_core qtrade_common ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/release/lib)
+install(TARGETS
+    qtrade_engine
+    ${QTRADE_SERVICE_TARGETS}
+    RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/release/bin
+)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION ${CMAKE_SOURCE_DIR}/release/include)
 
 # Build Tests

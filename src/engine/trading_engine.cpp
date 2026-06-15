@@ -35,9 +35,9 @@ ErrorCode TradingEngine::Start() {
   return ErrorCode::kSuccess;
 }
 
-void TradingEngine::Stop() {
+ErrorCode TradingEngine::Stop() {
   if (!running_) {
-    return;
+    return ErrorCode::kSystemError;
   }
 
   spdlog::info("[TradingEngine] stopping components...");
@@ -54,6 +54,7 @@ void TradingEngine::Stop() {
 
   running_ = false;
   spdlog::info("[TradingEngine] stopped cleanly");
+  return ErrorCode::kSuccess;
 }
 
 bool TradingEngine::IsRunning() const { return running_; }

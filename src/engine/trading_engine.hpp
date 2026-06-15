@@ -27,8 +27,8 @@ class TradingEngine {
   TradingEngine(const TradingEngine&) = delete;
   TradingEngine& operator=(const TradingEngine&) = delete;
 
+  ErrorCode Stop();
   ErrorCode Start();
-  void Stop();
   bool IsRunning() const;
 
   event_bus::EventBus& GetEventBus() { return event_bus_; }
@@ -36,7 +36,7 @@ class TradingEngine {
   strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
 
  private:
-  bool running_;                                /// 运行状态标志
+  bool running_ = false;                        /// 运行状态标志
   event_bus::EventBus event_bus_;               /// 事件总线，用于各个模块之间的通信
   strategy::StrategyEngine strategy_engine_;    /// 策略引擎，用于处理策略逻辑
   market::MarketHandler market_handler_;        /// 行情处理器，用于处理行情数据

@@ -51,6 +51,8 @@ qtrade/
 │   ├── common/                     # 公共基础（按功能分子目录）
 │   │   ├── app/                    # 进程 bootstrap：参数解析、信号处理、服务入口
 │   │   └── logging/                # 日志初始化
+│   ├── public/                     # include/qtrade 公共 API 的实现（目录镜像）
+│   │   └── error_code/             # 错误码等非 header-only 实现
 │   ├── adapter/                    # 【可插拔适配器层】
 │   │   ├── market/
 │   │   └── executor/
@@ -184,6 +186,7 @@ qtrade/
 ### 6.1 共享基础代码
 
 - 所有跨模块共享的数据结构（Tick、Order、Position 等）统一放在 `include/qtrade/structs/`，避免重复定义
+- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter/client 实现仍分别在 `src/adapter/`、`src/client/`
 - 模块内部头文件与 `.cpp` 同目录放在 `src/` 下，不放入 `include/`
 
 - 通用工具函数（时间、字符串、加密等）统一放在 `include/common/utils/`

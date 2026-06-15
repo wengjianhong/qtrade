@@ -1,5 +1,6 @@
 /// @file      code_message.hpp
 /// @brief     错误码描述映射表
+/// @details   提供错误码到人类可读描述的查找与映射
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0

@@ -1,7 +1,8 @@
-/// @file global_structs.hh
-/// @author wengjianhong
-/// @brief 全局公共结构体
-/// @date 2026-05-25
+/// @file      result.hpp
+/// @brief     通用返回结果结构体
+/// @details   定义带错误码、错误信息与可选数据的 Result<T> 泛型结构
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_STRUCTS_RESULT_HPP_
 #define QTRADE_TRADING_STRUCTS_RESULT_HPP_

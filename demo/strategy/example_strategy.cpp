@@ -1,3 +1,9 @@
+/// @file      example_strategy.cpp
+/// @brief     示例策略实现
+/// @details   实现简单趋势跟踪策略的 on_tick/on_bar 逻辑
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "example_strategy.hpp"
 #include <spdlog/spdlog.h>
 #include <cmath>

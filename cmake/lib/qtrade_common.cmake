@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 
 # Source Files
-file(GLOB_RECURSE COMMON_SRC CONFIGURE_DEPENDS ${QTRADE_SRC_DIR}/common/*.cpp)
+file(GLOB_RECURSE COMMON_SRC CONFIGURE_DEPENDS ${QTRADE_SRC_DIR}/common/*/*.cpp)
 file(GLOB_RECURSE QTRADE_SRC CONFIGURE_DEPENDS ${QTRADE_SRC_DIR}/qtrade/*.cpp)
 
 # Build Common Library

@@ -1,3 +1,9 @@
+/// @file      mock_market_source.cpp
+/// @brief     模拟行情源实现
+/// @details   提供用于测试的模拟 Tick/Bar 行情数据生成
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include <qtrade/adapter/market_source.hpp>
 #include <spdlog/spdlog.h>
 #include <thread>

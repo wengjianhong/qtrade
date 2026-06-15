@@ -1,3 +1,9 @@
+/// @file      strategy_engine.cpp
+/// @brief     策略引擎实现
+/// @details   实现策略注册、生命周期管理及市场数据分发
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "strategy_engine.hpp"
 #include <spdlog/spdlog.h>
 

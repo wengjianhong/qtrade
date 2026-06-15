@@ -1,3 +1,9 @@
+/// @file      event_bus.cpp
+/// @brief     事件总线实现
+/// @details   实现事件发布订阅及异步回调分发机制
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "engine/event_bus/event_bus.hpp"
 #include <spdlog/spdlog.h>
 

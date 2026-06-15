@@ -1,4 +1,4 @@
-# 开发指南xs
+# 开发指南
 
 本文档说明**仓库目录约定与研发协作要点**。系统设计目标、模块边界与交互规则以 `[Architecture.md](Architecture.md)` 为权威来源；实现演进时需与该文档同步评审。
 
@@ -48,7 +48,9 @@ qtrade/
 │   │   ├── qtrade_engine/main.cpp  # → build/bin/qtrade_engine
 │   │   ├── qtrade_config_service/main.cpp
 │   │   └── ...
-│   ├── common/                     # 公共基础：日志、进程 bootstrap（app_runner / service_main）
+│   ├── common/                     # 公共基础（按功能分子目录）
+│   │   ├── app/                    # 进程 bootstrap：参数解析、信号处理、服务入口
+│   │   └── logging/                # 日志初始化
 │   ├── adapter/                    # 【可插拔适配器层】
 │   │   ├── market/
 │   │   └── executor/
@@ -93,9 +95,8 @@ qtrade/
 
 2. **本地运行示例**（`build/bin/`）：
    ```shell
-   ./qtrade_engine --demo-seconds 5          # 引擎 demo，默认 dry-run
-   ./qtrade_config_service                   # 支撑服务，Ctrl+C 退出
-   ./qtrade_engine --live --demo-seconds 10  # 非 dry-run demo
+   ./qtrade_engine --config /path/to/engine.json          # 引擎
+   ./qtrade_config_service --config /path/to/config.json  # 支撑服务，Ctrl+C 退出
    ```
 
 3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。

@@ -4,10 +4,12 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#ifndef QTRADE_TRADING_COMMON_LOGGER_H_
-#define QTRADE_TRADING_COMMON_LOGGER_H_
+#ifndef QTRADE_COMMON_LOGGING_LOGGER_HPP_
+#define QTRADE_COMMON_LOGGING_LOGGER_HPP_
+
 #include <spdlog/spdlog.h>
 
+#include <cstddef>
 #include <string>
 
 namespace qtrade::common {
@@ -20,10 +22,10 @@ namespace qtrade::common {
 /// @param level        日志级别
 bool init_spdlog_logger(const std::string& log_dir = "logs",
                         const std::string& log_filename = "qtrade.log",
-                        size_t max_size_mb = 50,
-                        size_t max_files = 10,
+                        std::size_t max_size_mb = 50,
+                        std::size_t max_files = 10,
                         spdlog::level::level_enum level = spdlog::level::info);
 
 }  // namespace qtrade::common
 
-#endif  // QTRADE_TRADING_COMMON_LOGGER_H_
+#endif  // QTRADE_COMMON_LOGGING_LOGGER_HPP_

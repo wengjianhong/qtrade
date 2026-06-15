@@ -1,7 +1,11 @@
 /// @file      main.cpp
 /// @brief     交易引擎独立进程入口（qtrade_engine）
-#include "common/app_runner.hpp"
-#include "common/logger.hpp"
+/// @details   解析配置、初始化日志与交易引擎，挂载示例策略并运行主循环
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
+#include "common/app/app_runner.hpp"
+#include "common/logging/logger.hpp"
 #include "engine/trading_engine.hpp"
 #include "strategy/example_strategy.hpp"
 
@@ -10,29 +14,17 @@
 #include <spdlog/spdlog.h>
 
 #include <atomic>
-#include <chrono>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 #include <unistd.h>
 
-namespace {
-
-bool ParseDryRun(int argc, char** argv) {
-  for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "--live") {
-      return false;
-    }
-  }
-  return true;
-}
-
-}  // namespace
-
 int main(int argc, char** argv) {
-  int demo_seconds = 0;
-  qtrade::common::ParseDemoSeconds(argc, argv, demo_seconds);
-
-  const bool dry_run = ParseDryRun(argc, argv);
+  std::string config_path;
+  if (!qtrade::common::ParseConfigPath(argc, argv, config_path)) {
+    std::cerr << "[qtrade_engine] missing required argument: --config <path>\n";
+    return EXIT_FAILURE;
+  }
 
   if (!qtrade::common::init_spdlog_logger("logs", "trading-engine.log")) {
     return EXIT_FAILURE;
@@ -40,13 +32,13 @@ int main(int argc, char** argv) {
 
   spdlog::info("==================================================");
   spdlog::info("qtrade_engine starting (pid={})", getpid());
-  spdlog::info("mode: {}", dry_run ? "dry-run" : "live");
+  spdlog::info("config: {}", config_path);
   spdlog::info("==================================================");
 
-  qtrade::engine::TradingEngineConfig cfg;
-  cfg.dry_run = dry_run;
+  std::atomic<bool> stop_flag{false};
+  qtrade::common::InstallShutdownHandler(stop_flag);
 
-  qtrade::engine::TradingEngine engine(cfg);
+  qtrade::engine::TradingEngine engine;
   auto& market_handler = engine.GetMarketHandler();
   auto& strategy_engine = engine.GetStrategyEngine();
 
@@ -84,16 +76,11 @@ int main(int argc, char** argv) {
     market_handler.Subscribe({"IF2401", "IC2401"});
   }
 
-  std::atomic<bool> stop_flag{false};
-  qtrade::common::InstallShutdownHandler(stop_flag);
+  qtrade::common::UnblockShutdownSignals();
 
-  if (demo_seconds > 0) {
-    spdlog::info("[qtrade_engine] running {}s (demo mode, Ctrl+C to stop early)...", demo_seconds);
-  } else {
-    spdlog::info("[qtrade_engine] running until SIGINT/SIGTERM...");
-  }
+  spdlog::info("[qtrade_engine] running until SIGINT/SIGTERM...");
 
-  qtrade::common::RunUntilStop(stop_flag, std::chrono::seconds{demo_seconds});
+  qtrade::common::RunUntilStop(stop_flag);
 
   engine.Stop();
   spdlog::info("[qtrade_engine] stopped cleanly");

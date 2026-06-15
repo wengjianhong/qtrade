@@ -1,3 +1,9 @@
+/// @file      order_manager.cpp
+/// @brief     订单管理器实现
+/// @details   实现订单创建、修改、撤销及状态跟踪
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "engine/oms/order_manager.hpp"
 
 #include <qtrade/error_code/code_define.hpp>

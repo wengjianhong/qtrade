@@ -1,3 +1,9 @@
+/// @file      log_client.cpp
+/// @brief     日志客户端实现
+/// @details   实现向日志服务发送结构化日志
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include <qtrade/client/log_client.hpp>
 
 #include <spdlog/spdlog.h>

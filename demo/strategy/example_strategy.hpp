@@ -16,7 +16,7 @@ namespace qtrade::demo {
 // 简单的趋势跟踪策略
 class ExampleStrategy final : public strategy::IStrategy {
  public:
-  using OrderSender = std::function<ErrorCode(const Order&)>;
+  using OrderSender = std::function<ErrorCode(const OrderRequest&)>;
 
   ExampleStrategy();
   ~ExampleStrategy() override;

@@ -14,7 +14,7 @@
 
 namespace qtrade::engine::strategy {
 
-using OrderSender = std::function<ErrorCode(const Order&)>;
+using OrderSender = std::function<ErrorCode(const OrderRequest&)>;
 
 class StrategyEngine {
  public:

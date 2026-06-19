@@ -9,7 +9,7 @@
 
 namespace qtrade::engine {
 
-TradingEngine::TradingEngine() : running_(false), market_handler_(event_bus_), strategy_engine_(event_bus_) {}
+TradingEngine::TradingEngine() : running_(false), strategy_engine_(event_bus_), market_handler_(event_bus_) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 

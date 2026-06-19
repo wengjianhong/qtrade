@@ -8,9 +8,7 @@
 #ifndef QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 #define QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 
-#include "qtrade/structs/bar_data.hpp"
-#include "qtrade/structs/order.hpp"
-#include "qtrade/structs/tick_data.hpp"
+#include "qtrade/domain.hpp"
 
 #include <chrono>
 #include <functional>

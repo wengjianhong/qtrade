@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
   strategy->Init(strategy_cfg);
 
   auto* example_strategy = static_cast<qtrade::demo::ExampleStrategy*>(strategy.get());
-  auto order_sender = [](const qtrade::Order& order) {
+  auto order_sender = [](const qtrade::OrderRequest& request) {
     spdlog::info("[OrderSender] {} {} {} @ {}",
-                 order.instrument,
-                 order.side == qtrade::OrderSide::kBuy ? "BUY" : "SELL",
-                 order.volume,
-                 order.price);
+                 request.instrument,
+                 request.side == qtrade::SideType::kBuy ? "BUY" : "SELL",
+                 request.volume,
+                 request.price);
     return qtrade::ErrorCode::kSuccess;
   };
   example_strategy->SetOrderSender(order_sender);
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
   }
 
   if (auto* source_ptr = market_handler.GetMarketSource()) {
-    qtrade::adapter::MarketSourceConfig source_cfg;
+    qtrade_sdk::quote::ConnectRequest source_cfg;
     source_cfg.name = "MockDataSource";
     source_cfg.connection_string = "mock://localhost";
     source_ptr->Connect(source_cfg);

@@ -25,11 +25,11 @@ class OrderManager {
   void Start();
   void Stop();
 
-  ErrorCode SendOrder(const Order& order);
+  ErrorCode SendOrder(const OrderRequest& request);
   ErrorCode CancelOrder(const std::string& order_id);
 
   Order* GetOrder(const std::string& order_id);
-  void UpdateOrderStatus(const std::string& order_id, OrderStatus status);
+  void UpdateOrderStatus(const std::string& order_id, OrderStatusType status);
 
  private:
   std::unordered_map<std::string, Order> orders_;

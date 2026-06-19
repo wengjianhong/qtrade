@@ -1,3 +1,9 @@
+/// @file      order_manager.cpp
+/// @brief     订单管理器实现
+/// @details   实现订单创建、修改、撤销及状态跟踪
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "engine/oms/order_manager.hpp"
 
 #include <qtrade/error_code/code_define.hpp>
@@ -22,23 +28,28 @@ void OrderManager::Stop() {
   spdlog::info("[OrderManager] stopped");
 }
 
-ErrorCode OrderManager::SendOrder(const Order& order) {
+ErrorCode OrderManager::SendOrder(const OrderRequest& request) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!running_) {
     return ErrorCode::kNotInitialized;
   }
 
-  // 简单实现：直接保存订单
-  std::string order_id;
-  if (order.order_id.empty()) {
-    order_id = "ORD-" + std::to_string(++order_id_counter_);
-  } else {
-    order_id = order.order_id;
-  }
+  const std::string order_id = "ORD-" + std::to_string(++order_id_counter_);
 
-  Order new_order = order;
+  Order new_order;
   new_order.order_id = order_id;
-  new_order.status = OrderStatus::kNew;
+  new_order.client_order_id = request.client_order_id;
+  new_order.instrument = request.instrument;
+  new_order.market = request.market;
+  new_order.price = request.price;
+  new_order.volume = request.volume;
+  new_order.left_volume = request.volume;
+  new_order.price_type = request.price_type;
+  new_order.side = request.side;
+  new_order.position_effect = request.position_effect;
+  new_order.business_type = request.business_type;
+  new_order.status = OrderStatusType::kNew;
+  new_order.submit_status = OrderSubmitStatusType::kInsertSubmitted;
 
   orders_[order_id] = new_order;
   spdlog::info("[OrderManager] order created: {}", order_id);
@@ -51,7 +62,7 @@ ErrorCode OrderManager::CancelOrder(const std::string& order_id) {
   if (it == orders_.end()) {
     return ErrorCode::kNotFound;
   }
-  it->second.status = OrderStatus::kCanceled;
+  it->second.status = OrderStatusType::kCanceled;
   spdlog::info("[OrderManager] order canceled: {}", order_id);
   return ErrorCode::kSuccess;
 }
@@ -65,7 +76,7 @@ Order* OrderManager::GetOrder(const std::string& order_id) {
   return nullptr;
 }
 
-void OrderManager::UpdateOrderStatus(const std::string& order_id, OrderStatus status) {
+void OrderManager::UpdateOrderStatus(const std::string& order_id, OrderStatusType status) {
   std::lock_guard<std::mutex> lock(mutex_);
   auto it = orders_.find(order_id);
   if (it != orders_.end()) {

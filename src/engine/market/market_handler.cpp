@@ -1,3 +1,9 @@
+/// @file      market_handler.cpp
+/// @brief     行情处理器实现
+/// @details   实现行情数据接收、转换与事件总线分发
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 
 #include "engine/market/market_handler.hpp"
 
@@ -56,7 +62,7 @@ void MarketHandler::Subscribe(const std::vector<std::string>& instruments) {
     spdlog::warn("[MarketHandler] cannot subscribe: market source not ready");
     return;
   }
-  auto rc = market_source_->Subscribe(instruments);
+  auto rc = market_source_->Subscribe({instruments});
   if (rc == ErrorCode::kSuccess) {
     spdlog::info("[MarketHandler] subscribed to {} instruments", instruments.size());
   } else {
@@ -69,7 +75,7 @@ void MarketHandler::Unsubscribe(const std::vector<std::string>& instruments) {
   if (!market_source_ || !running_) {
     return;
   }
-  market_source_->Unsubscribe(instruments);
+  market_source_->Unsubscribe({instruments});
   spdlog::info("[MarketHandler] unsubscribed from {} instruments", instruments.size());
 }
 

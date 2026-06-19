@@ -1,42 +1,40 @@
-#include "logger.hpp"
+/// @file      logger.cpp
+/// @brief     日志模块实现
+/// @details   基于 spdlog 初始化全局日志器，支持轮转文件输出
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
+#include "common/logging/logger.hpp"
 
 #include <spdlog/sinks/rotating_file_sink.h>
 
 #include <cstdio>
 
 namespace qtrade::common {
+
 bool init_spdlog_logger(const std::string& log_dir,
                         const std::string& log_filename,
-                        size_t max_size_mb,
-                        size_t max_files,
+                        std::size_t max_size_mb,
+                        std::size_t max_files,
                         spdlog::level::level_enum level) {
   try {
-    // 单个文件大小
-    size_t rotate_size = max_size_mb * 1024 * 1024;
+    const std::size_t rotate_size = max_size_mb * 1024 * 1024;
 
-    // 文件输出 sink（滚动、多线程安全）
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
       log_dir + "/" + log_filename, rotate_size, max_files, false);
 
 #ifdef DEBUG
-    // 日志格式: [时间] [日志等级] [进程号] [线程号] [代码位置] 日志内容
     file_sink->set_pattern("[%Y-%m-%d %X.%e] [%l] [%P] [%t] [%g:%#] %v");
 #else
-    // 日志格式: [时间] [日志等级] [进程号] [线程号] 日志内容
     file_sink->set_pattern("[%Y-%m-%d %X.%e] [%l] [%P] [%t] %v");
 #endif
     file_sink->set_level(spdlog::level::trace);
 
-    // 创建全局 logger
     auto logger = std::make_shared<spdlog::logger>("global", file_sink);
     logger->set_level(level);
-
-    // 高性能配置：warn/error 级别立即刷盘，info 异步批量刷
     logger->flush_on(spdlog::level::warn);
     spdlog::set_default_logger(logger);
 
-    // 启动日志
-    spdlog::info("[logger] init success (file-only mode)");
     spdlog::info("[logger] init success (file-only mode)");
     spdlog::info("[logger] log path: {}/{}", log_dir, log_filename);
     spdlog::info("[logger] max size: {}MB, max files: {}", max_size_mb, max_files);
@@ -47,4 +45,5 @@ bool init_spdlog_logger(const std::string& log_dir,
 
   return true;
 }
+
 }  // namespace qtrade::common

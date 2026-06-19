@@ -27,6 +27,7 @@ enum class ErrorCode : int32_t {
   // 适配器层（BBB=011）
   kAlreadyConnected = MakeErrorCode(ModuleNumber::kMarketAdapter, 1),
   kNotConnected = MakeErrorCode(ModuleNumber::kMarketAdapter, 2),
+  kNotSupported = MakeErrorCode(ModuleNumber::kMarketAdapter, 3),
 };
 
 }  // namespace qtrade

@@ -1,10 +1,15 @@
+/// @file      trading_engine.cpp
+/// @brief     交易引擎实现
+/// @details   实现交易引擎的启动、停止及各子模块协调逻辑
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "trading_engine.hpp"
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine {
 
-TradingEngine::TradingEngine(TradingEngineConfig config)
-  : config_(config), running_(false), market_handler_(event_bus_), strategy_engine_(event_bus_) {}
+TradingEngine::TradingEngine() : running_(false), strategy_engine_(event_bus_), market_handler_(event_bus_) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 
@@ -30,9 +35,9 @@ ErrorCode TradingEngine::Start() {
   return ErrorCode::kSuccess;
 }
 
-void TradingEngine::Stop() {
+ErrorCode TradingEngine::Stop() {
   if (!running_) {
-    return;
+    return ErrorCode::kSystemError;
   }
 
   spdlog::info("[TradingEngine] stopping components...");
@@ -49,6 +54,7 @@ void TradingEngine::Stop() {
 
   running_ = false;
   spdlog::info("[TradingEngine] stopped cleanly");
+  return ErrorCode::kSuccess;
 }
 
 bool TradingEngine::IsRunning() const { return running_; }

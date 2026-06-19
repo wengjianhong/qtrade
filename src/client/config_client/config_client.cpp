@@ -1,3 +1,9 @@
+/// @file      config_client.cpp
+/// @brief     配置管理客户端实现
+/// @details   实现配置订阅及变更推送通知
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include <qtrade/client/config_client.hpp>
 
 namespace qtrade::client {

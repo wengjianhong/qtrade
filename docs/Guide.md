@@ -1,4 +1,4 @@
-# 开发指南xs
+# 开发指南
 
 本文档说明**仓库目录约定与研发协作要点**。系统设计目标、模块边界与交互规则以 `[Architecture.md](Architecture.md)` 为权威来源；实现演进时需与该文档同步评审。
 
@@ -48,7 +48,11 @@ qtrade/
 │   │   ├── qtrade_engine/main.cpp  # → build/bin/qtrade_engine
 │   │   ├── qtrade_config_service/main.cpp
 │   │   └── ...
-│   ├── common/                     # 公共基础：日志、进程 bootstrap（app_runner / service_main）
+│   ├── common/                     # 公共基础（按功能分子目录）
+│   │   ├── app/                    # 进程 bootstrap：参数解析、信号处理、服务入口
+│   │   └── logging/                # 日志初始化
+│   ├── public/                     # include/qtrade 公共 API 的实现（目录镜像）
+│   │   └── error_code/             # 错误码等非 header-only 实现
 │   ├── adapter/                    # 【可插拔适配器层】
 │   │   ├── market/
 │   │   └── executor/
@@ -93,9 +97,8 @@ qtrade/
 
 2. **本地运行示例**（`build/bin/`）：
    ```shell
-   ./qtrade_engine --demo-seconds 5          # 引擎 demo，默认 dry-run
-   ./qtrade_config_service                   # 支撑服务，Ctrl+C 退出
-   ./qtrade_engine --live --demo-seconds 10  # 非 dry-run demo
+   ./qtrade_engine --config /path/to/engine.json          # 引擎
+   ./qtrade_config_service --config /path/to/config.json  # 支撑服务，Ctrl+C 退出
    ```
 
 3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。
@@ -183,6 +186,7 @@ qtrade/
 ### 6.1 共享基础代码
 
 - 所有跨模块共享的数据结构（Tick、Order、Position 等）统一放在 `include/qtrade/structs/`，避免重复定义
+- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter/client 实现仍分别在 `src/adapter/`、`src/client/`
 - 模块内部头文件与 `.cpp` 同目录放在 `src/` 下，不放入 `include/`
 
 - 通用工具函数（时间、字符串、加密等）统一放在 `include/common/utils/`

@@ -1,3 +1,9 @@
+/// @file      registry_client.cpp
+/// @brief     服务注册客户端实现
+/// @details   实现服务注册与发现，对接 etcd 注册中心
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include <qtrade/client/registry_client.hpp>
 
 namespace qtrade::client {

@@ -1,3 +1,9 @@
+/// @file      example_strategy.cpp
+/// @brief     示例策略实现
+/// @details   实现简单趋势跟踪策略的 on_tick/on_bar 逻辑
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include "example_strategy.hpp"
 #include <spdlog/spdlog.h>
 #include <cmath>
@@ -41,21 +47,21 @@ void ExampleStrategy::OnTick(const MarketTick& tick) {
 
   // 如果价格变化超过 0.5%，发送订单
   if (std::fabs(price_change) > 0.005 && order_sender_) {
-    Order order;
-    order.instrument = tick.instrument;
-    order.price = tick.last_price;
-    order.volume = 1;
+    OrderRequest request;
+    request.instrument = tick.instrument;
+    request.price = tick.last_price;
+    request.volume = 1;
 
     // 根据价格变化方向决定买卖
     if (price_change > 0 && position_ <= 0) {
-      order.side = OrderSide::kBuy;
+      request.side = SideType::kBuy;
       spdlog::info("[ExampleStrategy] buy signal on {} at {}", tick.instrument, tick.last_price);
-      order_sender_(order);
+      order_sender_(request);
       position_ = 1;
     } else if (price_change < 0 && position_ >= 0) {
-      order.side = OrderSide::kSell;
+      request.side = SideType::kSell;
       spdlog::info("[ExampleStrategy] sell signal on {} at {}", tick.instrument, tick.last_price);
-      order_sender_(order);
+      order_sender_(request);
       position_ = -1;
     }
   }
@@ -79,11 +85,11 @@ ErrorCode ExampleStrategy::SendSignal(const strategy::Signal& signal) {
     "[ExampleStrategy] signal: {} direction={}, strength={}", signal.instrument, signal.direction, signal.strength);
 
   if (order_sender_) {
-    Order order;
-    order.instrument = signal.instrument;
-    order.side = signal.direction > 0 ? OrderSide::kBuy : OrderSide::kSell;
-    order.volume = static_cast<int64_t>(signal.strength);
-    return order_sender_(order);
+    OrderRequest request;
+    request.instrument = signal.instrument;
+    request.side = signal.direction > 0 ? SideType::kBuy : SideType::kSell;
+    request.volume = static_cast<int64_t>(signal.strength);
+    return order_sender_(request);
   }
 
   return ErrorCode::kSuccess;

@@ -1,3 +1,9 @@
+/// @file      monitor_client.cpp
+/// @brief     监控指标客户端实现
+/// @details   实现 Counter、Gauge 等监控指标上报
+/// @author    wengjianhong
+/// @date      2026-05-19
+/// @copyright CC BY-NC-SA 4.0
 #include <qtrade/client/monitor_client.hpp>
 
 namespace qtrade::client {

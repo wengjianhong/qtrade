@@ -1,16 +1,14 @@
-/// @file    event_types.hpp
-/// @brief   事件类型定义
-/// @details 定义事件类型枚举、事件基类以及各类具体事件结构
-/// @author  wengjianhong
-/// @date    2026-05-19
+/// @file      event_types.hpp
+/// @brief     事件类型定义
+/// @details   定义事件类型枚举、事件基类以及各类具体事件结构
+/// @author    wengjianhong
+/// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 
 #ifndef QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 #define QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 
-#include "qtrade/structs/bar_data.hpp"
-#include "qtrade/structs/order.hpp"
-#include "qtrade/structs/tick_data.hpp"
+#include "qtrade/domain.hpp"
 
 #include <chrono>
 #include <functional>

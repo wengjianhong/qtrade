@@ -19,20 +19,16 @@
 
 namespace qtrade::engine {
 
-struct TradingEngineConfig {
-  bool dry_run{true};
-};
-
 class TradingEngine {
  public:
-  explicit TradingEngine(TradingEngineConfig config);
+  TradingEngine();
   ~TradingEngine();
 
   TradingEngine(const TradingEngine&) = delete;
   TradingEngine& operator=(const TradingEngine&) = delete;
 
+  ErrorCode Stop();
   ErrorCode Start();
-  void Stop();
   bool IsRunning() const;
 
   event_bus::EventBus& GetEventBus() { return event_bus_; }
@@ -40,18 +36,16 @@ class TradingEngine {
   strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
 
  private:
-  TradingEngineConfig config_;
-  bool running_;
-
-  event_bus::EventBus event_bus_;
-  market::MarketHandler market_handler_;
-  strategy::StrategyEngine strategy_engine_;
-  cms::ComplianceManager compliance_;
-  ems::ExecutionManager execution_manager_;
-  oms::OrderManager order_manager_;
-  account::AccountManager account_manager_;
-  position::PositionManager position_manager_;
-  risk::RiskManager risk_manager_;
+  bool running_ = false;                        /// 运行状态标志
+  event_bus::EventBus event_bus_;               /// 事件总线，用于各个模块之间的通信
+  strategy::StrategyEngine strategy_engine_;    /// 策略引擎，用于处理策略逻辑
+  market::MarketHandler market_handler_;        /// 行情处理器，用于处理行情数据
+  cms::ComplianceManager compliance_;           /// 合规管理器，用于处理合规逻辑
+  ems::ExecutionManager execution_manager_;     /// 执行管理器，用于执行交易指令
+  oms::OrderManager order_manager_;             /// 订单管理器，用于管理订单
+  account::AccountManager account_manager_;     /// 账户管理器，用于管理账户
+  position::PositionManager position_manager_;  /// 持仓管理器，用于管理持仓
+  risk::RiskManager risk_manager_;              /// 风险管理器，用于管理风险
 };
 
 }  // namespace qtrade::engine

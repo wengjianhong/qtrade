@@ -9,10 +9,8 @@
 
 #include <string>
 
+#include <qtrade/domain.hpp>
 #include <qtrade/error_code/code_define.hpp>
-#include <qtrade/structs/bar_data.hpp>
-#include <qtrade/structs/order.hpp>
-#include <qtrade/structs/tick_data.hpp>
 
 namespace qtrade::strategy {
 

@@ -10,7 +10,6 @@
 #include <spdlog/spdlog.h>
 
 #include <sstream>
-#include <utility>
 
 namespace qtrade::client {
 
@@ -27,19 +26,18 @@ ErrorCode LogClient::Init(std::string_view topic) {
   worker_ = std::make_unique<detail::OutboundWorker>();
 
   const std::string topic_copy = topic_;
-  const ErrorCode rc = worker_->Start(
-      [topic_copy](ReportPriority priority, std::string_view payload) {
-        // MVP stub：本地 spdlog；远程 gRPC 上报可替换此 sink
-        if (priority == ReportPriority::kP0Audit) {
-          spdlog::info("[audit][{}] {}", topic_copy, payload);
-          return;
-        }
-        if (priority == ReportPriority::kP2Metrics || priority == ReportPriority::kP3Debug) {
-          spdlog::debug("[{}] {}", topic_copy, payload);
-          return;
-        }
-        spdlog::info("[{}] {}", topic_copy, payload);
-      });
+  const ErrorCode rc = worker_->Start([topic_copy](ReportPriority priority, std::string_view payload) {
+    // MVP stub：本地 spdlog；远程 gRPC 上报可替换此 sink
+    if (priority == ReportPriority::kP0Audit) {
+      spdlog::info("[audit][{}] {}", topic_copy, payload);
+      return;
+    }
+    if (priority == ReportPriority::kP2Metrics || priority == ReportPriority::kP3Debug) {
+      spdlog::debug("[{}] {}", topic_copy, payload);
+      return;
+    }
+    spdlog::info("[{}] {}", topic_copy, payload);
+  });
 
   if (rc != ErrorCode::kSuccess) {
     worker_.reset();

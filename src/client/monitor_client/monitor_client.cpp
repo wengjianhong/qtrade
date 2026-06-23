@@ -10,7 +10,6 @@
 #include <qtrade/client/report_priority.hpp>
 
 #include <sstream>
-#include <utility>
 
 namespace qtrade::client {
 

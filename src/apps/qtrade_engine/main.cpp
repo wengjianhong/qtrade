@@ -10,6 +10,7 @@
 #include "strategy/example_strategy.hpp"
 
 #include <qtrade/adapter/market_source.hpp>
+#include <qtrade/engine/engine_config_loader.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -35,10 +36,21 @@ int main(int argc, char** argv) {
   spdlog::info("config: {}", config_path);
   spdlog::info("==================================================");
 
+  qtrade::engine::EngineOptions engine_options;
+  if (const auto rc = qtrade::engine::LoadEngineOptionsFromJson(config_path, engine_options);
+      rc != qtrade::ErrorCode::kSuccess) {
+    spdlog::warn("[qtrade_engine] engine config load failed, using defaults");
+  }
+
   std::atomic<bool> stop_flag{false};
   qtrade::common::InstallShutdownHandler(stop_flag);
 
   qtrade::engine::TradingEngine engine;
+  if (const auto rc = engine.Init(engine_options); rc != qtrade::ErrorCode::kSuccess) {
+    spdlog::error("[qtrade_engine] init failed, code={}", static_cast<int>(rc));
+    return EXIT_FAILURE;
+  }
+
   auto& market_handler = engine.GetMarketHandler();
   auto& strategy_engine = engine.GetStrategyEngine();
 

@@ -7,10 +7,14 @@
 #include <gtest/gtest.h>
 
 #include <qtrade/structs/tick_data.hpp>
+#include <qtrade/engine/engine_options.hpp>
 #include "engine/trading_engine.hpp"
 
 TEST(EngineSmoke, TradingEngineStartStop) {
+  qtrade::engine::EngineOptions options;
+  options.log_topic = "test";
   qtrade::engine::TradingEngine engine;
+  ASSERT_EQ(engine.Init(options), qtrade::ErrorCode::kSuccess);
   ASSERT_EQ(engine.Start(), qtrade::ErrorCode::kSuccess);
   ASSERT_TRUE(engine.IsRunning());
   engine.Stop();

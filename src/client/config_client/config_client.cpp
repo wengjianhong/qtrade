@@ -3,7 +3,7 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#include <qtrade/client/config_client.hpp>
+#include "client/config_client/config_client.hpp"
 
 #include <qtrade/config/v1/config.grpc.pb.h>
 

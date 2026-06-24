@@ -6,8 +6,8 @@
 /// @copyright CC BY-NC-SA 4.0
 #include <gtest/gtest.h>
 
-#include <qtrade/client/log_client.hpp>
-#include <qtrade/client/monitor_client.hpp>
+#include "client/log_client/log_client.hpp"
+#include "client/monitor_client/monitor_client.hpp"
 
 #include <chrono>
 #include <thread>

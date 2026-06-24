@@ -16,9 +16,9 @@
 #include "engine/risk/risk_manager.hpp"
 #include "engine/strategy/strategy_engine.hpp"
 
-#include <qtrade/client/config_client.hpp>
-#include <qtrade/client/log_client.hpp>
-#include <qtrade/client/monitor_client.hpp>
+#include "client/config_client/config_client.hpp"
+#include "client/log_client/log_client.hpp"
+#include "client/monitor_client/monitor_client.hpp"
 #include "engine/engine_options.hpp"
 #include <qtrade/error_code/error_codes.hpp>
 

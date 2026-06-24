@@ -3,7 +3,7 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#include <qtrade/client/log_client.hpp>
+#include "client/log_client/log_client.hpp"
 
 #include "client/common/outbound_worker.hpp"
 

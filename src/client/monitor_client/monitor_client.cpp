@@ -3,11 +3,11 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#include <qtrade/client/monitor_client.hpp>
+#include "client/monitor_client/monitor_client.hpp"
 
 #include "client/common/outbound_worker.hpp"
 
-#include <qtrade/client/report_priority.hpp>
+#include "client/common/report_priority.hpp"
 
 #include <sstream>
 

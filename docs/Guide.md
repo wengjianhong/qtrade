@@ -37,11 +37,10 @@ qtrade/
 │   ├── architecture.md             # 系统架构权威文档：架构总览、模块设计、交互方式、容灾方案、安全合规
 │   ├── guide.md                    # 开发指南：编码规范、插件开发流程、部署步骤、调试方法、协作规则
 │   └── deploy.md                   # 部署文档：各模块部署要求、机器配置、网络拓扑、监控告警、容灾切换
-├── include/qtrade/                 # 【对外公共头文件】插件、客户端、共享数据结构、错误码
+├── include/qtrade/                 # 【对外公共头文件】插件接口、共享数据结构、错误码
 │   ├── structs/                    # 框架通用结构（如 result.hpp）
 │   ├── error_code/                 # 错误码：error_codes.hpp、code_segment.hpp、code_message.hpp
 │   ├── adapter/                    # 适配器抽象接口：IMarketSource、IExecutionAdapter
-│   ├── client/                     # 支撑服务客户端接口：日志、配置、监控、服务发现
 │   └── strategy/                   # 策略基类接口：IStrategy
 ├── src/
 │   ├── apps/                       # 【可部署二进制入口】仅含 main，目录名 = 产物名
@@ -66,11 +65,12 @@ qtrade/
 │   │   ├── account/                # 账户管理：资金、资产、可用额度实时核算，多租户隔离
 │   │   ├── position/               # 持仓管理：持仓、开平、冻结、盈亏实时核算，异常校验
 │   │   └── risk/                   # 风控管理
-│   ├── client/                     # 【支撑服务轻量级客户端】
-│   │   ├── log_client/             # 日志客户端：A 段仅内存队列；Outbound 线程异步上报；P0 本地 spool；远程实现可 stub
+│   ├── client/                     # 【引擎内部】支撑服务出站客户端（头文件与 .cpp 同目录，不对外暴露）
+│   │   ├── common/                 # OutboundWorker、ReportPriority
+│   │   ├── log_client/             # 日志客户端：A 段仅内存队列；Outbound 线程异步上报
 │   │   ├── config_client/          # 配置客户端：GetConfig 冷启动；WatchConfig 运行时订阅（gRPC 出站）
-│   │   ├── monitor_client/         # 监控客户端：异步上报业务指标，不影响交易延迟
-│   │   └── registry_client/        # 服务发现客户端：仅用于支撑服务间，交易引擎不使用
+│   │   ├── monitor_client/         # 监控客户端：异步上报业务指标
+│   │   └── registry_client/        # 服务发现客户端：仅用于支撑服务间
 │   └── service/                    # 【支撑服务层】业务实现（无 main；入口在 src/apps/）
 │       ├── config_service/         # 配置管理服务实现
 │       ├── log_service/
@@ -192,7 +192,7 @@ qtrade/
 
 - 跨模块共享的数据结构定义在 `qtrade_sdk/quote/`、`qtrade_sdk/trader/`；按需 `#include` 对应头文件，使用 `qtrade_sdk::quote::`、`qtrade_sdk::trader::` 命名空间
 - 错误码枚举见 `include/qtrade/error_code/error_codes.hpp`，分段规则见 `code_segment.hpp`
-- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter/client 实现仍分别在 `src/adapter/`、`src/client/`
+- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter 实现在 `src/adapter/`；引擎内部 client 头文件与实现均在 `src/client/`
 - 模块内部头文件与 `.cpp` 同目录放在 `src/` 下，不放入 `include/`
 
 - 通用工具函数（时间、字符串、加密等）统一放在 `include/common/utils/`

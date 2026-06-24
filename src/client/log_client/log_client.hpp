@@ -7,7 +7,7 @@
 #ifndef QTRADE_TRADING_CLIENT_LOG_CLIENT_HPP_
 #define QTRADE_TRADING_CLIENT_LOG_CLIENT_HPP_
 
-#include <qtrade/client/report_priority.hpp>
+#include "client/common/report_priority.hpp"
 #include <qtrade/error_code/error_codes.hpp>
 
 #include <memory>

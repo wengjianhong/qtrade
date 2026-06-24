@@ -44,8 +44,8 @@ void MarketHandler::SetMarketSource(std::unique_ptr<adapter::IMarketSource> sour
 
   if (market_source_) {
     // 设置回调
-    market_source_->SetTickCallback([this](const MarketTick& tick) { OnTick(tick); });
-    market_source_->SetBarCallback([this](const Bar& bar) { OnBar(bar); });
+    market_source_->SetTickCallback([this](const qtrade_sdk::quote::MarketTick& tick) { OnTick(tick); });
+    market_source_->SetBarCallback([this](const qtrade_sdk::quote::Bar& bar) { OnBar(bar); });
     spdlog::info("[MarketHandler] market source set successfully");
   }
 }
@@ -79,8 +79,8 @@ void MarketHandler::Unsubscribe(const std::vector<std::string>& instruments) {
   spdlog::info("[MarketHandler] unsubscribed from {} instruments", instruments.size());
 }
 
-void MarketHandler::OnTick(const MarketTick& tick) { event_bus_.PublishTick(tick); }
+void MarketHandler::OnTick(const qtrade_sdk::quote::MarketTick& tick) { event_bus_.PublishTick(tick); }
 
-void MarketHandler::OnBar(const Bar& bar) { event_bus_.PublishBar(bar); }
+void MarketHandler::OnBar(const qtrade_sdk::quote::Bar& bar) { event_bus_.PublishBar(bar); }
 
 }  // namespace qtrade::engine::market

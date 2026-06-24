@@ -1,8 +1,8 @@
 /// @file      constants.hpp
 /// @brief     SDK 公共常量
 /// @details   参考 EMT_API 的长度、方向、业务类型等常量，供行情与交易模块共用。
-#ifndef QTRADE_SDK_DEFINE_CONSTANTS_HPP_
-#define QTRADE_SDK_DEFINE_CONSTANTS_HPP_
+#ifndef QTRADE_SDK_CONSTANTS_HPP_
+#define QTRADE_SDK_CONSTANTS_HPP_
 
 #include <cstddef>
 #include <cstdint>
@@ -48,4 +48,4 @@ inline constexpr double kPricePrecision = 1e-6;
 
 }  // namespace qtrade_sdk::constants
 
-#endif  // QTRADE_SDK_DEFINE_CONSTANTS_HPP_
+#endif  // QTRADE_SDK_CONSTANTS_HPP_

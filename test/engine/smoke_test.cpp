@@ -6,8 +6,8 @@
 /// @copyright CC BY-NC-SA 4.0
 #include <gtest/gtest.h>
 
-#include <qtrade/structs/tick_data.hpp>
-#include <qtrade/engine/engine_options.hpp>
+#include <qtrade_sdk/quote/quote_struct.hpp>
+#include "engine/engine_options.hpp"
 #include "engine/trading_engine.hpp"
 
 TEST(EngineSmoke, TradingEngineStartStop) {
@@ -22,7 +22,7 @@ TEST(EngineSmoke, TradingEngineStartStop) {
 }
 
 TEST(EngineSmoke, MarketTickSize) {
-  qtrade::MarketTick tick;
+  qtrade_sdk::quote::MarketTick tick;
   (void)tick;
   SUCCEED();
 }

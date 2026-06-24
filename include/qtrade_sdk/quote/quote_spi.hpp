@@ -4,7 +4,7 @@
 #ifndef QTRADE_SDK_QUOTE_SPI_HPP_
 #define QTRADE_SDK_QUOTE_SPI_HPP_
 
-#include <qtrade_sdk/struct/quote_struct.hpp>
+#include <qtrade_sdk/quote/quote_struct.hpp>
 
 #include <cstdint>
 #include <span>

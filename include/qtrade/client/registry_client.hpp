@@ -6,7 +6,7 @@
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
 #define QTRADE_TRADING_CLIENT_REGISTRY_CLIENT_HPP_
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <string_view>
 

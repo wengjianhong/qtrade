@@ -19,8 +19,8 @@
 #include <qtrade/client/config_client.hpp>
 #include <qtrade/client/log_client.hpp>
 #include <qtrade/client/monitor_client.hpp>
-#include <qtrade/engine/engine_options.hpp>
-#include <qtrade/error_code/code_define.hpp>
+#include "engine/engine_options.hpp"
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <string_view>
 

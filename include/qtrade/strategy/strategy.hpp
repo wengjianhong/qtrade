@@ -7,10 +7,11 @@
 #ifndef QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
 #define QTRADE_TRADING_STRATEGY_STRATEGY_HPP_
 
-#include <string>
+#include <qtrade/error_code/error_codes.hpp>
+#include <qtrade_sdk/quote/quote_struct.hpp>
+#include <qtrade_sdk/trader/trader_struct.hpp>
 
-#include <qtrade/domain.hpp>
-#include <qtrade/error_code/code_define.hpp>
+#include <string>
 
 namespace qtrade::strategy {
 
@@ -55,19 +56,19 @@ class IStrategy {
 
   /// @brief Tick数据回调
   /// @param tick 市场Tick数据
-  virtual void OnTick(const MarketTick& tick) = 0;
+  virtual void OnTick(const qtrade_sdk::quote::MarketTick& tick) = 0;
   
   /// @brief Bar数据回调
   /// @param bar K线数据
-  virtual void OnBar(const Bar& bar) = 0;
+  virtual void OnBar(const qtrade_sdk::quote::Bar& bar) = 0;
   
   /// @brief 订单更新回调
   /// @param order 订单信息
-  virtual void OnOrder(const Order& order) = 0;
+  virtual void OnOrder(const qtrade_sdk::trader::Order& order) = 0;
   
   /// @brief 成交更新回调
   /// @param trade 成交信息
-  virtual void OnTrade(const Trade& trade) = 0;
+  virtual void OnTrade(const qtrade_sdk::trader::Trade& trade) = 0;
 
   /// @brief 发送交易信号
   /// @param signal 交易信号

@@ -1,10 +1,10 @@
 /// @file      fund_struct.hpp
 /// @brief     资金划拨相关结构体
 /// @details   参考 EMT_API 的 eoms_api_fund_struct.h，定义资金划转、额度调拨与资金查询结构体。
-#ifndef QTRADE_SDK_STRUCT_FUND_STRUCT_HPP_
-#define QTRADE_SDK_STRUCT_FUND_STRUCT_HPP_
+#ifndef QTRADE_SDK_TRADER_FUND_STRUCT_HPP_
+#define QTRADE_SDK_TRADER_FUND_STRUCT_HPP_
 
-#include <qtrade_sdk/define/trader_types.hpp>
+#include <qtrade_sdk/trader/trader_types.hpp>
 
 #include <array>
 #include <cstdint>
@@ -77,4 +77,4 @@ using QuotaTransferAck = QuotaTransferNotice;
 
 }  // namespace qtrade_sdk::trader
 
-#endif  // QTRADE_SDK_STRUCT_FUND_STRUCT_HPP_
+#endif  // QTRADE_SDK_TRADER_FUND_STRUCT_HPP_

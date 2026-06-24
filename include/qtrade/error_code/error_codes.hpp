@@ -1,11 +1,11 @@
-/// @file      code_define.hpp
+/// @file      error_codes.hpp
 /// @brief     错误码定义
 /// @details   定义所有错误码的枚举类型，采用 AA BBB CCC 八位整数编码方案
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#ifndef QTRADE_ERROR_CODE_CODE_DEFINE_HPP_
-#define QTRADE_ERROR_CODE_CODE_DEFINE_HPP_
+#ifndef QTRADE_ERROR_CODE_ERROR_CODES_HPP_
+#define QTRADE_ERROR_CODE_ERROR_CODES_HPP_
 #include <qtrade/error_code/code_segment.hpp>
 
 #include <cstdint>
@@ -32,4 +32,4 @@ enum class ErrorCode : int32_t {
 
 }  // namespace qtrade
 
-#endif  // QTRADE_ERROR_CODE_CODE_DEFINE_HPP_
+#endif  // QTRADE_ERROR_CODE_ERROR_CODES_HPP_

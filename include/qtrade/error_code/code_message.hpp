@@ -6,7 +6,7 @@
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_ERROR_CODE_CODE_MESSAGE_HPP_
 #define QTRADE_ERROR_CODE_CODE_MESSAGE_HPP_
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <cstdint>
 #include <string_view>

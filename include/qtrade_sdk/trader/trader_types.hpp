@@ -1,8 +1,8 @@
 /// @file      trader_types.hpp
 /// @brief     交易模块枚举定义
 /// @details   参考 EMT_API 交易侧类型（EMT_MARKET_TYPE / EMT_SIDE_TYPE / EMT_FUND_TRANSFER_TYPE 等）。
-#ifndef QTRADE_SDK_DEFINE_TRADER_TYPES_HPP_
-#define QTRADE_SDK_DEFINE_TRADER_TYPES_HPP_
+#ifndef QTRADE_SDK_TRADER_TYPES_HPP_
+#define QTRADE_SDK_TRADER_TYPES_HPP_
 
 #include <cstdint>
 
@@ -189,4 +189,4 @@ enum class QuotaOperStatus : std::uint8_t {
 
 }  // namespace qtrade_sdk::trader
 
-#endif  // QTRADE_SDK_DEFINE_TRADER_TYPES_HPP_
+#endif  // QTRADE_SDK_TRADER_TYPES_HPP_

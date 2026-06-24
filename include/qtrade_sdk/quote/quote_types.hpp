@@ -1,8 +1,8 @@
 /// @file      quote_types.hpp
 /// @brief     行情模块枚举定义
 /// @details   参考 EMT_API 行情侧类型（EMQ_EXCHANGE_TYPE / EMQ_TICKER_TYPE）。
-#ifndef QTRADE_SDK_DEFINE_QUOTE_TYPES_HPP_
-#define QTRADE_SDK_DEFINE_QUOTE_TYPES_HPP_
+#ifndef QTRADE_SDK_QUOTE_TYPES_HPP_
+#define QTRADE_SDK_QUOTE_TYPES_HPP_
 
 #include <cstdint>
 
@@ -28,4 +28,4 @@ enum class TickerType : std::uint8_t {
 
 }  // namespace qtrade_sdk::quote
 
-#endif  // QTRADE_SDK_DEFINE_QUOTE_TYPES_HPP_
+#endif  // QTRADE_SDK_QUOTE_TYPES_HPP_

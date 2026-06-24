@@ -8,7 +8,7 @@
 #define QTRADE_CLIENT_COMMON_OUTBOUND_WORKER_HPP_
 
 #include <qtrade/client/report_priority.hpp>
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <atomic>
 #include <condition_variable>

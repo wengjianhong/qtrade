@@ -10,7 +10,7 @@
 #include "strategy/example_strategy.hpp"
 
 #include <qtrade/adapter/market_source.hpp>
-#include <qtrade/engine/engine_config_loader.hpp>
+#include "engine/engine_config_loader.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -63,10 +63,10 @@ int main(int argc, char** argv) {
   strategy->Init(strategy_cfg);
 
   auto* example_strategy = static_cast<qtrade::demo::ExampleStrategy*>(strategy.get());
-  auto order_sender = [](const qtrade::OrderRequest& request) {
+  auto order_sender = [](const qtrade_sdk::trader::OrderRequest& request) {
     spdlog::info("[OrderSender] {} {} {} @ {}",
                  request.instrument,
-                 request.side == qtrade::SideType::kBuy ? "BUY" : "SELL",
+                 request.side == qtrade_sdk::trader::SideType::kBuy ? "BUY" : "SELL",
                  request.volume,
                  request.price);
     return qtrade::ErrorCode::kSuccess;

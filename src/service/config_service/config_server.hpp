@@ -8,7 +8,7 @@
 
 #include "service/config_service/config_store.hpp"
 
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <memory>
 #include <string>

@@ -1,11 +1,11 @@
 /// @file      trader_struct.hpp
 /// @brief     交易相关结构体
 /// @details   参考 EMT_API 交易结构体，聚合登录、报单、撤单、查询、资金、持仓与成交回报。
-#ifndef QTRADE_SDK_STRUCT_TRADER_HPP_
-#define QTRADE_SDK_STRUCT_TRADER_HPP_
+#ifndef QTRADE_SDK_TRADER_STRUCT_HPP_
+#define QTRADE_SDK_TRADER_STRUCT_HPP_
 
-#include <qtrade_sdk/define/trader_types.hpp>
-#include <qtrade_sdk/struct/fund_struct.hpp>
+#include <qtrade_sdk/trader/fund_struct.hpp>
+#include <qtrade_sdk/trader/trader_types.hpp>
 
 #include <cstdint>
 #include <string>
@@ -223,4 +223,4 @@ struct QueryAssetResponse {
 
 }  // namespace qtrade_sdk::trader
 
-#endif  // QTRADE_SDK_STRUCT_TRADER_HPP_
+#endif  // QTRADE_SDK_TRADER_STRUCT_HPP_

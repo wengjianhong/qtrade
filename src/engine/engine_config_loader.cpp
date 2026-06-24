@@ -3,7 +3,7 @@
 /// @author    wengjianhong
 /// @date      2026-06-22
 /// @copyright CC BY-NC-SA 4.0
-#include <qtrade/engine/engine_config_loader.hpp>
+#include "engine/engine_config_loader.hpp"
 
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>

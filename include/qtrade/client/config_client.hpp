@@ -7,7 +7,7 @@
 #ifndef QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
 #define QTRADE_TRADING_CLIENT_CONFIG_CLIENT_HPP_
 
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <cstdint>
 #include <functional>

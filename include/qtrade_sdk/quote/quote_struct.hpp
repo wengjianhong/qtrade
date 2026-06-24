@@ -1,12 +1,12 @@
 /// @file      quote_struct.hpp
 /// @brief     行情相关结构体
 /// @details   参考 EMT_API 的行情结构体，聚合连接、订阅、快照、指数、静态信息与查询响应。
-#ifndef QTRADE_SDK_STRUCT_QUOTE_HPP_
-#define QTRADE_SDK_STRUCT_QUOTE_HPP_
+#ifndef QTRADE_SDK_QUOTE_STRUCT_HPP_
+#define QTRADE_SDK_QUOTE_STRUCT_HPP_
 
-#include <qtrade_sdk/define/constants.hpp>
-#include <qtrade_sdk/define/quote_types.hpp>
-#include <qtrade_sdk/define/trader_types.hpp>
+#include <qtrade_sdk/constants/constants.hpp>
+#include <qtrade_sdk/quote/quote_types.hpp>
+#include <qtrade_sdk/trader/trader_types.hpp>
 
 #include <array>
 #include <cstdint>
@@ -185,4 +185,4 @@ struct QuerySnapshotResponse {
 
 }  // namespace qtrade_sdk::quote
 
-#endif  // QTRADE_SDK_STRUCT_QUOTE_HPP_
+#endif  // QTRADE_SDK_QUOTE_STRUCT_HPP_

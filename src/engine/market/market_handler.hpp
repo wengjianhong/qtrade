@@ -38,8 +38,8 @@ class MarketHandler {
   std::mutex mutex_;
   bool running_;
 
-  void OnTick(const MarketTick& tick);
-  void OnBar(const Bar& bar);
+  void OnTick(const qtrade_sdk::quote::MarketTick& tick);
+  void OnBar(const qtrade_sdk::quote::Bar& bar);
 };
 
 }  // namespace qtrade::engine::market

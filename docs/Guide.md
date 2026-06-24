@@ -38,8 +38,8 @@ qtrade/
 │   ├── guide.md                    # 开发指南：编码规范、插件开发流程、部署步骤、调试方法、协作规则
 │   └── deploy.md                   # 部署文档：各模块部署要求、机器配置、网络拓扑、监控告警、容灾切换
 ├── include/qtrade/                 # 【对外公共头文件】插件、客户端、共享数据结构、错误码
-│   ├── structs/                    # 通用数据结构：订单、行情、Bar、常量等
-│   ├── error_code/                 # 错误码定义（AABBBCCC 三级编码）
+│   ├── structs/                    # 框架通用结构（如 result.hpp）
+│   ├── error_code/                 # 错误码：error_codes.hpp、code_segment.hpp、code_message.hpp
 │   ├── adapter/                    # 适配器抽象接口：IMarketSource、IExecutionAdapter
 │   ├── client/                     # 支撑服务客户端接口：日志、配置、监控、服务发现
 │   └── strategy/                   # 策略基类接口：IStrategy
@@ -78,6 +78,9 @@ qtrade/
 ├── api/                            # 【接入层】仅提供查询与配置提交功能，无任何交易操作权限
 │   ├── gateway/                    # API 网关：统一接入入口，认证，限流，路由，协议转换
 │   └── console/                    # 前端控制台：可视化查看（持仓/订单/绩效/日志/监控），配置提交
+├── config/                         # 【示例配置】本地开发默认 JSON（--config 传入，非编译产物）
+│   ├── engine.json                 # 交易引擎
+│   └── config_service.json         # 配置管理服务
 ├── demo/                           # 【示例代码】仅用于演示，不参与生产部署
 │   └── strategy/                   # 可插拔策略插件开发示例：趋势跟踪、套利等简单策略实现
 ├── test/                           # 【测试代码】按模块分类，单元测试、集成测试、性能测试
@@ -95,11 +98,12 @@ qtrade/
 
 1. **进程模型**：可执行入口在 **`src/apps/`**（仅 `main.cpp`）；**构建定义在 `cmake/`**（`src/` 下不放 CMakeLists）。`qtrade_core` 供引擎与测试链接；`qtrade_common` 供支撑服务链接。
 
-2. **本地运行示例**（`build/bin/`）：
+2. **本地运行示例**（`build/bin/`，在项目根目录执行）：
    ```shell
-   ./qtrade_engine --config /path/to/engine.json          # 引擎
-   ./qtrade_config_service --config /path/to/config.json  # 支撑服务，Ctrl+C 退出
+   ./build/bin/qtrade_config_service --config config/config_service.json
+   ./build/bin/qtrade_engine --config config/engine.json
    ```
+   Ctrl+C 退出支撑服务。
 
 3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。
 
@@ -186,7 +190,8 @@ qtrade/
 
 ### 6.1 共享基础代码
 
-- 所有跨模块共享的数据结构（Tick、Order、Position 等）统一放在 `include/qtrade/structs/`，避免重复定义
+- 跨模块共享的数据结构定义在 `qtrade_sdk/quote/`、`qtrade_sdk/trader/`；按需 `#include` 对应头文件，使用 `qtrade_sdk::quote::`、`qtrade_sdk::trader::` 命名空间
+- 错误码枚举见 `include/qtrade/error_code/error_codes.hpp`，分段规则见 `code_segment.hpp`
 - `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter/client 实现仍分别在 `src/adapter/`、`src/client/`
 - 模块内部头文件与 `.cpp` 同目录放在 `src/` 下，不放入 `include/`
 

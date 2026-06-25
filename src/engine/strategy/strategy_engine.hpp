@@ -6,7 +6,7 @@
 /// @copyright CC BY-NC-SA 4.0
 #ifndef QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
 #define QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
-#include "engine/event_bus/event_bus.hpp"
+#include "engine/event_bus/event_lanes.hpp"
 #include <qtrade/error_code/error_codes.hpp>
 #include <qtrade/strategy/strategy.hpp>
 
@@ -19,7 +19,7 @@ using OrderSender = std::function<ErrorCode(const qtrade_sdk::trader::OrderReque
 
 class StrategyEngine {
  public:
-  explicit StrategyEngine(event_bus::EventBus& event_bus);
+  explicit StrategyEngine(event_bus::EventLanes& event_lanes);
   ~StrategyEngine();
 
   void Start();
@@ -29,8 +29,9 @@ class StrategyEngine {
   void SetOrderSender(OrderSender sender);
 
  private:
-  event_bus::EventBus& event_bus_;
+  event_bus::EventLanes& event_lanes_;
   std::vector<std::unique_ptr<qtrade::strategy::IStrategy>> strategies_;
+  /// Market / Return 双线程回调共用此锁，串行进入策略（最小锁；OMS 另有 mutex_）
   std::mutex mutex_;
   bool running_;
   OrderSender order_sender_;

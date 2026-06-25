@@ -13,7 +13,8 @@
 
 namespace qtrade::engine::market {
 
-MarketHandler::MarketHandler(event_bus::EventBus& event_bus) : event_bus_(event_bus), running_(false) {}
+MarketHandler::MarketHandler(event_bus::MarketEventReactor& market_event_reactor)
+    : market_event_reactor_(market_event_reactor), running_(false) {}
 
 MarketHandler::~MarketHandler() { Stop(); }
 
@@ -79,8 +80,8 @@ void MarketHandler::Unsubscribe(const std::vector<std::string>& instruments) {
   spdlog::info("[MarketHandler] unsubscribed from {} instruments", instruments.size());
 }
 
-void MarketHandler::OnTick(const qtrade_sdk::quote::MarketTick& tick) { event_bus_.PublishTick(tick); }
+void MarketHandler::OnTick(const qtrade_sdk::quote::MarketTick& tick) { market_event_reactor_.PublishTick(tick); }
 
-void MarketHandler::OnBar(const qtrade_sdk::quote::Bar& bar) { event_bus_.PublishBar(bar); }
+void MarketHandler::OnBar(const qtrade_sdk::quote::Bar& bar) { market_event_reactor_.PublishBar(bar); }
 
 }  // namespace qtrade::engine::market

@@ -10,7 +10,7 @@
 
 #include <qtrade_sdk/quote/quote_api.hpp>
 
-#include "engine/event_bus/event_bus.hpp"
+#include "engine/event_bus/event_lanes.hpp"
 
 #include <memory>
 #include <mutex>
@@ -20,7 +20,7 @@ namespace qtrade::engine::market {
 
 class MarketHandler {
  public:
-  explicit MarketHandler(event_bus::EventBus& event_bus);
+  explicit MarketHandler(event_bus::MarketEventReactor& market_event_reactor);
   ~MarketHandler();
 
   void Start();
@@ -33,7 +33,7 @@ class MarketHandler {
   void Unsubscribe(const std::vector<std::string>& instruments);
 
  private:
-  event_bus::EventBus& event_bus_;
+  event_bus::MarketEventReactor& market_event_reactor_;
   std::unique_ptr<qtrade_sdk::quote::QuoteApi> market_source_;
   std::mutex mutex_;
   bool running_;

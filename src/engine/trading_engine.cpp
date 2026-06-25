@@ -51,7 +51,8 @@ ErrorCode ParseEngineOptionsFromJson(const std::string& json_path, EngineOptions
 
 }  // namespace
 
-TradingEngine::TradingEngine() : running_(false), strategy_engine_(event_bus_), market_handler_(event_bus_) {}
+TradingEngine::TradingEngine()
+    : strategy_engine_(event_lanes_), market_handler_(event_lanes_.Market()) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 
@@ -142,7 +143,7 @@ ErrorCode TradingEngine::Start() {
 
   spdlog::info("[TradingEngine] starting components...");
 
-  event_bus_.Start();
+  event_lanes_.Start();
   market_handler_.Start();
   strategy_engine_.Start();
   compliance_.Start();
@@ -180,7 +181,7 @@ ErrorCode TradingEngine::Stop() {
   compliance_.Stop();
   strategy_engine_.Stop();
   market_handler_.Stop();
-  event_bus_.Stop();
+  event_lanes_.Stop();
 
   config_client_.Shutdown();
   log_client_.Shutdown();

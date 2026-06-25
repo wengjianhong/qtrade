@@ -9,7 +9,7 @@
 #include "engine/account/account_manager.hpp"
 #include "engine/cms/compliance_manager.hpp"
 #include "engine/ems/execution_manager.hpp"
-#include "engine/event_bus/event_bus.hpp"
+#include "engine/event_bus/event_lanes.hpp"
 #include "engine/market/market_handler.hpp"
 #include "engine/oms/order_manager.hpp"
 #include "engine/position/position_manager.hpp"
@@ -67,8 +67,8 @@ class TradingEngine {
   /// @brief 引擎是否处于运行中
   [[nodiscard]] bool IsRunning() const;
 
-  /// @brief 获取事件总线引用
-  event_bus::EventBus& GetEventBus() { return event_bus_; }
+  /// @brief 获取事件通道门面（Lane-M + Lane-R）
+  event_bus::EventLanes& GetEventLanes() { return event_lanes_; }
 
   /// @brief 获取行情处理器引用
   market::MarketHandler& GetMarketHandler() { return market_handler_; }
@@ -99,7 +99,7 @@ class TradingEngine {
   bool initialized_ = false;                    ///< 是否已完成 Init
   bool running_ = false;                        ///< 是否已 Start
   EngineOptions options_;                       ///< 启动选项副本
-  event_bus::EventBus event_bus_;               ///< 进程内事件总线
+  event_bus::EventLanes event_lanes_;             ///< Lane-M / Lane-R 事件通道
   strategy::StrategyEngine strategy_engine_;    ///< 策略引擎
   market::MarketHandler market_handler_;        ///< 行情处理器
   cms::ComplianceManager compliance_;           ///< 合规模块

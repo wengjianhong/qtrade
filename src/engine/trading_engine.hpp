@@ -22,6 +22,7 @@
 #include "engine/engine_options.hpp"
 #include <qtrade/error_code/error_codes.hpp>
 
+#include <string>
 #include <string_view>
 
 namespace qtrade::engine {
@@ -42,6 +43,18 @@ class TradingEngine {
   /// @param options 引擎启动选项（config 地址、tenant、log/monitor 等）
   /// @return ErrorCode::kSuccess 表示成功
   ErrorCode Init(const EngineOptions& options);
+
+  /// @brief 使用已加载的 options_ 初始化（须先 ReloadFromJson 或手动设置 options）
+  /// @return ErrorCode::kSuccess 表示成功
+  ErrorCode Init();
+
+  /// @brief 从本地 JSON 文件加载/重载引擎配置（如 config/engine.json）
+  /// @param json_path 配置文件路径
+  /// @return ErrorCode::kSuccess 表示成功；文件不存在返回 ErrorCode::kNotFound
+  ErrorCode ReloadFromJson(const std::string& json_path);
+
+  /// @brief 返回当前引擎配置快照
+  [[nodiscard]] const EngineOptions& GetOptions() const { return options_; }
 
   /// @brief 停止所有子模块与 client
   /// @return ErrorCode::kSuccess 表示成功；未运行返回 ErrorCode::kSystemError

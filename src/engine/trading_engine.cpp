@@ -4,15 +4,68 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#include "trading_engine.hpp"
+#include "engine/trading_engine.hpp"
 
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
+#include <fstream>
+
 namespace qtrade::engine {
+
+namespace {
+
+ErrorCode ParseEngineOptionsFromJson(const std::string& json_path, EngineOptions& options) {
+  std::ifstream ifs(json_path);
+  if (!ifs.is_open()) {
+    spdlog::error("[TradingEngine] cannot open config: {}", json_path);
+    return ErrorCode::kNotFound;
+  }
+
+  nlohmann::json root;
+  try {
+    ifs >> root;
+  } catch (const nlohmann::json::exception& ex) {
+    spdlog::error("[TradingEngine] invalid config JSON: {}", ex.what());
+    return ErrorCode::kInternal;
+  }
+
+  if (root.contains("config_service")) {
+    options.config_server_address = root["config_service"].get<std::string>();
+  }
+  if (root.contains("tenant_id")) {
+    options.tenant_id = root["tenant_id"].get<std::string>();
+  }
+  if (root.contains("engine_id")) {
+    options.engine_id = root["engine_id"].get<std::string>();
+  }
+  if (root.contains("log_topic")) {
+    options.log_topic = root["log_topic"].get<std::string>();
+  }
+  if (root.contains("monitor_endpoint")) {
+    options.monitor_endpoint = root["monitor_endpoint"].get<std::string>();
+  }
+
+  return ErrorCode::kSuccess;
+}
+
+}  // namespace
 
 TradingEngine::TradingEngine() : running_(false), strategy_engine_(event_bus_), market_handler_(event_bus_) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
+
+ErrorCode TradingEngine::ReloadFromJson(const std::string& json_path) {
+  EngineOptions loaded;
+  if (const auto rc = ParseEngineOptionsFromJson(json_path, loaded); rc != ErrorCode::kSuccess) {
+    return rc;
+  }
+  options_ = std::move(loaded);
+  spdlog::info("[TradingEngine] config loaded from {}", json_path);
+  return ErrorCode::kSuccess;
+}
+
+ErrorCode TradingEngine::Init() { return Init(options_); }
 
 ErrorCode TradingEngine::Init(const EngineOptions& options) {
   if (initialized_) {

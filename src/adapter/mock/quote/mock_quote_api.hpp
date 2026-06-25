@@ -107,6 +107,9 @@ class MockQuoteApi final : public qtrade_sdk::quote::QuoteApi {
   std::thread tick_thread_;
 };
 
+/// @brief 创建 Mock 行情 Api，供 demo 与测试使用。
+std::unique_ptr<qtrade_sdk::quote::QuoteApi> CreateMockQuoteApi();
+
 }  // namespace qtrade::adapter::mock::quote
 
 #endif  // QTRADE_ADAPTER_MOCK_QUOTE_API_HPP_

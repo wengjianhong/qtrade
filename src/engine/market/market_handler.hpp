@@ -26,15 +26,15 @@ class MarketHandler {
   void Start();
   void Stop();
 
-  void SetMarketSource(std::unique_ptr<qtrade_sdk::quote::IMarketSource> source);
-  qtrade_sdk::quote::IMarketSource* GetMarketSource();
+  void SetQuoteApi(std::unique_ptr<qtrade_sdk::quote::QuoteApi> source);
+  qtrade_sdk::quote::QuoteApi* GetQuoteApi();
 
   void Subscribe(const std::vector<std::string>& instruments);
   void Unsubscribe(const std::vector<std::string>& instruments);
 
  private:
   event_bus::EventBus& event_bus_;
-  std::unique_ptr<qtrade_sdk::quote::IMarketSource> market_source_;
+  std::unique_ptr<qtrade_sdk::quote::QuoteApi> market_source_;
   std::mutex mutex_;
   bool running_;
 

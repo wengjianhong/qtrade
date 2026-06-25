@@ -38,7 +38,7 @@ void MarketHandler::Stop() {
   spdlog::info("[MarketHandler] stopped cleanly");
 }
 
-void MarketHandler::SetMarketSource(std::unique_ptr<qtrade_sdk::quote::IMarketSource> source) {
+void MarketHandler::SetQuoteApi(std::unique_ptr<qtrade_sdk::quote::QuoteApi> source) {
   std::lock_guard<std::mutex> lock(mutex_);
   market_source_ = std::move(source);
 
@@ -51,7 +51,7 @@ void MarketHandler::SetMarketSource(std::unique_ptr<qtrade_sdk::quote::IMarketSo
 }
 
 // 新增：获取当前行情源（用于外部初始化）
-qtrade_sdk::quote::IMarketSource* MarketHandler::GetMarketSource() {
+qtrade_sdk::quote::QuoteApi* MarketHandler::GetQuoteApi() {
   std::lock_guard<std::mutex> lock(mutex_);
   return market_source_.get();
 }

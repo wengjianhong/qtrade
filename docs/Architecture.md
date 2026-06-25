@@ -309,7 +309,7 @@ src/adapter/
 └── emt/quote|trader/      # EMT 生产：EmtXxxApi + EmtXxxSpi 成对出现
 ```
 
-工厂函数：`CreateMockMarketSource()` / `CreateMockTraderGateway()` 返回 Target Api 指针，引擎不感知具体厂商。
+工厂函数：`qtrade::adapter::mock::*::CreateMock*Api()` 返回 Target Api 指针，仅 demo/测试链接 mock 适配器时使用。
 
 #### 7.0.5 与引擎内部分发的关系
 
@@ -340,7 +340,7 @@ src/adapter/
 
 - 企业级扩展：`GetHealthStatus()`（健康状态上报）、`GetErrorCode()`（标准化错误码）、`SetPriority()`（数据源优先级）、`GetShardingId()`（获取当前分片 ID）
 
-> 历史文档中的 `IMarketSource` 已统一为 `qtrade_sdk::quote::QuoteApi`（别名 `IMarketSource`）。详见 §7.0。
+> 历史文档中的 `QuoteApi` 已统一为 `qtrade_sdk::quote::QuoteApi`（别名 `QuoteApi`）。详见 §7.0。
 
 #### 7.1.3 负载均衡策略（分阶段）
 

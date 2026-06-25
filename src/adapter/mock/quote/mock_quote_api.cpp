@@ -179,9 +179,7 @@ void MockQuoteApi::SetTickCallback(TickCallback cb) { on_tick_ = std::move(cb); 
 
 void MockQuoteApi::SetBarCallback(BarCallback cb) { on_bar_ = std::move(cb); }
 
-std::vector<std::string> MockQuoteApi::GetSupportedInstruments() const {
-  return {"IF2401", "IC2401", "IH2401"};
-}
+std::vector<std::string> MockQuoteApi::GetSupportedInstruments() const { return {"IF2401", "IC2401", "IH2401"}; }
 
 void MockQuoteApi::GenerateMockTicks() {
   std::random_device rd;
@@ -194,9 +192,9 @@ void MockQuoteApi::GenerateMockTicks() {
       for (const auto& instrument : instruments_) {
         sdk::MarketTick tick;
         tick.instrument = instrument;
-        tick.data_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                             std::chrono::system_clock::now().time_since_epoch())
-                             .count();
+        tick.data_time =
+          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
         base_price += std::uniform_real_distribution<>(-0.5, 0.5)(gen);
         tick.last_price = base_price;
 
@@ -229,10 +227,10 @@ void MockQuoteApi::GenerateMockTicks() {
 
 }  // namespace qtrade::adapter::mock::quote
 
-namespace qtrade_sdk::quote {
+namespace qtrade::adapter::mock::quote {
 
-std::unique_ptr<IMarketSource> CreateMockMarketSource() {
-  return std::make_unique<qtrade::adapter::mock::quote::MockQuoteApi>();
+std::unique_ptr<qtrade_sdk::quote::QuoteApi> CreateMockQuoteApi() {
+  return std::make_unique<MockQuoteApi>();
 }
 
-}  // namespace qtrade_sdk::quote
+}  // namespace qtrade::adapter::mock::quote

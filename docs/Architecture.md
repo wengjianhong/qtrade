@@ -151,11 +151,11 @@
 |模块名称（Google C\+\+ 规范）|核心功能|可插拔设计|企业级优化点|
 |---|---|---|---|
 |**事件总线模块**|进程内事件中枢，模块间消息传递|核心基础设施，支持事件类型扩展|1. 无锁队列，按事件类型分片；<br />2. 事件优先级（订单回报 > 行情 > 控制面）；|
-|**行情处理模块**|接收、清洗、标准化、分发行情数据|`IMarketSource` 适配器接口|1. 多数据源主备切换；<br />2. 行情校验与异常过滤；<br/>3. 本地环形缓冲；<br/>4. 按品种哈希分片 + CPU 亲和（MVP）；<br/>5. MarketLoadBalancer 分阶段扩展（§7.1.3）|
+|**行情处理模块**|接收、清洗、标准化、分发行情数据|`qtrade_sdk::quote::QuoteApi` / `QuoteSpi`（§7.0）|1. 多数据源主备切换；<br />2. 行情校验与异常过滤；<br/>3. 本地环形缓冲；<br/>4. 按品种哈希分片 + CPU 亲和（MVP）；<br/>5. MarketLoadBalancer 分阶段扩展（§7.1.3）|
 |**策略引擎模块**|加载、运行、管理策略，生成交易信号|`IStrategy` 插件接口|1. **故障隔离**（异常捕获 + 策略级熔断，见 §7.3）；<br />2. 资源限制（订单频率 / 内存配额）；<br/>3. 控制面热加载/卸载；<br/>4. 异常自动暂停并旁路上报告警|
 |**交易合规模块(cms)**|监管/合规硬规则（限仓、限购、日内频次、禁交易名单）|规则可配置化|1. 静态合规规则，变更需审计；<br />2. 合规拦截记录异步落盘（B 段）；<br/>3. 规则经控制面异步更新|
 |**订单管理模块(oms)**|订单全生命周期（创建/修改/取消/状态跟踪）|核心流程固定，支持订单类型扩展|1. WAL 异步持久化（B 段），保证不丢单；<br />2. 幂等性（全局唯一 order_id）；<br/>3. 多租户隔离；<br/>4. 超时自动处理|
-|**交易执行模块(ems)**|订单路由、拆单、算法执行、通道管理|`IExecutionAdapter` 适配器接口|1. 多通道故障转移；<br />2. 流量控制；<br/>3. 拆单算法；<br/>4. 出站发单走 C 段，与 A 段分别计量|
+|**交易执行模块(ems)**|订单路由、拆单、算法执行、通道管理|`qtrade_sdk::trader::TraderApi` / `TraderSpi`（§7.0）|1. 多通道故障转移；<br />2. 流量控制；<br/>3. 拆单算法；<br/>4. 出站发单走 C 段，与 A 段分别计量|
 |**账号管理模块**|资金、资产、可用额度实时核算|无，进程内状态|1. 多租户账户隔离；<br />2. 资金实时校验；<br/>3. 定时内存快照（B 段异步刷盘）|
 |**持仓管理模块(pms)**|持仓、开平、冻结、盈亏实时核算|无，进程内状态|1. 逐标的持仓；<br />2. 今/昨仓区分；<br/>3. 持仓异常校验|
 |**风险管理模块**|实时风险（PnL、亏损、涨跌停、异常行情熔断）|风险规则可配置化|1. 动态风控（租户/账户/策略/品种）；<br />2. 熔断与降频；<br/>3. 阈值经控制面异步更新|
@@ -249,27 +249,98 @@
 
 ## 七、适配层设计详细说明
 
+### 7.0 双向适配器模式（Api + Spi）
+
+券商/行情 SDK（如 EMT）是**双向 API**：引擎主动调用柜台（Api），柜台异步回调引擎（Spi）。适配层对每一侧各实现一个适配器，共同完成 **Adapter（适配器）模式**，但继承方向相反。
+
+#### 7.0.1 角色定义
+
+| 概念 | 行情 | 交易 | 说明 |
+|------|------|------|------|
+| **Target（稳定接口）** | `qtrade_sdk::quote::QuoteApi` / `QuoteSpi` | `qtrade_sdk::trader::TraderApi` / `TraderSpi` | 引擎与插件契约，定义于 `include/qtrade_sdk/` |
+| **Adaptee（厂商接口）** | `EMT::API::QuoteApi` / `QuoteSpi` | `EMT::API::TraderApi` / `TraderSpi` | 外部 SDK，结构体与回调签名由厂商定义 |
+| **Api 适配器** | `EmtQuoteApi` | `EmtTraderApi` | **public 继承 Target Api**，内部持有 Adaptee Api 并转发 |
+| **Spi 适配器** | `EmtQuoteSpi` | `EmtTraderSpi` | **public 继承 Adaptee Spi**（接入 SDK 后），内部持有 Target Spi 指针并转发 |
+| **引擎侧 Spi 实现** | 由 `MarketHandler` 等实现 | 由 EMS/OMS 等实现 | **实现** `qtrade_sdk::*Spi`，经 `RegisterSpi` 注册给适配器 |
+
+#### 7.0.2 调用方向（主动 vs 被动）
+
+```text
+主动侧（Api）：
+  引擎 ──调用──► XxxApi 适配器 : qtrade_sdk::XxxApi ──转发──► 厂商 XxxApi
+
+被动侧（Spi）：
+  厂商 XxxSpi ──回调──► XxxSpi 适配器 : 厂商::XxxSpi ──转换+委托──► 引擎实现的 qtrade_sdk::XxxSpi
+```
+
+**要点**：Spi 适配器**不**继承 `qtrade_sdk::*Spi`。`qtrade_sdk::*Spi` 是引擎要实现的 Target；Spi 适配器继承的是厂商回调接口，在 override 中做结构体转换后调用 `target_->On*()`。
+
+#### 7.0.3 接线示例（以 EMT 行情为例）
+
+```cpp
+// Api：适配器即 Target 的实现
+class EmtQuoteApi final : public qtrade_sdk::quote::QuoteApi {
+  void RegisterSpi(qtrade_sdk::quote::QuoteSpi& spi) override {
+    emt_spi_.SetTarget(&spi);
+    // emt_api_->RegisterSpi(&emt_spi_);
+  }
+  // Subscribe 等 → 转发至 emt_api_
+ private:
+  EmtQuoteSpi emt_spi_;
+  // EMT::API::QuoteApi* emt_api_;
+};
+
+// Spi：适配器即厂商回调的接收者
+class EmtQuoteSpi final : public EMT::API::QuoteSpi {
+  void OnDepthMarketData(EMT::EMTMarketData* data, ...) override {
+    // EMT 结构体 → qtrade_sdk::MarketTick
+    target_->OnDepthMarketData(tick, bid1_qty, ask1_qty);
+  }
+ private:
+  qtrade_sdk::quote::QuoteSpi* target_ = nullptr;
+};
+```
+
+#### 7.0.4 代码目录约定
+
+```text
+src/adapter/
+├── mock/quote|trader/     # 无厂商依赖：MockXxxApi : Target Api；MockXxxSpi 模拟厂商回调
+└── emt/quote|trader/      # EMT 生产：EmtXxxApi + EmtXxxSpi 成对出现
+```
+
+工厂函数：`CreateMockMarketSource()` / `CreateMockTraderGateway()` 返回 Target Api 指针，引擎不感知具体厂商。
+
+#### 7.0.5 与引擎内部分发的关系
+
+- **适配层 Spi**：厂商协议 → `qtrade_sdk` 类型（Adapter 边界）
+- **引擎 EventBus**：`MarketHandler` 等将 Tick 发布到策略/OMS（进程内 Observer/Mediator）
+
+二者职责不同：前者解决**外部接口兼容**，后者解决**内部模块解耦**。MVP 中 `MarketHandler` 可同时使用 `SetTickCallback` 与 `RegisterSpi`，逐步统一到 Spi 路径。
+
 ### 7.1 行情数据源适配器
 
 #### 7.1.1 整体架构新增负载均衡核心组件
 
 在原有适配器架构基础上，新增**行情负载均衡器（MarketLoadBalancer）** 核心组件，与数据源管理器深度集成，负责行情数据接收、分片、调度、故障转移全流程，确保行情处理的低延迟、高可用与负载均匀性。
 
-#### 7.1.2 抽象接口层（新增负载均衡扩展接口）
+#### 7.1.2 抽象接口层（Target）
 
-定义`IMarketSource`标准接口，包含：
+稳定接口定义于 `qtrade_sdk/quote/`（`QuoteApi`、`QuoteSpi`），引擎与适配器仅依赖此层。核心能力包括：
 
-- 连接管理：`Connect(config)`、`Disconnect()`
+- 连接管理：`Connect` / `Disconnect` / `IsConnected`
 
-- 订阅控制：`Subscribe(instruments)`、`Unsubscribe(instruments)`
+- 订阅控制：`Subscribe` / `Unsubscribe`（及厂商原生订阅接口）
 
-- 数据回调：`OnTick(tick_data)`、`OnBar(bar_data)`
+- 数据回调：`QuoteSpi::OnDepthMarketData` 等（由 Spi 适配器转发触发）
 
-- 状态查询：`IsConnected()`、`GetSupportedInstruments()`
+- 便捷回调：`SetTickCallback` / `SetBarCallback`（引擎内部路径，可与 Spi 并存）
 
 - 负载监控扩展：`GetLoadMetrics()`（返回 CPU 使用率 / 队列长度 / 处理延迟）、`SetShardingRule()`（设置品种分片规则）
 
 - 企业级扩展：`GetHealthStatus()`（健康状态上报）、`GetErrorCode()`（标准化错误码）、`SetPriority()`（数据源优先级）、`GetShardingId()`（获取当前分片 ID）
+
+> 历史文档中的 `IMarketSource` 已统一为 `qtrade_sdk::quote::QuoteApi`（别名 `IMarketSource`）。详见 §7.0。
 
 #### 7.1.3 负载均衡策略（分阶段）
 
@@ -288,9 +359,9 @@
 
 #### 7.1.4 插件实现层
 
-- 每种数据源（如 CTP、Binance、Wind）实现`IMarketSource`接口，兼容负载均衡扩展接口
+- 每种数据源（如 EMT、CTP、Wind）在 `src/adapter/<vendor>/quote/` 提供 **Api + Spi 成对实现**（§7.0），`MockQuoteApi` / `MockQuoteSpi` 用于开发测试
 - 编译为独立动态库（.so/.dll），包含插件元数据（支持的品种、数据类型、版本、兼容系统版本、支持的负载均衡策略）
-- 实现数据协议解析与转换（统一为系统内部格式）
+- Spi 适配器负责厂商结构体 → `qtrade_sdk` 类型的转换；Api 适配器负责引擎请求 → 厂商 API 的转发
 - 企业级扩展：
   - 插件签名校验，防止恶意插件；
   - 插件版本兼容检测，避免版本冲突；
@@ -308,22 +379,23 @@
 
 ### 7.2 交易执行模块适配器
 
-- **抽象接口层**：定义`IExecutionAdapter`接口，包含：
+- **抽象接口层（Target）**：定义于 `qtrade_sdk/trader/`（`TraderApi`、`TraderSpi`），包含：
 
-    - 连接管理：`Connect(config)`、`Disconnect()`
+    - 连接管理：`Connect` / `Disconnect` / `Login` / `Logout`
 
-    - 订单操作：`SendOrder(order)`、`CancelOrder(order_id)`
+    - 订单操作：`SendOrder` / `InsertOrder` / `CancelOrder`
 
-    - 查询功能：`QueryOrders(filters)`、`QueryTrades(filters)`
+    - 查询功能：`QueryOrders` / `QueryTrades` / `QueryPositions` / `QueryAsset`
 
-    - 回报回调：`OnOrderStatus(order)`、`OnTrade(trade)`
+    - 回报回调：`TraderSpi::OnOrderEvent` / `OnTradeEvent` 等（由 Spi 适配器转发触发）
 
     - 企业级扩展：`GetConnectionHealth()`（连接健康度）、`GetFlowControlStatus()`（流量控制状态）、`SetFailoverConfig()`（故障转移配置）、`GetExecutionCost()`（执行成本统计）
-- **适配器实现层**：
 
-    - 每个交易所 / 经纪商对应一个适配器（如: CTPAdapter, IBAdapter）
-    - 实现交易所协议转换（系统内部订单格式→交易所协议格式）
-    - 处理交易所回报解析与转换
+- **适配器实现层**（§7.0 双向适配）：
+
+    - 每个经纪商在 `src/adapter/<vendor>/trader/` 提供 `XxxTraderApi` + `XxxTraderSpi`
+    - **Api 适配器**继承 `TraderApi`，将发单/撤单/查询转发至厂商 API
+    - **Spi 适配器**继承厂商 `TraderSpi`，将回报解析为 `qtrade_sdk` 类型后调用引擎注册的 `TraderSpi`
     - 企业级扩展：
       - 适配器协议版本兼容，支持交易所协议升级；
       - 适配器流量控制，适配交易所限流规则；

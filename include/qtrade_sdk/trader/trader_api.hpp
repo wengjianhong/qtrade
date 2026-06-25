@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 
 namespace qtrade_sdk::trader {
@@ -269,6 +270,10 @@ class TraderApi {
 
 using ITradeGateway = TraderApi;
 using IExecutionAdapter = TraderApi;
+
+/// @brief 创建模拟交易网关，供示例和测试使用。
+/// @return 模拟交易网关实例。
+std::unique_ptr<ITradeGateway> CreateMockTraderGateway();
 
 }  // namespace qtrade_sdk::trader
 

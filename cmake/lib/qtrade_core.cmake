@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# qtrade_core：交易引擎核心库（adapter / engine / client / demo）
+# qtrade_core：交易引擎核心库（adapter/mock、adapter/emt / engine / client / demo）
 # ---------------------------------------------------------------------------
 
 # Source Files

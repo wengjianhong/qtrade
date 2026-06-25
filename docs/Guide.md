@@ -40,7 +40,7 @@ qtrade/
 ├── include/qtrade/                 # 【对外公共头文件】插件接口、共享数据结构、错误码
 │   ├── structs/                    # 框架通用结构（如 result.hpp）
 │   ├── error_code/                 # 错误码：error_codes.hpp、code_segment.hpp、code_message.hpp
-│   ├── adapter/                    # 适配器抽象接口：IMarketSource、IExecutionAdapter
+│   ├── qtrade_sdk/                 # 插件 Target 接口：quote/、trader/（Api + Spi）
 │   └── strategy/                   # 策略基类接口：IStrategy
 ├── src/
 │   ├── apps/                       # 【可部署二进制入口】仅含 main，目录名 = 产物名
@@ -53,8 +53,12 @@ qtrade/
 │   ├── public/                     # include/qtrade 公共 API 的实现（目录镜像）
 │   │   └── error_code/             # 错误码等非 header-only 实现
 │   ├── adapter/                    # 【可插拔适配器层】
-│   │   ├── market/
-│   │   └── executor/
+│   │   ├── mock/                   # Mock 开发/测试适配
+│   │   │   ├── quote/
+│   │   │   └── trader/
+│   │   └── emt/                    # EMT 厂商适配
+│   │       ├── quote/
+│   │       └── trader/
 │   ├── engine/                     # 【核心交易引擎层】库代码，无 main
 │   │   ├── event_bus/              # 事件总线
 │   │   ├── market/                 # 行情处理：接收、清洗、标准化、分发行情数据，多数据源融合
@@ -85,7 +89,8 @@ qtrade/
 │   └── strategy/                   # 可插拔策略插件开发示例：趋势跟踪、套利等简单策略实现
 ├── test/                           # 【测试代码】按模块分类，单元测试、集成测试、性能测试
 │   ├── engine/                     # 交易引擎测试：核心模块单元测试、链路测试
-│   ├── adapter/                    # 适配器测试：行情源、交易通道兼容性测试
+│   ├── quote/                      # 行情适配器测试
+│   ├── trader/                     # 交易适配器测试
 │   ├── strategy/                   # 策略测试：策略插件单元测试、回测验证
 │   ├── client/                     # 客户端测试：日志、配置、监控客户端连通性测试
 │   └── service/                    # 支撑服务测试：服务可用性、性能测试
@@ -162,9 +167,23 @@ qtrade/
 
 系统包含三类可插拔组件，均编译为独立动态库（`.so`/`.dll`）：
 
-1. **行情适配器**：实现 `IMarketSource` 接口，位于 `src/adapter/market/`
+1. **行情适配器**（Target = `qtrade_sdk::quote::QuoteApi` / `QuoteSpi`）
+   - `src/adapter/mock/quote/`：`mock_quote_api`、`mock_quote_spi`
+   - `src/adapter/emt/quote/`：`emt_quote_api`、`emt_quote_spi`
 
-2. **执行适配器**：实现 `IExecutionAdapter` 接口，位于 `src/adapter/executor/`
+2. **交易适配器**（Target = `qtrade_sdk::trader::TraderApi` / `TraderSpi`）
+   - `src/adapter/mock/trader/`：`mock_trader_api`、`mock_trader_spi`
+   - `src/adapter/emt/trader/`：`emt_trader_api`、`emt_trader_spi`
+
+**双向适配约定**（详见 `docs/Architecture.md` §7.0）：
+
+| 适配器 | 继承 | 职责 |
+|--------|------|------|
+| `XxxQuoteApi` / `XxxTraderApi` | **Target Api**（`qtrade_sdk::*Api`） | 引擎主动调用 → 转发至厂商 Api |
+| `XxxQuoteSpi` / `XxxTraderSpi` | **Adaptee Spi**（厂商 `*Spi`，接入 SDK 后） | 厂商回调 → 结构体转换 → 调用引擎注册的 Target `*Spi` |
+| 引擎内 `MarketHandler` 等 | **Target Spi**（`qtrade_sdk::*Spi`） | 实现 `On*` 回调，经 `RegisterSpi` 注入适配器 |
+
+Spi 适配器**不**继承 `qtrade_sdk::*Spi`；`#include` 该头文件仅为使用 `QuoteSpi*` 与结构体类型。
 
 3. **策略插件**：继承 `IStrategy` 基类，**由独立仓库维护**，本仓库仅保留示例
 

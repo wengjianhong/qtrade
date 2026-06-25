@@ -9,7 +9,7 @@
 #include "engine/trading_engine.hpp"
 #include "strategy/example_strategy.hpp"
 
-#include <qtrade/adapter/market_source.hpp>
+#include <qtrade_sdk/quote/quote_api.hpp>
 #include "engine/engine_config_loader.hpp"
 
 #include <spdlog/spdlog.h>
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   auto& market_handler = engine.GetMarketHandler();
   auto& strategy_engine = engine.GetStrategyEngine();
 
-  auto market_source = qtrade::adapter::CreateMockMarketSource();
+  auto market_source = qtrade_sdk::quote::CreateMockMarketSource();
   market_handler.SetMarketSource(std::move(market_source));
 
   auto strategy = qtrade::demo::CreateExampleStrategy();

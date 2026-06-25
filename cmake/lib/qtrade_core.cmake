@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# qtrade_core：交易引擎核心库（adapter / engine / client / demo）
+# qtrade_core：交易引擎核心库（adapter/mock、adapter/emt / engine / client / demo）
 # ---------------------------------------------------------------------------
 
 # Source Files
@@ -25,5 +25,6 @@ target_include_directories(qtrade_core PRIVATE
 )
 target_link_libraries(qtrade_core PUBLIC
     qtrade_common
+    qtrade_proto
     nlohmann_json::nlohmann_json
 )

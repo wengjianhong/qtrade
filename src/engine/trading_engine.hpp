@@ -15,37 +15,102 @@
 #include "engine/position/position_manager.hpp"
 #include "engine/risk/risk_manager.hpp"
 #include "engine/strategy/strategy_engine.hpp"
-#include <qtrade/error_code/code_define.hpp>
+
+#include "client/config_client/config_client.hpp"
+#include "client/log_client/log_client.hpp"
+#include "client/monitor_client/monitor_client.hpp"
+#include "engine/engine_options.hpp"
+#include <qtrade/error_code/error_codes.hpp>
+
+#include <string>
+#include <string_view>
 
 namespace qtrade::engine {
 
+/// @brief 交易引擎：单进程封闭运行，整合行情、策略、OMS、EMS 等模块
 class TradingEngine {
  public:
+  /// @brief 构造交易引擎（未初始化，须 Init 后 Start）
   TradingEngine();
+
+  /// @brief 析构并 Stop
   ~TradingEngine();
 
   TradingEngine(const TradingEngine&) = delete;
   TradingEngine& operator=(const TradingEngine&) = delete;
 
-  ErrorCode Stop();
-  ErrorCode Start();
-  bool IsRunning() const;
+  /// @brief 初始化控制面 gRPC 与 D 段 client（须在 Start 之前调用）
+  /// @param options 引擎启动选项（config 地址、tenant、log/monitor 等）
+  /// @return ErrorCode::kSuccess 表示成功
+  ErrorCode Init(const EngineOptions& options);
 
+  /// @brief 使用已加载的 options_ 初始化（须先 ReloadFromJson 或手动设置 options）
+  /// @return ErrorCode::kSuccess 表示成功
+  ErrorCode Init();
+
+  /// @brief 从本地 JSON 文件加载/重载引擎配置（如 config/engine.json）
+  /// @param json_path 配置文件路径
+  /// @return ErrorCode::kSuccess 表示成功；文件不存在返回 ErrorCode::kNotFound
+  ErrorCode ReloadFromJson(const std::string& json_path);
+
+  /// @brief 返回当前引擎配置快照
+  [[nodiscard]] const EngineOptions& GetOptions() const { return options_; }
+
+  /// @brief 停止所有子模块与 client
+  /// @return ErrorCode::kSuccess 表示成功；未运行返回 ErrorCode::kSystemError
+  ErrorCode Stop();
+
+  /// @brief 启动所有子模块（须先 Init）
+  /// @return ErrorCode::kSuccess 表示成功
+  ErrorCode Start();
+
+  /// @brief 引擎是否处于运行中
+  [[nodiscard]] bool IsRunning() const;
+
+  /// @brief 获取事件总线引用
   event_bus::EventBus& GetEventBus() { return event_bus_; }
+
+  /// @brief 获取行情处理器引用
   market::MarketHandler& GetMarketHandler() { return market_handler_; }
+
+  /// @brief 获取策略引擎引用
   strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
 
+  /// @brief 获取日志客户端引用
+  client::LogClient& GetLogClient() { return log_client_; }
+
+  /// @brief 获取监控客户端引用
+  client::MonitorClient& GetMonitorClient() { return monitor_client_; }
+
+  /// @brief 获取配置客户端引用
+  client::ConfigClient& GetConfigClient() { return config_client_; }
+
  private:
-  bool running_ = false;                        /// 运行状态标志
-  event_bus::EventBus event_bus_;               /// 事件总线，用于各个模块之间的通信
-  strategy::StrategyEngine strategy_engine_;    /// 策略引擎，用于处理策略逻辑
-  market::MarketHandler market_handler_;        /// 行情处理器，用于处理行情数据
-  cms::ComplianceManager compliance_;           /// 合规管理器，用于处理合规逻辑
-  ems::ExecutionManager execution_manager_;     /// 执行管理器，用于执行交易指令
-  oms::OrderManager order_manager_;             /// 订单管理器，用于管理订单
-  account::AccountManager account_manager_;     /// 账户管理器，用于管理账户
-  position::PositionManager position_manager_;  /// 持仓管理器，用于管理持仓
-  risk::RiskManager risk_manager_;              /// 风险管理器，用于管理风险
+  /// @brief 初始化并连接 config_client（GetConfig + WatchConfig）
+  /// @param options 引擎启动选项
+  /// @return ErrorCode::kSuccess 表示成功
+  ErrorCode InitConfigClient(const EngineOptions& options);
+
+  /// @brief 配置增量回调：写入本地快照并旁路日志
+  /// @param key 配置键
+  /// @param value 配置值
+  void OnConfigUpdate(std::string_view key, std::string_view value);
+
+  bool initialized_ = false;                    ///< 是否已完成 Init
+  bool running_ = false;                        ///< 是否已 Start
+  EngineOptions options_;                       ///< 启动选项副本
+  event_bus::EventBus event_bus_;               ///< 进程内事件总线
+  strategy::StrategyEngine strategy_engine_;    ///< 策略引擎
+  market::MarketHandler market_handler_;        ///< 行情处理器
+  cms::ComplianceManager compliance_;           ///< 合规模块
+  ems::ExecutionManager execution_manager_;     ///< 执行管理模块
+  oms::OrderManager order_manager_;             ///< 订单管理模块
+  account::AccountManager account_manager_;     ///< 账户管理模块
+  position::PositionManager position_manager_;  ///< 持仓管理模块
+  risk::RiskManager risk_manager_;              ///< 风险管理模块
+  client::ConfigClient config_client_;          ///< 控制面 gRPC 客户端
+  client::LogClient log_client_;                ///< D 段日志旁路客户端
+  client::MonitorClient monitor_client_;        ///< D 段监控旁路客户端
 };
 
 }  // namespace qtrade::engine

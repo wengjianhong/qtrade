@@ -1,0 +1,24 @@
+/// @file      engine_options.hpp
+/// @brief     交易引擎启动选项
+/// @author    wengjianhong
+/// @date      2026-06-22
+/// @copyright CC BY-NC-SA 4.0
+#ifndef QTRADE_ENGINE_ENGINE_OPTIONS_HPP_
+#define QTRADE_ENGINE_ENGINE_OPTIONS_HPP_
+
+#include <string>
+
+namespace qtrade::engine {
+
+/// @brief 交易引擎运行时选项（控制面 gRPC + D 段 client）
+struct EngineOptions {
+  std::string config_server_address;           ///< config-service gRPC 地址；空则跳过 config_client
+  std::string tenant_id = "default";           ///< 租户 ID
+  std::string engine_id = "default";           ///< 引擎实例 ID
+  std::string log_topic = "engine";            ///< log_client 日志主题
+  std::string monitor_endpoint;                ///< monitor_client 端点；空则使用 stub://local
+};
+
+}  // namespace qtrade::engine
+
+#endif  // QTRADE_ENGINE_ENGINE_OPTIONS_HPP_

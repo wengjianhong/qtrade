@@ -49,19 +49,19 @@ class EventBus {
 
   /// @brief 发布Tick数据事件
   /// @param tick Tick数据
-  void PublishTick(const MarketTick& tick);
+  void PublishTick(const qtrade_sdk::quote::MarketTick& tick);
 
   /// @brief 发布Bar数据事件
   /// @param bar Bar数据
-  void PublishBar(const Bar& bar);
+  void PublishBar(const qtrade_sdk::quote::Bar& bar);
 
   /// @brief 发布订单更新事件
   /// @param order 订单信息
-  void PublishOrder(const Order& order);
+  void PublishOrder(const qtrade_sdk::trader::Order& order);
 
   /// @brief 发布成交更新事件
   /// @param trade 成交信息
-  void PublishTrade(const Trade& trade);
+  void PublishTrade(const qtrade_sdk::trader::Trade& trade);
 
  private:
   bool running_;                                /// 运行状态标志

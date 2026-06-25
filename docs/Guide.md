@@ -11,11 +11,11 @@
 |适配层|`src/adapter/`（可插拔动态库：行情源、交易通道协议转换）|
 |交易引擎层|`src/engine/`（单进程封闭运行：事件总线、行情处理、策略引擎、OMS、EMS、账户、持仓、实时风控、合规）|
 |支撑服务客户端|`src/client/`（轻量级异步客户端：日志、配置、监控、服务发现）|
-|支撑服务层|`src/service/<名称>/`（独立进程 / 镜像部署；与核心通过消息队列 /gRPC 交互）|
+|支撑服务层|`src/service/<名称>/`（独立进程 / 镜像部署；与引擎经 gRPC 控制面与 `client/` 旁路接口交互）|
 |接入层|`api/gateway/`、`api/console/`（可按里程碑增补目录）|
 |企业级治理|多与接入层、运维流水线耦合：`release/deploy/`、`release/ci/`、密钥与策略以外置配置为主|
 
-**性能口径**：A/B/C/D 链路分段、控制面/数据面边界见《架构》**§1.3、§2.1**；**A 段**（策略回调同线程）禁止同步阻塞远程服务、禁止等待 Kafka/磁盘 fsync。
+**性能口径**：A/B/C/D 链路分段、控制面/数据面边界见《架构》**§1.3、§2.1**；**A 段**（策略回调同线程）禁止同步阻塞远程服务、禁止等待磁盘 fsync。
 
 ---
 
@@ -37,11 +37,10 @@ qtrade/
 │   ├── architecture.md             # 系统架构权威文档：架构总览、模块设计、交互方式、容灾方案、安全合规
 │   ├── guide.md                    # 开发指南：编码规范、插件开发流程、部署步骤、调试方法、协作规则
 │   └── deploy.md                   # 部署文档：各模块部署要求、机器配置、网络拓扑、监控告警、容灾切换
-├── include/qtrade/                 # 【对外公共头文件】插件、客户端、共享数据结构、错误码
-│   ├── structs/                    # 通用数据结构：订单、行情、Bar、常量等
-│   ├── error_code/                 # 错误码定义（AABBBCCC 三级编码）
-│   ├── adapter/                    # 适配器抽象接口：IMarketSource、IExecutionAdapter
-│   ├── client/                     # 支撑服务客户端接口：日志、配置、监控、服务发现
+├── include/qtrade/                 # 【对外公共头文件】插件接口、共享数据结构、错误码
+│   ├── structs/                    # 框架通用结构（如 result.hpp）
+│   ├── error_code/                 # 错误码：error_codes.hpp、code_segment.hpp、code_message.hpp
+│   ├── qtrade_sdk/                 # 插件 Target 接口：quote/、trader/（Api + Spi）
 │   └── strategy/                   # 策略基类接口：IStrategy
 ├── src/
 │   ├── apps/                       # 【可部署二进制入口】仅含 main，目录名 = 产物名
@@ -54,8 +53,12 @@ qtrade/
 │   ├── public/                     # include/qtrade 公共 API 的实现（目录镜像）
 │   │   └── error_code/             # 错误码等非 header-only 实现
 │   ├── adapter/                    # 【可插拔适配器层】
-│   │   ├── market/
-│   │   └── executor/
+│   │   ├── mock/                   # Mock 开发/测试适配
+│   │   │   ├── quote/
+│   │   │   └── trader/
+│   │   └── emt/                    # EMT 厂商适配
+│   │       ├── quote/
+│   │       └── trader/
 │   ├── engine/                     # 【核心交易引擎层】库代码，无 main
 │   │   ├── event_bus/              # 事件总线
 │   │   ├── market/                 # 行情处理：接收、清洗、标准化、分发行情数据，多数据源融合
@@ -66,11 +69,12 @@ qtrade/
 │   │   ├── account/                # 账户管理：资金、资产、可用额度实时核算，多租户隔离
 │   │   ├── position/               # 持仓管理：持仓、开平、冻结、盈亏实时核算，异常校验
 │   │   └── risk/                   # 风控管理
-│   ├── client/                     # 【支撑服务轻量级客户端】
-│   │   ├── log_client/             # 日志客户端：A段仅内存队列；异步批量上报 Kafka；P0 本地 spool（B 段线程）
-│   │   ├── config_client/          # 配置客户端：启动时拉取配置，运行时监听Kafka配置更新
-│   │   ├── monitor_client/         # 监控客户端：异步上报业务指标，不影响交易延迟
-│   │   └── registry_client/        # 服务发现客户端：仅用于支撑服务间，交易引擎不使用
+│   ├── client/                     # 【引擎内部】支撑服务出站客户端（头文件与 .cpp 同目录，不对外暴露）
+│   │   ├── common/                 # OutboundWorker、ReportPriority
+│   │   ├── log_client/             # 日志客户端：A 段仅内存队列；Outbound 线程异步上报
+│   │   ├── config_client/          # 配置客户端：GetConfig 冷启动；WatchConfig 运行时订阅（gRPC 出站）
+│   │   ├── monitor_client/         # 监控客户端：异步上报业务指标
+│   │   └── registry_client/        # 服务发现客户端：仅用于支撑服务间
 │   └── service/                    # 【支撑服务层】业务实现（无 main；入口在 src/apps/）
 │       ├── config_service/         # 配置管理服务实现
 │       ├── log_service/
@@ -78,11 +82,15 @@ qtrade/
 ├── api/                            # 【接入层】仅提供查询与配置提交功能，无任何交易操作权限
 │   ├── gateway/                    # API 网关：统一接入入口，认证，限流，路由，协议转换
 │   └── console/                    # 前端控制台：可视化查看（持仓/订单/绩效/日志/监控），配置提交
+├── config/                         # 【示例配置】本地开发默认 JSON（--config 传入，非编译产物）
+│   ├── engine.json                 # 交易引擎
+│   └── config_service.json         # 配置管理服务
 ├── demo/                           # 【示例代码】仅用于演示，不参与生产部署
 │   └── strategy/                   # 可插拔策略插件开发示例：趋势跟踪、套利等简单策略实现
 ├── test/                           # 【测试代码】按模块分类，单元测试、集成测试、性能测试
 │   ├── engine/                     # 交易引擎测试：核心模块单元测试、链路测试
-│   ├── adapter/                    # 适配器测试：行情源、交易通道兼容性测试
+│   ├── quote/                      # 行情适配器测试
+│   ├── trader/                     # 交易适配器测试
 │   ├── strategy/                   # 策略测试：策略插件单元测试、回测验证
 │   ├── client/                     # 客户端测试：日志、配置、监控客户端连通性测试
 │   └── service/                    # 支撑服务测试：服务可用性、性能测试
@@ -95,11 +103,12 @@ qtrade/
 
 1. **进程模型**：可执行入口在 **`src/apps/`**（仅 `main.cpp`）；**构建定义在 `cmake/`**（`src/` 下不放 CMakeLists）。`qtrade_core` 供引擎与测试链接；`qtrade_common` 供支撑服务链接。
 
-2. **本地运行示例**（`build/bin/`）：
+2. **本地运行示例**（`build/bin/`，在项目根目录执行）：
    ```shell
-   ./qtrade_engine --config /path/to/engine.json          # 引擎
-   ./qtrade_config_service --config /path/to/config.json  # 支撑服务，Ctrl+C 退出
+   ./build/bin/qtrade_config_service --config config/config_service.json
+   ./build/bin/qtrade_engine --config config/engine.json
    ```
+   Ctrl+C 退出支撑服务。
 
 3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。
 
@@ -115,17 +124,17 @@ qtrade/
 
 - **定义**（§1.3.1）：行情解析 → EventBus → 策略 → CMS → RiskManager → OMS 内存更新 → EMS 入队
 
-- **同线程禁止**：同步阻塞、磁盘 fsync、网络 I/O、等待 Kafka/支撑服务
+- **同线程禁止**：同步阻塞、磁盘 fsync、网络 I/O、调用支撑服务 client
 
 - **B 段（异步）**：OMS WAL、合规日志、快照由专用 I/O 线程批量写入，不得阻塞 A 段
 
-- **控制面**：本地快照 + Kafka 增量；冷启动 Bootstrap 拉全量（独立线程/启动阶段，不在策略回调内）
+- **控制面**：本地快照 + gRPC `WatchConfig` 增量；冷启动 `GetConfig` 拉全量（独立控制线程/启动阶段，不在策略回调内）
 
 ### 3.2 非热路径（C/D 段及支撑服务）
 
 - **定义**：回测、报表、日志检索、事后审计、批量查询、配置管理等
 
-- **约束**：gRPC、HTTP、Kafka；旁路背压策略见《架构》§8.1（A 段永不因旁路满而阻塞）
+- **约束**：gRPC、HTTP；D 段旁路背压策略见《架构》§8.1（A 段永不因旁路满而阻塞）
 
 ---
 
@@ -137,17 +146,18 @@ qtrade/
 |---|---|---|
 |交易引擎内部|内存结构体 + 无锁队列|无网络、无序列化|
 |交易引擎 ↔ 适配器|函数调用 + 回调接口|同进程内|
-|交易引擎 → 支撑服务|Protobuf + Kafka|异步单向推送，不等待响应|
+|交易引擎 → 支撑服务（D 段）|`client/` 异步接口 + Protobuf|Outbound 线程 fire-and-forget；内部传输可插拔，MVP 可 stub|
+|引擎 ↔ config-service|gRPC + Protobuf|引擎仅作 Client：`GetConfig` + `WatchConfig`|
 |支撑服务之间|gRPC + Protobuf|同步 / 异步均可|
 |接入层 ↔ 外部系统|HTTP(S)/WebSocket|RESTful 风格，网关做协议转换|
 
-### 4.2 消息队列规范
+### 4.2 旁路上报与配置订阅规范
 
-- 投递保证：至少一次投递，消费侧必须实现**幂等性**（通过业务唯一键去重）
+- **D 段**：`log_client`、`monitor_client` 等仅定义引擎侧异步接口；是否实现远程 gRPC/HTTP、是否 no-op 由里程碑决定
 
-- 分区策略：顺序敏感主题按「租户 / 账户 / 品种」分区，保证同一业务流的消息顺序
+- **控制面**：配置变更经 config-service 审计后，由 `WatchConfig` 流推送；引擎按 `config_version` 幂等应用
 
-- 优先级：配置更新主题使用独立分区与更高优先级，避免与大流量业务队列积压耦合
+- **优先级**：P0 审计须经本地 Spool 保底，不得仅依赖远程上报
 
 ---
 
@@ -157,9 +167,23 @@ qtrade/
 
 系统包含三类可插拔组件，均编译为独立动态库（`.so`/`.dll`）：
 
-1. **行情适配器**：实现 `IMarketSource` 接口，位于 `src/adapter/market/`
+1. **行情适配器**（Target = `qtrade_sdk::quote::QuoteApi` / `QuoteSpi`）
+   - `src/adapter/mock/quote/`：`mock_quote_api`、`mock_quote_spi`
+   - `src/adapter/emt/quote/`：`emt_quote_api`、`emt_quote_spi`
 
-2. **执行适配器**：实现 `IExecutionAdapter` 接口，位于 `src/adapter/executor/`
+2. **交易适配器**（Target = `qtrade_sdk::trader::TraderApi` / `TraderSpi`）
+   - `src/adapter/mock/trader/`：`mock_trader_api`、`mock_trader_spi`
+   - `src/adapter/emt/trader/`：`emt_trader_api`、`emt_trader_spi`
+
+**双向适配约定**（详见 `docs/Architecture.md` §7.0）：
+
+| 适配器 | 继承 | 职责 |
+|--------|------|------|
+| `XxxQuoteApi` / `XxxTraderApi` | **Target Api**（`qtrade_sdk::*Api`） | 引擎主动调用 → 转发至厂商 Api |
+| `XxxQuoteSpi` / `XxxTraderSpi` | **Adaptee Spi**（厂商 `*Spi`，接入 SDK 后） | 厂商回调 → 结构体转换 → 调用引擎注册的 Target `*Spi` |
+| 引擎内 `MarketHandler` 等 | **Target Spi**（`qtrade_sdk::*Spi`） | 实现 `On*` 回调，经 `RegisterSpi` 注入适配器 |
+
+Spi 适配器**不**继承 `qtrade_sdk::*Spi`；`#include` 该头文件仅为使用 `QuoteSpi*` 与结构体类型。
 
 3. **策略插件**：继承 `IStrategy` 基类，**由独立仓库维护**，本仓库仅保留示例
 
@@ -185,8 +209,9 @@ qtrade/
 
 ### 6.1 共享基础代码
 
-- 所有跨模块共享的数据结构（Tick、Order、Position 等）统一放在 `include/qtrade/structs/`，避免重复定义
-- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter/client 实现仍分别在 `src/adapter/`、`src/client/`
+- 跨模块共享的数据结构定义在 `qtrade_sdk/quote/`、`qtrade_sdk/trader/`；按需 `#include` 对应头文件，使用 `qtrade_sdk::quote::`、`qtrade_sdk::trader::` 命名空间
+- 错误码枚举见 `include/qtrade/error_code/error_codes.hpp`，分段规则见 `code_segment.hpp`
+- `include/qtrade/` 下需 `.cpp` 的公共 API 实现，目录镜像放在 `src/public/`（如 `error_code/code_message.cpp`）；adapter 实现在 `src/adapter/`；引擎内部 client 头文件与实现均在 `src/client/`
 - 模块内部头文件与 `.cpp` 同目录放在 `src/` 下，不放入 `include/`
 
 - 通用工具函数（时间、字符串、加密等）统一放在 `include/common/utils/`
@@ -195,11 +220,11 @@ qtrade/
 
 ### 6.2 交易引擎封闭性
 
-- 交易引擎**不对外开放任何 TCP/HTTP 控制接口**，所有外部操作只能通过支撑服务间接进行
+- 交易引擎**不对外开放任何 TCP/HTTP/gRPC 控制服务端**，所有外部操作只能通过支撑服务间接进行
 
 - 策略**仅由内部行情 Tick/Bar 事件驱动**，不接受任何外部触发信号
 
-- 所有配置更新只能通过 config_service 异步推送，不能直接修改交易引擎内存
+- 所有配置更新经 config-service 的 gRPC `WatchConfig` 推送，引擎出站订阅；禁止外部直接修改交易引擎内存
 
 ### 6.3 可观测性
 

@@ -4,7 +4,7 @@
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
-#include <qtrade/client/registry_client.hpp>
+#include "client/registry_client/registry_client.hpp"
 
 namespace qtrade::client {
 

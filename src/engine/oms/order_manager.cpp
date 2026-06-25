@@ -6,11 +6,13 @@
 /// @copyright CC BY-NC-SA 4.0
 #include "engine/oms/order_manager.hpp"
 
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 
 #include <spdlog/spdlog.h>
 
 namespace qtrade::engine::oms {
+
+namespace trader = qtrade_sdk::trader;
 
 OrderManager::OrderManager() : running_(false), order_id_counter_(0) {}
 
@@ -28,7 +30,7 @@ void OrderManager::Stop() {
   spdlog::info("[OrderManager] stopped");
 }
 
-ErrorCode OrderManager::SendOrder(const OrderRequest& request) {
+ErrorCode OrderManager::SendOrder(const trader::OrderRequest& request) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!running_) {
     return ErrorCode::kNotInitialized;
@@ -36,7 +38,7 @@ ErrorCode OrderManager::SendOrder(const OrderRequest& request) {
 
   const std::string order_id = "ORD-" + std::to_string(++order_id_counter_);
 
-  Order new_order;
+  trader::Order new_order;
   new_order.order_id = order_id;
   new_order.client_order_id = request.client_order_id;
   new_order.instrument = request.instrument;
@@ -48,8 +50,8 @@ ErrorCode OrderManager::SendOrder(const OrderRequest& request) {
   new_order.side = request.side;
   new_order.position_effect = request.position_effect;
   new_order.business_type = request.business_type;
-  new_order.status = OrderStatusType::kNew;
-  new_order.submit_status = OrderSubmitStatusType::kInsertSubmitted;
+  new_order.status = trader::OrderStatusType::kNew;
+  new_order.submit_status = trader::OrderSubmitStatusType::kInsertSubmitted;
 
   orders_[order_id] = new_order;
   spdlog::info("[OrderManager] order created: {}", order_id);
@@ -62,12 +64,12 @@ ErrorCode OrderManager::CancelOrder(const std::string& order_id) {
   if (it == orders_.end()) {
     return ErrorCode::kNotFound;
   }
-  it->second.status = OrderStatusType::kCanceled;
+  it->second.status = trader::OrderStatusType::kCanceled;
   spdlog::info("[OrderManager] order canceled: {}", order_id);
   return ErrorCode::kSuccess;
 }
 
-Order* OrderManager::GetOrder(const std::string& order_id) {
+trader::Order* OrderManager::GetOrder(const std::string& order_id) {
   std::lock_guard<std::mutex> lock(mutex_);
   auto it = orders_.find(order_id);
   if (it != orders_.end()) {
@@ -76,7 +78,7 @@ Order* OrderManager::GetOrder(const std::string& order_id) {
   return nullptr;
 }
 
-void OrderManager::UpdateOrderStatus(const std::string& order_id, OrderStatusType status) {
+void OrderManager::UpdateOrderStatus(const std::string& order_id, trader::OrderStatusType status) {
   std::lock_guard<std::mutex> lock(mutex_);
   auto it = orders_.find(order_id);
   if (it != orders_.end()) {

@@ -8,7 +8,7 @@
 #ifndef QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
 #define QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
 
-#include <qtrade/adapter/market_source.hpp>
+#include <qtrade_sdk/quote/quote_api.hpp>
 
 #include "engine/event_bus/event_bus.hpp"
 
@@ -26,20 +26,20 @@ class MarketHandler {
   void Start();
   void Stop();
 
-  void SetMarketSource(std::unique_ptr<adapter::IMarketSource> source);
-  adapter::IMarketSource* GetMarketSource();
+  void SetMarketSource(std::unique_ptr<qtrade_sdk::quote::IMarketSource> source);
+  qtrade_sdk::quote::IMarketSource* GetMarketSource();
 
   void Subscribe(const std::vector<std::string>& instruments);
   void Unsubscribe(const std::vector<std::string>& instruments);
 
  private:
   event_bus::EventBus& event_bus_;
-  std::unique_ptr<adapter::IMarketSource> market_source_;
+  std::unique_ptr<qtrade_sdk::quote::IMarketSource> market_source_;
   std::mutex mutex_;
   bool running_;
 
-  void OnTick(const MarketTick& tick);
-  void OnBar(const Bar& bar);
+  void OnTick(const qtrade_sdk::quote::MarketTick& tick);
+  void OnBar(const qtrade_sdk::quote::Bar& bar);
 };
 
 }  // namespace qtrade::engine::market

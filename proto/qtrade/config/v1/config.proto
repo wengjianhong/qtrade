@@ -1,0 +1,60 @@
+// @file      config.proto
+// @brief     配置中心 gRPC 接口定义
+// @details   控制面：引擎出站调用 GetConfig（冷启动）与 WatchConfig（运行时增量）
+syntax = "proto3";
+
+package qtrade.config.v1;
+
+option cc_enable_arenas = true;
+
+// 单条配置键值对
+message ConfigEntry {
+  // 配置键，如 strategy.example.enabled
+  string key = 1;    
+  // 配置值，字符串形式
+  string value = 2;  
+}
+
+// GetConfig 请求：按租户与引擎实例拉取全量快照
+message GetConfigRequest {
+  // 租户 ID
+  string tenant_id = 1;  
+  // 引擎实例 ID
+  string engine_id = 2;  
+}
+
+// 配置全量快照（冷启动 Bootstrap）
+message ConfigSnapshot {
+  // 单调递增配置版本号
+  uint64 version = 1;             
+  // 全量键值对列表
+  repeated ConfigEntry entries = 2;
+}
+
+// WatchConfig 请求：订阅 since_version 之后的增量变更
+message WatchConfigRequest {
+  // 租户 ID
+  string tenant_id = 1;     
+  // 引擎实例 ID
+  string engine_id = 2;     
+  // 客户端已应用的最新版本；服务端仅推送更大版本的 Delta
+  uint64 since_version = 3; 
+}
+
+// 配置增量变更（运行时控制面推送）
+message ConfigDelta {
+  // 本次变更后的版本号
+  uint64 version = 1;             
+  // 新增或更新的键值对
+  repeated ConfigEntry upserts = 2; 
+  // 待删除的配置键
+  repeated string deletes = 3;      
+}
+
+// 配置中心 gRPC 服务（引擎仅作 Client，不对外暴露 Server）
+service ConfigService {
+  // 冷启动：一次性拉取全量配置
+  rpc GetConfig(GetConfigRequest) returns (ConfigSnapshot);
+  // 运行时：Server Streaming 推送配置增量
+  rpc WatchConfig(WatchConfigRequest) returns (stream ConfigDelta);
+}

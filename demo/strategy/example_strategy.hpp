@@ -16,7 +16,7 @@ namespace qtrade::demo {
 // 简单的趋势跟踪策略
 class ExampleStrategy final : public strategy::IStrategy {
  public:
-  using OrderSender = std::function<ErrorCode(const OrderRequest&)>;
+  using OrderSender = std::function<ErrorCode(const qtrade_sdk::trader::OrderRequest&)>;
 
   ExampleStrategy();
   ~ExampleStrategy() override;
@@ -27,10 +27,10 @@ class ExampleStrategy final : public strategy::IStrategy {
   void Resume() override;
   void Stop() override;
 
-  void OnTick(const MarketTick& tick) override;
-  void OnBar(const Bar& bar) override;
-  void OnOrder(const Order& order) override;
-  void OnTrade(const Trade& trade) override;
+  void OnTick(const qtrade_sdk::quote::MarketTick& tick) override;
+  void OnBar(const qtrade_sdk::quote::Bar& bar) override;
+  void OnOrder(const qtrade_sdk::trader::Order& order) override;
+  void OnTrade(const qtrade_sdk::trader::Trade& trade) override;
 
   ErrorCode SendSignal(const strategy::Signal& signal) override;
   std::string GetParameter(const std::string& key) const override;

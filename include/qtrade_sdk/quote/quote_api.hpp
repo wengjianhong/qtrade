@@ -4,7 +4,7 @@
 #ifndef QTRADE_SDK_QUOTE_API_HPP_
 #define QTRADE_SDK_QUOTE_API_HPP_
 
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 #include <qtrade_sdk/quote/quote_spi.hpp>
 
 #include <cstddef>

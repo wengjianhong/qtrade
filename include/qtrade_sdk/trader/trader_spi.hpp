@@ -4,7 +4,7 @@
 #ifndef QTRADE_SDK_TRADER_SPI_HPP_
 #define QTRADE_SDK_TRADER_SPI_HPP_
 
-#include <qtrade_sdk/struct/trader_struct.hpp>
+#include <qtrade_sdk/trader/trader_struct.hpp>
 
 #include <cstdint>
 

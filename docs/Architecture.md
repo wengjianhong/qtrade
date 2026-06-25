@@ -33,7 +33,7 @@
 | **A. 内存决策链** | **是** | 行情入队 → 策略回调 → CMS/风控 → OMS 内存状态更新 → EMS 内存队列入队 |
 | **B. 异步持久化** | **否** | OMS WAL、合规日志、内存快照：独立 I/O 线程 / 批量 fsync，**不得阻塞 A 段同线程** |
 | **C. 出站发单** | **单独 SLA** | EMS → 执行适配器 → 交易所/券商 RTT，与 A 段分别压测与对外承诺 |
-| **D. 旁路上报** | **否** | Kafka 日志/监控/历史推送，异步单向，不等待响应 |
+| **D. 旁路上报** | **否** | 经 `log_client` / `monitor_client` 等异步接口上报，单向 fire-and-forget，不等待响应 |
 
 - **「核心交易链路」** 特指 **A 段**；典型路径：标准化行情入队 → 策略回调与信号生成 → CMS 合规校验 → 实时风控 → OMS 内存校验 → EMS 入队。
 
@@ -54,7 +54,7 @@
 | 平面 | 驱动来源 | 允许操作 | 禁止操作 |
 |---|---|---|---|
 | **数据面** | Tick/Bar/订单回报事件 | 策略逻辑、发单/撤单信号、风控拦截 | 外部 HTTP/TCP 直连触发交易 |
-| **控制面** | 配置中心 → Kafka → 引擎控制线程 | 策略启停/暂停、参数热更新、分片规则变更 | 绕过配置中心直接改引擎内存；同步阻塞热路径 |
+| **控制面** | 配置中心 ← gRPC Watch ← 引擎控制线程（出站订阅） | 策略启停/暂停、参数热更新、分片规则变更 | 绕过配置中心直接改引擎内存；同步阻塞热路径 |
 
 控制面变更**不产生订单**，仅改变策略生命周期或配置快照；生效后由下一 Tick 事件自然驱动数据面。
 
@@ -102,13 +102,13 @@
 
 ### 2.1 热路径与非热路径划分
 
-- **热路径（A 段，§1.3.1）**：行情解析 → 事件总线 → 策略触发 → CMS → 风控 → OMS 内存更新 → EMS 入队；**同线程禁止**：同步阻塞、调用支撑服务、等待磁盘 fsync、等待 Kafka 响应。
+- **热路径（A 段，§1.3.1）**：行情解析 → 事件总线 → 策略触发 → CMS → 风控 → OMS 内存更新 → EMS 入队；**同线程禁止**：同步阻塞、调用支撑服务、等待磁盘 fsync、等待远程 I/O 响应。
 
 - **准热路径（B 段，异步）**：OMS WAL、合规日志、内存快照；专用 I/O 线程批量写入，与 A 段线程解耦。
 
-- **非热路径（旁路异步）**：日志、监控、历史、备份、审计、回测；引擎侧经 **Kafka 异步单向推送**（Protobuf 序列化），**不等待响应**；支撑服务之间使用 **gRPC** 同步/异步调用。
+- **非热路径（D 段旁路）**：日志、监控、历史、审计等；A 段仅写入内存队列，由 **Outbound 线程**调用 `log_client` / `monitor_client` 等**异步上报接口**（Protobuf 载荷），**不等待响应**；client 内部实现（gRPC/HTTP/本地 Spool/stub）**架构不约束**，MVP 允许仅 stub 或本地落盘；支撑服务之间使用 **gRPC** 同步/异步调用。
 
-- **控制面**：配置与风控阈值采用**本地快照缓存 + Kafka 异步推送增量**；引擎启动时经 config_client **一次性 Bootstrap 拉取**全量配置（见 §8.1），运行时仅消费 Kafka 变更。
+- **控制面**：配置与风控阈值采用**本地快照缓存 + gRPC 增量订阅**；引擎以 **gRPC Client 出站**连接 config-service：`GetConfig` 冷启动拉全量，`WatchConfig`（Server Streaming）运行时收增量（见 §8.1）；**引擎不对外暴露 gRPC Server**。
 
 - **多租户上下文**：所有 EventBus 事件、OMS 状态、订单 ID 携带 `tenant_id`；策略插件默认不可跨租户访问内存状态。
 
@@ -117,7 +117,7 @@
 控制开局复杂度，按阶段扩展微服务边界：
 
 - **一期（MVP，合并部署）**：
-  - **config-service**：配置管理 + Bootstrap 下发 + 变更审计
+  - **config-service**：配置管理 + gRPC（`GetConfig` / `WatchConfig`）+ 变更审计
   - **observability-service**：日志采集 + 业务监控 + 基础告警（日志/监控原独立服务逻辑保留，可同进程多模块）
   - **history-service（可选）**：历史行情/成交简化存储；回测可暂用本地脚本
   - 引擎：固定品种哈希分片 + 主备行情源切换
@@ -127,7 +127,18 @@
 
 - **三期**：跨机房 Active-Passive 灾备、监管报送、智能风控；跨机房行情调度
 
-- **原则**：支撑服务与交易引擎**物理隔离**，可按需独立部署 / 关停，不影响实盘交易
+- **原则**：支撑服务与交易引擎**物理隔离**（Lite 档位例外见 §9.1），可按需独立部署 / 关停，不影响实盘交易
+
+### 2.3 引擎与支撑服务交互模型
+
+本系统**不引入独立消息中间件**（如 Kafka/Redis/NATS）作为引擎与支撑服务的必选基础设施。交互分为两类：
+
+| 类型 | 方向 | 机制 | 说明 |
+|---|---|---|---|
+| **控制面** | config-service → engine（逻辑推送） | gRPC Server Streaming | 引擎**主动出站**订阅 `WatchConfig`；config-service 在流上推送增量；禁止 config-service 回调引擎 RPC |
+| **D 段旁路** | engine → 支撑服务 | `src/client/` 异步上报接口 | Outbound 线程 fire-and-forget；各 client 内部实现可插拔，MVP 可为 stub |
+| **冷启动配置** | engine → config-service | gRPC `GetConfig` | 一次性全量拉取 + 本地兜底快照 |
+| **服务间查询** | 支撑服务 ↔ 支撑服务 | gRPC | 回测拉历史、审计查询等，不经引擎 |
 
 ---
 
@@ -135,16 +146,16 @@
 
 所有模块运行在同一进程内，通过内存级事件总线通信，避免跨进程延迟。
 
-**数据面**封闭：无对外 TCP/HTTP 控制口，仅通过适配器对接外部行情与交易所。**控制面**经 Kafka 异步投递（§1.3.3），不直接触发发单。
+**数据面**封闭：无对外 TCP/HTTP/gRPC 控制服务端，仅通过适配器对接外部行情与交易所。**控制面**经出站 gRPC 订阅 config-service（§1.3.3、§8.1），不直接触发发单。
 
 |模块名称（Google C\+\+ 规范）|核心功能|可插拔设计|企业级优化点|
 |---|---|---|---|
 |**事件总线模块**|进程内事件中枢，模块间消息传递|核心基础设施，支持事件类型扩展|1. 无锁队列，按事件类型分片；<br />2. 事件优先级（订单回报 > 行情 > 控制面）；|
-|**行情处理模块**|接收、清洗、标准化、分发行情数据|`IMarketSource` 适配器接口|1. 多数据源主备切换；<br />2. 行情校验与异常过滤；<br/>3. 本地环形缓冲；<br/>4. 按品种哈希分片 + CPU 亲和（MVP）；<br/>5. MarketLoadBalancer 分阶段扩展（§7.1.3）|
+|**行情处理模块**|接收、清洗、标准化、分发行情数据|`qtrade_sdk::quote::QuoteApi` / `QuoteSpi`（§7.0）|1. 多数据源主备切换；<br />2. 行情校验与异常过滤；<br/>3. 本地环形缓冲；<br/>4. 按品种哈希分片 + CPU 亲和（MVP）；<br/>5. MarketLoadBalancer 分阶段扩展（§7.1.3）|
 |**策略引擎模块**|加载、运行、管理策略，生成交易信号|`IStrategy` 插件接口|1. **故障隔离**（异常捕获 + 策略级熔断，见 §7.3）；<br />2. 资源限制（订单频率 / 内存配额）；<br/>3. 控制面热加载/卸载；<br/>4. 异常自动暂停并旁路上报告警|
 |**交易合规模块(cms)**|监管/合规硬规则（限仓、限购、日内频次、禁交易名单）|规则可配置化|1. 静态合规规则，变更需审计；<br />2. 合规拦截记录异步落盘（B 段）；<br/>3. 规则经控制面异步更新|
 |**订单管理模块(oms)**|订单全生命周期（创建/修改/取消/状态跟踪）|核心流程固定，支持订单类型扩展|1. WAL 异步持久化（B 段），保证不丢单；<br />2. 幂等性（全局唯一 order_id）；<br/>3. 多租户隔离；<br/>4. 超时自动处理|
-|**交易执行模块(ems)**|订单路由、拆单、算法执行、通道管理|`IExecutionAdapter` 适配器接口|1. 多通道故障转移；<br />2. 流量控制；<br/>3. 拆单算法；<br/>4. 出站发单走 C 段，与 A 段分别计量|
+|**交易执行模块(ems)**|订单路由、拆单、算法执行、通道管理|`qtrade_sdk::trader::TraderApi` / `TraderSpi`（§7.0）|1. 多通道故障转移；<br />2. 流量控制；<br/>3. 拆单算法；<br/>4. 出站发单走 C 段，与 A 段分别计量|
 |**账号管理模块**|资金、资产、可用额度实时核算|无，进程内状态|1. 多租户账户隔离；<br />2. 资金实时校验；<br/>3. 定时内存快照（B 段异步刷盘）|
 |**持仓管理模块(pms)**|持仓、开平、冻结、盈亏实时核算|无，进程内状态|1. 逐标的持仓；<br />2. 今/昨仓区分；<br/>3. 持仓异常校验|
 |**风险管理模块**|实时风险（PnL、亏损、涨跌停、异常行情熔断）|风险规则可配置化|1. 动态风控（租户/账户/策略/品种）；<br />2. 熔断与降频；<br/>3. 阈值经控制面异步更新|
@@ -159,11 +170,11 @@
 
 1. 所有模块运行在**同一个交易引擎进程**内，不拆分、不独立部署
 
-2. 交易引擎**不对外开放任何 TCP/HTTP 控制接口**；控制面变更仅经 **Kafka 消费线程** 应用
+2. 交易引擎**不对外开放任何 TCP/HTTP/gRPC 控制服务端**；控制面变更由**独立控制线程**经出站 gRPC `WatchConfig` 应用至本地快照
 
 3. **数据面**策略**仅由**内部 Tick/Bar/回报事件驱动，不接受外部触发发单信号
 
-4. **A 段热路径**（§1.3.1）禁止：同步阻塞、等待 Kafka/磁盘、调用支撑服务；**B/C/D 段**允许异步 I/O 与网络，但不得阻塞 A 段同线程
+4. **A 段热路径**（§1.3.1）禁止：同步阻塞、等待远程 I/O/磁盘、调用支撑服务；**B/C/D 段**允许异步 I/O 与网络，但不得阻塞 A 段同线程
 
 5. 行情分片与负载均衡逻辑**在进程内完成**；MVP 不做运行时跨分片迁移
 
@@ -171,7 +182,7 @@
 
 ## 四、支撑服务层（独立微服务，企业级治理）
 
-所有服务**独立部署在非交易服务器**，通过`异步消息队列（Kafka）`与`交易引擎通信`，强化服务治理、弹性伸缩、容灾备份能力，满足企业级微服务架构要求。**不影响交易、不占用交易资源、可随意扩容 / 缩容 / 重启**。
+所有服务**独立部署在非交易服务器**（Lite 档位例外见 §9.1），通过 **gRPC（控制面）** 与引擎侧 **`client/` 异步上报接口（D 段旁路）** 与交易引擎通信，强化服务治理、弹性伸缩、容灾备份能力。**不影响交易、不占用交易热路径资源、可随意扩容 / 缩容 / 重启**。
 
 |微服务名称|核心功能|技术特性|企业级优化点|
 |---|---|---|---|
@@ -190,13 +201,13 @@
 
 1. 所有支撑服务**不得与交易引擎部署在同一物理机 / 虚拟机**
 
-2. 支撑服务**禁止主动调用交易引擎**；配置变更经 Kafka 推送，引擎 **config_client** 被动消费
+2. 支撑服务**禁止主动调用交易引擎**（不向引擎发起 gRPC/HTTP）；配置增量由引擎 **config_client 出站订阅** `WatchConfig` 接收
 
-3. 交易引擎向支撑服务的旁路上报**均为异步单向推送**，不等待响应
+3. 交易引擎向支撑服务的旁路上报**经 `client/` 异步接口单向投递**，不等待响应；各服务接收端内部实现架构不约束
 
-4. 配置与分片规则变更**仅经 config-service 校验后 Kafka 下发**；禁止接入层或运维直连修改引擎内存
+4. 配置与分片规则变更**仅经 config-service 校验后**由 `WatchConfig` 流推送；禁止接入层或运维直连修改引擎内存
 
-5. **Bootstrap**：引擎冷启动时允许 config_client **一次性拉取**全量配置（HTTP/gRPC，超时独立、失败则使用本地兜底快照）；运行时仅 Kafka 增量，不在 A 段同步拉配置
+5. **配置拉取**：冷启动 `GetConfig` 拉全量（gRPC，超时独立、失败则使用本地兜底快照）；运行时 `WatchConfig` 收增量；均不在 A 段同步执行
 
 ---
 
@@ -217,7 +228,7 @@
 
 1. 接入层**不提供任何直连交易引擎的 API**
 
-2. 所有配置与策略生命周期变更必须经 **config-service → Kafka** 异步下发
+2. 所有配置与策略生命周期变更必须经 **config-service → gRPC WatchConfig** 异步下发（引擎出站订阅）
 
 3. 前端**禁止**下单、撤单、手动改单等交易操作入口；策略启停/参数变更属于**控制面配置提交**，非数据面干预
 
@@ -238,27 +249,98 @@
 
 ## 七、适配层设计详细说明
 
+### 7.0 双向适配器模式（Api + Spi）
+
+券商/行情 SDK（如 EMT）是**双向 API**：引擎主动调用柜台（Api），柜台异步回调引擎（Spi）。适配层对每一侧各实现一个适配器，共同完成 **Adapter（适配器）模式**，但继承方向相反。
+
+#### 7.0.1 角色定义
+
+| 概念 | 行情 | 交易 | 说明 |
+|------|------|------|------|
+| **Target（稳定接口）** | `qtrade_sdk::quote::QuoteApi` / `QuoteSpi` | `qtrade_sdk::trader::TraderApi` / `TraderSpi` | 引擎与插件契约，定义于 `include/qtrade_sdk/` |
+| **Adaptee（厂商接口）** | `EMT::API::QuoteApi` / `QuoteSpi` | `EMT::API::TraderApi` / `TraderSpi` | 外部 SDK，结构体与回调签名由厂商定义 |
+| **Api 适配器** | `EmtQuoteApi` | `EmtTraderApi` | **public 继承 Target Api**，内部持有 Adaptee Api 并转发 |
+| **Spi 适配器** | `EmtQuoteSpi` | `EmtTraderSpi` | **public 继承 Adaptee Spi**（接入 SDK 后），内部持有 Target Spi 指针并转发 |
+| **引擎侧 Spi 实现** | 由 `MarketHandler` 等实现 | 由 EMS/OMS 等实现 | **实现** `qtrade_sdk::*Spi`，经 `RegisterSpi` 注册给适配器 |
+
+#### 7.0.2 调用方向（主动 vs 被动）
+
+```text
+主动侧（Api）：
+  引擎 ──调用──► XxxApi 适配器 : qtrade_sdk::XxxApi ──转发──► 厂商 XxxApi
+
+被动侧（Spi）：
+  厂商 XxxSpi ──回调──► XxxSpi 适配器 : 厂商::XxxSpi ──转换+委托──► 引擎实现的 qtrade_sdk::XxxSpi
+```
+
+**要点**：Spi 适配器**不**继承 `qtrade_sdk::*Spi`。`qtrade_sdk::*Spi` 是引擎要实现的 Target；Spi 适配器继承的是厂商回调接口，在 override 中做结构体转换后调用 `target_->On*()`。
+
+#### 7.0.3 接线示例（以 EMT 行情为例）
+
+```cpp
+// Api：适配器即 Target 的实现
+class EmtQuoteApi final : public qtrade_sdk::quote::QuoteApi {
+  void RegisterSpi(qtrade_sdk::quote::QuoteSpi& spi) override {
+    emt_spi_.SetTarget(&spi);
+    // emt_api_->RegisterSpi(&emt_spi_);
+  }
+  // Subscribe 等 → 转发至 emt_api_
+ private:
+  EmtQuoteSpi emt_spi_;
+  // EMT::API::QuoteApi* emt_api_;
+};
+
+// Spi：适配器即厂商回调的接收者
+class EmtQuoteSpi final : public EMT::API::QuoteSpi {
+  void OnDepthMarketData(EMT::EMTMarketData* data, ...) override {
+    // EMT 结构体 → qtrade_sdk::MarketTick
+    target_->OnDepthMarketData(tick, bid1_qty, ask1_qty);
+  }
+ private:
+  qtrade_sdk::quote::QuoteSpi* target_ = nullptr;
+};
+```
+
+#### 7.0.4 代码目录约定
+
+```text
+src/adapter/
+├── mock/quote|trader/     # 无厂商依赖：MockXxxApi : Target Api；MockXxxSpi 模拟厂商回调
+└── emt/quote|trader/      # EMT 生产：EmtXxxApi + EmtXxxSpi 成对出现
+```
+
+工厂函数：`CreateMockMarketSource()` / `CreateMockTraderGateway()` 返回 Target Api 指针，引擎不感知具体厂商。
+
+#### 7.0.5 与引擎内部分发的关系
+
+- **适配层 Spi**：厂商协议 → `qtrade_sdk` 类型（Adapter 边界）
+- **引擎 EventBus**：`MarketHandler` 等将 Tick 发布到策略/OMS（进程内 Observer/Mediator）
+
+二者职责不同：前者解决**外部接口兼容**，后者解决**内部模块解耦**。MVP 中 `MarketHandler` 可同时使用 `SetTickCallback` 与 `RegisterSpi`，逐步统一到 Spi 路径。
+
 ### 7.1 行情数据源适配器
 
 #### 7.1.1 整体架构新增负载均衡核心组件
 
 在原有适配器架构基础上，新增**行情负载均衡器（MarketLoadBalancer）** 核心组件，与数据源管理器深度集成，负责行情数据接收、分片、调度、故障转移全流程，确保行情处理的低延迟、高可用与负载均匀性。
 
-#### 7.1.2 抽象接口层（新增负载均衡扩展接口）
+#### 7.1.2 抽象接口层（Target）
 
-定义`IMarketSource`标准接口，包含：
+稳定接口定义于 `qtrade_sdk/quote/`（`QuoteApi`、`QuoteSpi`），引擎与适配器仅依赖此层。核心能力包括：
 
-- 连接管理：`Connect(config)`、`Disconnect()`
+- 连接管理：`Connect` / `Disconnect` / `IsConnected`
 
-- 订阅控制：`Subscribe(instruments)`、`Unsubscribe(instruments)`
+- 订阅控制：`Subscribe` / `Unsubscribe`（及厂商原生订阅接口）
 
-- 数据回调：`OnTick(tick_data)`、`OnBar(bar_data)`
+- 数据回调：`QuoteSpi::OnDepthMarketData` 等（由 Spi 适配器转发触发）
 
-- 状态查询：`IsConnected()`、`GetSupportedInstruments()`
+- 便捷回调：`SetTickCallback` / `SetBarCallback`（引擎内部路径，可与 Spi 并存）
 
 - 负载监控扩展：`GetLoadMetrics()`（返回 CPU 使用率 / 队列长度 / 处理延迟）、`SetShardingRule()`（设置品种分片规则）
 
 - 企业级扩展：`GetHealthStatus()`（健康状态上报）、`GetErrorCode()`（标准化错误码）、`SetPriority()`（数据源优先级）、`GetShardingId()`（获取当前分片 ID）
+
+> 历史文档中的 `IMarketSource` 已统一为 `qtrade_sdk::quote::QuoteApi`（别名 `IMarketSource`）。详见 §7.0。
 
 #### 7.1.3 负载均衡策略（分阶段）
 
@@ -277,9 +359,9 @@
 
 #### 7.1.4 插件实现层
 
-- 每种数据源（如 CTP、Binance、Wind）实现`IMarketSource`接口，兼容负载均衡扩展接口
+- 每种数据源（如 EMT、CTP、Wind）在 `src/adapter/<vendor>/quote/` 提供 **Api + Spi 成对实现**（§7.0），`MockQuoteApi` / `MockQuoteSpi` 用于开发测试
 - 编译为独立动态库（.so/.dll），包含插件元数据（支持的品种、数据类型、版本、兼容系统版本、支持的负载均衡策略）
-- 实现数据协议解析与转换（统一为系统内部格式）
+- Spi 适配器负责厂商结构体 → `qtrade_sdk` 类型的转换；Api 适配器负责引擎请求 → 厂商 API 的转发
 - 企业级扩展：
   - 插件签名校验，防止恶意插件；
   - 插件版本兼容检测，避免版本冲突；
@@ -297,22 +379,23 @@
 
 ### 7.2 交易执行模块适配器
 
-- **抽象接口层**：定义`IExecutionAdapter`接口，包含：
+- **抽象接口层（Target）**：定义于 `qtrade_sdk/trader/`（`TraderApi`、`TraderSpi`），包含：
 
-    - 连接管理：`Connect(config)`、`Disconnect()`
+    - 连接管理：`Connect` / `Disconnect` / `Login` / `Logout`
 
-    - 订单操作：`SendOrder(order)`、`CancelOrder(order_id)`
+    - 订单操作：`SendOrder` / `InsertOrder` / `CancelOrder`
 
-    - 查询功能：`QueryOrders(filters)`、`QueryTrades(filters)`
+    - 查询功能：`QueryOrders` / `QueryTrades` / `QueryPositions` / `QueryAsset`
 
-    - 回报回调：`OnOrderStatus(order)`、`OnTrade(trade)`
+    - 回报回调：`TraderSpi::OnOrderEvent` / `OnTradeEvent` 等（由 Spi 适配器转发触发）
 
     - 企业级扩展：`GetConnectionHealth()`（连接健康度）、`GetFlowControlStatus()`（流量控制状态）、`SetFailoverConfig()`（故障转移配置）、`GetExecutionCost()`（执行成本统计）
-- **适配器实现层**：
 
-    - 每个交易所 / 经纪商对应一个适配器（如: CTPAdapter, IBAdapter）
-    - 实现交易所协议转换（系统内部订单格式→交易所协议格式）
-    - 处理交易所回报解析与转换
+- **适配器实现层**（§7.0 双向适配）：
+
+    - 每个经纪商在 `src/adapter/<vendor>/trader/` 提供 `XxxTraderApi` + `XxxTraderSpi`
+    - **Api 适配器**继承 `TraderApi`，将发单/撤单/查询转发至厂商 API
+    - **Spi 适配器**继承厂商 `TraderSpi`，将回报解析为 `qtrade_sdk` 类型后调用引擎注册的 `TraderSpi`
     - 企业级扩展：
       - 适配器协议版本兼容，支持交易所协议升级；
       - 适配器流量控制，适配交易所限流规则；
@@ -372,26 +455,36 @@
 
 - **交易引擎内部**：内存 EventBus（无锁队列）；MarketLoadBalancer 与适配器间内存队列
 
-- **交易引擎 → 支撑服务**：**Protobuf + Kafka**，异步单向，不等待响应
+- **交易引擎 → 支撑服务（D 段）**：经 `log_client`、`monitor_client` 等**异步上报接口**单向投递（A 段仅 `enqueue`；**Outbound 线程**调用 client）；载荷 Protobuf；**不等待响应**；client 内部传输（gRPC/HTTP/本地 Spool/no-op）**架构不规定**，MVP 允许 stub
 
-- **引擎冷启动 → config-service**：config_client **一次性 Bootstrap 拉取**全量配置（允许同步 HTTP/gRPC，独立超时）；失败则读本地兜底快照
-
-- **config-service → 交易引擎（运行时）**：Kafka 推送增量；引擎控制线程消费，**不阻塞 A 段**
+- **引擎 ↔ config-service（控制面，全程 gRPC）**：
+  - 冷启动：`GetConfig` 一次性拉全量配置（独立超时）；失败则读本地兜底快照
+  - 运行时：引擎以 **gRPC Client 出站**调用 `WatchConfig`（Server Streaming），config-service 在流上推送增量；**独立控制线程**消费并更新本地快照，**不阻塞 A 段**
+  - **禁止**：引擎对外提供 gRPC Server；禁止 config-service 主动 RPC 调用引擎
 
 - **支撑服务之间**：**gRPC + Protobuf**
 
 - **外部 → 交易引擎**：**禁止**；外部经接入层 → 支撑服务
 
-#### Kafka 旁路背压策略
+#### 控制面 gRPC 接口（概念）
 
-| 数据级别 | 示例 | Kafka 不可用时的行为 |
+| RPC | 类型 | 调用方 | 用途 |
+|---|---|---|---|
+| `GetConfig` | Unary | engine → config-service | 冷启动全量配置 |
+| `WatchConfig` | Server Streaming | engine → config-service | 运行时配置增量（携带 `since_version`） |
+
+断线时控制线程指数退避重连；重连期间沿用本地快照，交易不中断。
+
+#### 旁路背压策略
+
+| 数据级别 | 示例 | 远程上报不可用时的行为 |
 |---|---|---|
 | **P0 审计** | 合规拦截、发单/撤单流水 | 本地 spool 环形缓冲（有界）→ 恢复后重放；缓冲满则**拒写新 P0 并告警**（不阻塞 A 段） |
 | **P1 业务** | 订单状态、成交副本 | 有界缓冲，满则丢弃最旧批次并计数告警 |
 | **P2 指标** | 延迟直方图、队列深度 | 可丢弃 |
 | **P3 调试** | verbose 日志 | 可丢弃 |
 
-原则：**A 段永不因旁路满而阻塞**；P0 通过本地 spool + 运维告警保障最终一致。
+原则：**A 段永不因旁路满而阻塞**；P0 通过本地 spool + 运维告警保障最终一致；长期归档由 observability/audit 服务写入时序库或对象存储（≥3 年），不由引擎 client 保证。
 
 ### 8.2 核心数据流（最关键）
 
@@ -407,8 +500,16 @@
 
 ```Plain
 用户 → API 网关 → config-service（校验/审计）
-  ├─ 冷启动: config_client Bootstrap 拉取全量
-  └─ 运行时: Kafka → 引擎控制线程 → 策略/风控/分片本地快照
+  ├─ 冷启动: engine ──GetConfig──► config-service（全量）
+  └─ 运行时: engine ──WatchConfig（出站订阅）──► 控制线程 → 策略/风控/分片本地快照
+```
+
+D 段旁路上报数据流：
+
+```Plain
+A 段 enqueue → Outbound 线程 → log_client / monitor_client / …（异步接口，实现可插拔）
+  ├─ MVP：stub 或本地 Spool
+  └─ 二期+：各服务 gRPC 接收端内部落库 / 转发（架构不约束）
 ```
 
 外部 API 请求的数据流：
@@ -423,9 +524,8 @@
 |---|---|---|
 |交易引擎内部|内存结构体 + 无锁队列|A 段微秒级，同进程零拷贝|
 |交易引擎 ↔ 适配器|函数调用 + 回调|同进程插件，无网络|
-|交易引擎 ↔ 支撑服务（旁路上报）|Protobuf + Kafka|二进制序列化、高吞吐、引擎侧 fire-and-forget，不阻塞 A 段|
-|交易引擎 ↔ config-service（Bootstrap）|gRPC/HTTP + Protobuf|冷启动一次性全量拉取，与运行时 Kafka 增量分离|
-|config-service → 引擎（运行时）|Protobuf + Kafka|配置/控制面增量推送，控制线程异步消费|
+|交易引擎 → 支撑服务（D 段旁路）|`client/` 异步接口 + Protobuf|A 段仅入队；Outbound 线程 fire-and-forget；内部传输可插拔|
+|引擎 ↔ config-service（控制面）|gRPC + Protobuf|`GetConfig` 冷启动；`WatchConfig` 流式增量；引擎仅作 Client|
 |支撑服务之间|gRPC + Protobuf|强类型 RPC，适合查询与批量数据（如回测拉历史）|
 |接入层 ↔ 外部|HTTP/HTTPS + REST|OpenAPI 友好；网关可做 REST ↔ gRPC 转换|
 
@@ -449,7 +549,8 @@
 | 二期 | 单机房多实例 + 分片主备 | 节点故障时 Standby 升 Active（RTO < 30s） |
 | 三期 | 双机房 Active-Passive + 灾备 | 主机房 Active 集合；备机房热 Standby；灾备冷备 |
 
-- **支撑服务层**：二期起多副本；ClickHouse/Kafka 三副本与跨机房同步放在二期/三期
+- **支撑服务层**：二期起多副本；ClickHouse 三副本与跨机房同步放在二期/三期
+- **Lite 档位（可选）**：单租户 / 资源受限时，允许 config-service、observability 与 engine **同 VM** 部署，但 engine 须 CPU 绑核，且**不引入独立消息中间件**
 - **网络隔离**：交易引擎独立内网，与支撑服务、接入层防火墙隔离
 - **行情**：每引擎实例内置 MarketLoadBalancer；主备行情源可跨机房（三期）
 
@@ -529,8 +630,8 @@
 | EventBus + 引擎骨架 | MVP | ✅ 已有 |
 | CMS / OMS / EMS / 风控 / 持仓 | MVP | 🟡 模块骨架，WAL/幂等待完善 |
 | MarketLoadBalancer | MVP | ❌ 未实现，`MarketHandler` 直连单源 |
-| Kafka 旁路 client | MVP | 🟡 client 存在，引擎未集成 |
-| config Bootstrap + Kafka 增量 | MVP | 🟡 config_client 待接入引擎 |
+| 旁路 client（log/monitor） | MVP | 🟡 接口已有，远程上报未实现，引擎未集成 |
+| config_client gRPC（GetConfig + WatchConfig） | MVP | 🟡 config_client 待接入引擎 |
 | 支撑微服务 | MVP | 🟡 多为 stub |
 | 接入层 gateway/console | 二期 | ❌ 目录待建 |
 | 分片 Active-Passive | 二期 | ❌ |

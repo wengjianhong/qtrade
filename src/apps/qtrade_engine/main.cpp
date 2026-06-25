@@ -9,7 +9,7 @@
 #include "engine/trading_engine.hpp"
 #include "strategy/example_strategy.hpp"
 
-#include <qtrade/adapter/market_source.hpp>
+#include <qtrade_sdk/quote/quote_api.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -35,14 +35,23 @@ int main(int argc, char** argv) {
   spdlog::info("config: {}", config_path);
   spdlog::info("==================================================");
 
+  qtrade::engine::TradingEngine engine;
+  if (const auto rc = engine.ReloadFromJson(config_path); rc != qtrade::ErrorCode::kSuccess) {
+    spdlog::warn("[qtrade_engine] engine config load failed, using defaults");
+  }
+
   std::atomic<bool> stop_flag{false};
   qtrade::common::InstallShutdownHandler(stop_flag);
 
-  qtrade::engine::TradingEngine engine;
+  if (const auto rc = engine.Init(); rc != qtrade::ErrorCode::kSuccess) {
+    spdlog::error("[qtrade_engine] init failed, code={}", static_cast<int>(rc));
+    return EXIT_FAILURE;
+  }
+
   auto& market_handler = engine.GetMarketHandler();
   auto& strategy_engine = engine.GetStrategyEngine();
 
-  auto market_source = qtrade::adapter::CreateMockMarketSource();
+  auto market_source = qtrade_sdk::quote::CreateMockMarketSource();
   market_handler.SetMarketSource(std::move(market_source));
 
   auto strategy = qtrade::demo::CreateExampleStrategy();
@@ -51,10 +60,10 @@ int main(int argc, char** argv) {
   strategy->Init(strategy_cfg);
 
   auto* example_strategy = static_cast<qtrade::demo::ExampleStrategy*>(strategy.get());
-  auto order_sender = [](const qtrade::OrderRequest& request) {
+  auto order_sender = [](const qtrade_sdk::trader::OrderRequest& request) {
     spdlog::info("[OrderSender] {} {} {} @ {}",
                  request.instrument,
-                 request.side == qtrade::SideType::kBuy ? "BUY" : "SELL",
+                 request.side == qtrade_sdk::trader::SideType::kBuy ? "BUY" : "SELL",
                  request.volume,
                  request.price);
     return qtrade::ErrorCode::kSuccess;

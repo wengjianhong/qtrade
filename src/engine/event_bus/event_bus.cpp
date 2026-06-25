@@ -55,7 +55,7 @@ void EventBus::SubscribeTrade(TradeCallback callback) {
   trade_callbacks_.push_back(callback);
 }
 
-void EventBus::PublishTick(const MarketTick& tick) {
+void EventBus::PublishTick(const qtrade_sdk::quote::MarketTick& tick) {
   std::vector<TickCallback> callbacks;
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -72,7 +72,7 @@ void EventBus::PublishTick(const MarketTick& tick) {
   }
 }
 
-void EventBus::PublishBar(const Bar& bar) {
+void EventBus::PublishBar(const qtrade_sdk::quote::Bar& bar) {
   std::vector<BarCallback> callbacks;
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -89,7 +89,7 @@ void EventBus::PublishBar(const Bar& bar) {
   }
 }
 
-void EventBus::PublishOrder(const Order& order) {
+void EventBus::PublishOrder(const qtrade_sdk::trader::Order& order) {
   std::vector<OrderCallback> callbacks;
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -106,7 +106,7 @@ void EventBus::PublishOrder(const Order& order) {
   }
 }
 
-void EventBus::PublishTrade(const Trade& trade) {
+void EventBus::PublishTrade(const qtrade_sdk::trader::Trade& trade) {
   std::vector<TradeCallback> callbacks;
   {
     std::lock_guard<std::mutex> lock(mutex_);

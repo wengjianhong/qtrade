@@ -21,10 +21,10 @@ void StrategyEngine::Start() {
   running_ = true;
 
   // 订阅事件总线
-  event_bus_.SubscribeTick([this](const MarketTick& tick) { OnTickEvent(tick); });
-  event_bus_.SubscribeBar([this](const Bar& bar) { OnBarEvent(bar); });
-  event_bus_.SubscribeOrder([this](const Order& order) { OnOrderEvent(order); });
-  event_bus_.SubscribeTrade([this](const Trade& trade) { OnTradeEvent(trade); });
+  event_bus_.SubscribeTick([this](const qtrade_sdk::quote::MarketTick& tick) { OnTickEvent(tick); });
+  event_bus_.SubscribeBar([this](const qtrade_sdk::quote::Bar& bar) { OnBarEvent(bar); });
+  event_bus_.SubscribeOrder([this](const qtrade_sdk::trader::Order& order) { OnOrderEvent(order); });
+  event_bus_.SubscribeTrade([this](const qtrade_sdk::trader::Trade& trade) { OnTradeEvent(trade); });
 
   // 启动所有策略
   for (auto& strategy : strategies_) {
@@ -60,7 +60,7 @@ void StrategyEngine::SetOrderSender(OrderSender sender) {
   order_sender_ = std::move(sender);
 }
 
-void StrategyEngine::OnTickEvent(const MarketTick& tick) {
+void StrategyEngine::OnTickEvent(const qtrade_sdk::quote::MarketTick& tick) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (auto& strategy : strategies_) {
     try {
@@ -71,7 +71,7 @@ void StrategyEngine::OnTickEvent(const MarketTick& tick) {
   }
 }
 
-void StrategyEngine::OnBarEvent(const Bar& bar) {
+void StrategyEngine::OnBarEvent(const qtrade_sdk::quote::Bar& bar) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (auto& strategy : strategies_) {
     try {
@@ -82,7 +82,7 @@ void StrategyEngine::OnBarEvent(const Bar& bar) {
   }
 }
 
-void StrategyEngine::OnOrderEvent(const Order& order) {
+void StrategyEngine::OnOrderEvent(const qtrade_sdk::trader::Order& order) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (auto& strategy : strategies_) {
     try {
@@ -93,7 +93,7 @@ void StrategyEngine::OnOrderEvent(const Order& order) {
   }
 }
 
-void StrategyEngine::OnTradeEvent(const Trade& trade) {
+void StrategyEngine::OnTradeEvent(const qtrade_sdk::trader::Trade& trade) {
   std::lock_guard<std::mutex> lock(mutex_);
   for (auto& strategy : strategies_) {
     try {

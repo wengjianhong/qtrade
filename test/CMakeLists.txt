@@ -7,7 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test/bin)
 find_package(GTest 1.14.0 REQUIRED)
 
 # Source Files
-file(GLOB_RECURSE ALL_TEST_FILES CONFIGURE_DEPENDS "*.cpp")
+file(GLOB_RECURSE ALL_TEST_FILES CONFIGURE_DEPENDS "test_*.cpp")
 
 # Build Executable
 add_executable(qtrade_tests ${ALL_TEST_FILES})
@@ -29,6 +29,6 @@ target_link_libraries(qtrade_tests PRIVATE
 include(GoogleTest)
 gtest_discover_tests(qtrade_tests
     PROPERTIES
-        LABELS "unit"
+        LABELS "unit_test"
         DISCOVERY_TIMEOUT 60
 )

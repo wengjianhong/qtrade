@@ -8,7 +8,8 @@
 #ifndef QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 #define QTRADE_TRADING_ENGINE_EVENT_TYPES_HPP_
 
-#include "qtrade/domain.hpp"
+#include <qtrade_sdk/quote/quote_struct.hpp>
+#include <qtrade_sdk/trader/trader_struct.hpp>
 
 #include <chrono>
 #include <functional>
@@ -34,40 +35,40 @@ struct Event {
 
 /// @brief Tick 数据事件
 struct TickEvent : public Event {
-  MarketTick tick;
+  qtrade_sdk::quote::MarketTick tick;
 
-  explicit TickEvent(const MarketTick& t) : Event(EventType::kTickData), tick(t) {}
+  explicit TickEvent(const qtrade_sdk::quote::MarketTick& t) : Event(EventType::kTickData), tick(t) {}
 };
 
 /// @brief Bar 数据事件
 struct BarEvent : public Event {
-  Bar bar;
+  qtrade_sdk::quote::Bar bar;
 
-  explicit BarEvent(const Bar& b) : Event(EventType::kBarData), bar(b) {}
+  explicit BarEvent(const qtrade_sdk::quote::Bar& b) : Event(EventType::kBarData), bar(b) {}
 };
 
 /// @brief 订单更新事件
 struct OrderEvent : public Event {
-  Order order;
+  qtrade_sdk::trader::Order order;
 
-  explicit OrderEvent(const Order& o) : Event(EventType::kOrderUpdate), order(o) {}
+  explicit OrderEvent(const qtrade_sdk::trader::Order& o) : Event(EventType::kOrderUpdate), order(o) {}
 };
 
 /// @brief 成交更新事件
 struct TradeEvent : public Event {
-  Trade trade;
+  qtrade_sdk::trader::Trade trade;
 
-  explicit TradeEvent(const Trade& t) : Event(EventType::kTradeUpdate), trade(t) {}
+  explicit TradeEvent(const qtrade_sdk::trader::Trade& t) : Event(EventType::kTradeUpdate), trade(t) {}
 };
 
 /// @brief Tick 数据回调类型
-using TickCallback = std::function<void(const MarketTick&)>;
+using TickCallback = std::function<void(const qtrade_sdk::quote::MarketTick&)>;
 /// @brief Bar 数据回调类型
-using BarCallback = std::function<void(const Bar&)>;
+using BarCallback = std::function<void(const qtrade_sdk::quote::Bar&)>;
 /// @brief 订单更新回调类型
-using OrderCallback = std::function<void(const Order&)>;
+using OrderCallback = std::function<void(const qtrade_sdk::trader::Order&)>;
 /// @brief 成交更新回调类型
-using TradeCallback = std::function<void(const Trade&)>;
+using TradeCallback = std::function<void(const qtrade_sdk::trader::Trade&)>;
 
 }  // namespace qtrade::engine::event_bus
 

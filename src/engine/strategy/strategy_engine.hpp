@@ -7,14 +7,15 @@
 #ifndef QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
 #define QTRADE_TRADING_ENGINE_STRATEGY_ENGINE_HPP_
 #include "engine/event_bus/event_bus.hpp"
-#include <qtrade/error_code/code_define.hpp>
+#include <qtrade/error_code/error_codes.hpp>
 #include <qtrade/strategy/strategy.hpp>
 
+#include <functional>
 #include <mutex>
 
 namespace qtrade::engine::strategy {
 
-using OrderSender = std::function<ErrorCode(const OrderRequest&)>;
+using OrderSender = std::function<ErrorCode(const qtrade_sdk::trader::OrderRequest&)>;
 
 class StrategyEngine {
  public:
@@ -34,10 +35,10 @@ class StrategyEngine {
   bool running_;
   OrderSender order_sender_;
 
-  void OnTickEvent(const MarketTick& tick);
-  void OnBarEvent(const Bar& bar);
-  void OnOrderEvent(const Order& order);
-  void OnTradeEvent(const Trade& trade);
+  void OnTickEvent(const qtrade_sdk::quote::MarketTick& tick);
+  void OnBarEvent(const qtrade_sdk::quote::Bar& bar);
+  void OnOrderEvent(const qtrade_sdk::trader::Order& order);
+  void OnTradeEvent(const qtrade_sdk::trader::Trade& trade);
 };
 
 }  // namespace qtrade::engine::strategy

@@ -15,7 +15,7 @@ namespace qtrade::client {
 enum class ReportPriority : std::uint8_t {
   kP0Audit = 0,     ///< 合规拦截、发单/撤单流水
   kP1Business = 1,  ///< 订单状态、成交副本
-  kP2Metrics = 2,     ///< 延迟直方图、队列深度
+  kP2Metrics = 2,   ///< 延迟直方图、队列深度
   kP3Debug = 3,     ///< verbose 日志
 };
 

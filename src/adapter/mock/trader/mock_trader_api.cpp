@@ -260,10 +260,10 @@ void MockTraderApi::SetTradeCallback(TradeCallback cb) { on_trade_ = std::move(c
 
 }  // namespace qtrade::adapter::mock::trader
 
-namespace qtrade_sdk::trader {
+namespace qtrade::adapter::mock::trader {
 
-std::unique_ptr<ITradeGateway> CreateMockTraderGateway() {
-  return std::make_unique<qtrade::adapter::mock::trader::MockTraderApi>();
+std::unique_ptr<qtrade_sdk::trader::TraderApi> CreateMockTraderApi() {
+  return std::make_unique<MockTraderApi>();
 }
 
-}  // namespace qtrade_sdk::trader
+}  // namespace qtrade::adapter::mock::trader

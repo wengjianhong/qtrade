@@ -9,8 +9,9 @@
 #include "engine/account/account_manager.hpp"
 #include "engine/cms/compliance_manager.hpp"
 #include "engine/ems/execution_manager.hpp"
-#include "engine/event_bus/event_bus.hpp"
-#include "engine/market/market_handler.hpp"
+#include "engine/event_bus/event_lanes.hpp"
+#include "engine/normalizer/quote_normalizer.hpp"
+#include "engine/normalizer/trader_normalizer.hpp"
 #include "engine/oms/order_manager.hpp"
 #include "engine/position/position_manager.hpp"
 #include "engine/risk/risk_manager.hpp"
@@ -67,11 +68,14 @@ class TradingEngine {
   /// @brief 引擎是否处于运行中
   [[nodiscard]] bool IsRunning() const;
 
-  /// @brief 获取事件总线引用
-  event_bus::EventBus& GetEventBus() { return event_bus_; }
+  /// @brief 获取事件通道门面（Lane-M + Lane-R）
+  event_bus::EventLanes& GetEventLanes() { return event_lanes_; }
 
-  /// @brief 获取行情处理器引用
-  market::MarketHandler& GetMarketHandler() { return market_handler_; }
+  /// @brief 获取行情标准化模块引用
+  normalizer::QuoteNormalizer& GetQuoteNormalizer() { return quote_normalizer_; }
+
+  /// @brief 获取交易标准化模块引用
+  normalizer::TraderNormalizer& GetTraderNormalizer() { return trader_normalizer_; }
 
   /// @brief 获取策略引擎引用
   strategy::StrategyEngine& GetStrategyEngine() { return strategy_engine_; }
@@ -99,9 +103,10 @@ class TradingEngine {
   bool initialized_ = false;                    ///< 是否已完成 Init
   bool running_ = false;                        ///< 是否已 Start
   EngineOptions options_;                       ///< 启动选项副本
-  event_bus::EventBus event_bus_;               ///< 进程内事件总线
+  event_bus::EventLanes event_lanes_;           ///< Lane-M / Lane-R 事件通道
   strategy::StrategyEngine strategy_engine_;    ///< 策略引擎
-  market::MarketHandler market_handler_;        ///< 行情处理器
+  normalizer::QuoteNormalizer quote_normalizer_;    ///< 行情标准化（QuoteNormalizer）
+  normalizer::TraderNormalizer trader_normalizer_;  ///< 交易标准化（TraderNormalizer）
   cms::ComplianceManager compliance_;           ///< 合规模块
   ems::ExecutionManager execution_manager_;     ///< 执行管理模块
   oms::OrderManager order_manager_;             ///< 订单管理模块

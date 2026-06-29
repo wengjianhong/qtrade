@@ -180,12 +180,6 @@ class QuoteApi {
   virtual std::vector<std::string> GetSupportedInstruments() const = 0;
 };
 
-using IMarketSource = QuoteApi;
-
-/// @brief 创建模拟行情源，供示例和测试使用。
-/// @return 模拟行情源实例。
-std::unique_ptr<IMarketSource> CreateMockMarketSource();
-
 }  // namespace qtrade_sdk::quote
 
 #endif  // QTRADE_SDK_QUOTE_API_HPP_

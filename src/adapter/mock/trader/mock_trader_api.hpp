@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 
 namespace qtrade::adapter::mock::trader {
@@ -142,6 +143,9 @@ class MockTraderApi final : public qtrade_sdk::trader::TraderApi {
   bool connected_ = false;
   std::uint64_t session_id_ = 0;
 };
+
+/// @brief 创建 Mock 交易 Api，供 demo 与测试使用。
+std::unique_ptr<qtrade_sdk::trader::TraderApi> CreateMockTraderApi();
 
 }  // namespace qtrade::adapter::mock::trader
 

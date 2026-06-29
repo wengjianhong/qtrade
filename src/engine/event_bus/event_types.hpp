@@ -11,27 +11,28 @@
 #include <qtrade_sdk/quote/quote_struct.hpp>
 #include <qtrade_sdk/trader/trader_struct.hpp>
 
-#include <chrono>
+#include <memory>
 #include <functional>
 
 namespace qtrade::engine::event_bus {
 
 /// @brief 事件类型枚举
 enum class EventType {
-  kTickData = 0,     /// 市场数据事件
-  kBarData = 1,      /// K线柱数据事件
-  kOrderUpdate = 2,  /// 订单更新事件
-  kTradeUpdate = 3,  /// 成交更新事件
+  kTickData = 0,     ///< 市场 Tick 事件（Lane-M）
+  kBarData = 1,      ///< K 线 Bar 事件（Lane-M）
+  kOrderUpdate = 2,  ///< 订单回报事件（Lane-R）
+  kTradeUpdate = 3,  ///< 成交回报事件（Lane-R）
 };
 
-/// @brief 事件基类
+/// @brief 事件基类；Reactor 队列以 `EventPtr` 多态入队；时间见各子类载荷字段
 struct Event {
   EventType type;
-  std::chrono::system_clock::time_point timestamp;
 
-  explicit Event(EventType t) : type(t), timestamp(std::chrono::system_clock::now()) {}
+  explicit Event(EventType t) : type(t) {}
   virtual ~Event() = default;
 };
+
+using EventPtr = std::unique_ptr<Event>;
 
 /// @brief Tick 数据事件
 struct TickEvent : public Event {
@@ -61,14 +62,14 @@ struct TradeEvent : public Event {
   explicit TradeEvent(const qtrade_sdk::trader::Trade& t) : Event(EventType::kTradeUpdate), trade(t) {}
 };
 
-/// @brief Tick 数据回调类型
-using TickCallback = std::function<void(const qtrade_sdk::quote::MarketTick&)>;
-/// @brief Bar 数据回调类型
-using BarCallback = std::function<void(const qtrade_sdk::quote::Bar&)>;
-/// @brief 订单更新回调类型
-using OrderCallback = std::function<void(const qtrade_sdk::trader::Order&)>;
-/// @brief 成交更新回调类型
-using TradeCallback = std::function<void(const qtrade_sdk::trader::Trade&)>;
+/// @brief Tick 事件处理器（Lane-M）
+using TickEventHandler = std::function<void(const qtrade_sdk::quote::MarketTick&)>;
+/// @brief Bar 事件处理器（Lane-M）
+using BarEventHandler = std::function<void(const qtrade_sdk::quote::Bar&)>;
+/// @brief 订单回报事件处理器（Lane-R）
+using OrderEventHandler = std::function<void(const qtrade_sdk::trader::Order&)>;
+/// @brief 成交回报事件处理器（Lane-R）
+using TradeEventHandler = std::function<void(const qtrade_sdk::trader::Trade&)>;
 
 }  // namespace qtrade::engine::event_bus
 

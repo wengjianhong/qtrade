@@ -9,7 +9,8 @@
 
 namespace qtrade::engine::strategy {
 
-StrategyEngine::StrategyEngine(event_bus::EventBus& event_bus) : event_bus_(event_bus), running_(false) {}
+StrategyEngine::StrategyEngine(event_bus::EventLanes& event_lanes)
+    : event_lanes_(event_lanes), running_(false) {}
 
 StrategyEngine::~StrategyEngine() { Stop(); }
 
@@ -21,10 +22,10 @@ void StrategyEngine::Start() {
   running_ = true;
 
   // 订阅事件总线
-  event_bus_.SubscribeTick([this](const qtrade_sdk::quote::MarketTick& tick) { OnTickEvent(tick); });
-  event_bus_.SubscribeBar([this](const qtrade_sdk::quote::Bar& bar) { OnBarEvent(bar); });
-  event_bus_.SubscribeOrder([this](const qtrade_sdk::trader::Order& order) { OnOrderEvent(order); });
-  event_bus_.SubscribeTrade([this](const qtrade_sdk::trader::Trade& trade) { OnTradeEvent(trade); });
+  event_lanes_.Market().SubscribeTick([this](const qtrade_sdk::quote::MarketTick& tick) { OnTickEvent(tick); });
+  event_lanes_.Market().SubscribeBar([this](const qtrade_sdk::quote::Bar& bar) { OnBarEvent(bar); });
+  event_lanes_.Return().SubscribeOrder([this](const qtrade_sdk::trader::Order& order) { OnOrderEvent(order); });
+  event_lanes_.Return().SubscribeTrade([this](const qtrade_sdk::trader::Trade& trade) { OnTradeEvent(trade); });
 
   // 启动所有策略
   for (auto& strategy : strategies_) {

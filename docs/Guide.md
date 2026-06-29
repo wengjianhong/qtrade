@@ -9,11 +9,11 @@
 |《[Architecture.md](Architecture.md)》层次|代码侧落到何处|
 |---|---|
 |适配层|`src/adapter/`（可插拔动态库：行情源、交易通道协议转换）|
-|交易引擎层|`src/engine/`（单进程封闭运行：事件总线、行情处理、策略引擎、OMS、EMS、账户、持仓、实时风控、合规）|
+|交易引擎层|`src/engine/`（单进程封闭运行：事件总线、行情/交易标准化、策略引擎、OMS、EMS、账户、持仓、实时风控、合规）|
 |支撑服务客户端|`src/client/`（轻量级异步客户端：日志、配置、监控、服务发现）|
 |支撑服务层|`src/service/<名称>/`（独立进程 / 镜像部署；与引擎经 gRPC 控制面与 `client/` 旁路接口交互）|
-|接入层|`api/gateway/`、`api/console/`（可按里程碑增补目录）|
-|企业级治理|多与接入层、运维流水线耦合：`release/deploy/`、`release/ci/`、密钥与策略以外置配置为主|
+|接入层（外部独立项目）|不在本仓库；北向 HTTP REST，南向调 QTrade 支撑服务 gRPC|见《架构》§五|
+|企业级治理|多与**外部接入层**、运维流水线耦合：`release/deploy/`、`release/ci/`；Keycloak 等 IdP 可外置|
 
 **性能口径**：A/B/C/D 链路分段、控制面/数据面边界见《架构》**§1.3、§2.1**；**A 段**（策略回调同线程）禁止同步阻塞远程服务、禁止等待磁盘 fsync。
 
@@ -61,7 +61,7 @@ qtrade/
 │   │       └── trader/
 │   ├── engine/                     # 【核心交易引擎层】库代码，无 main
 │   │   ├── event_bus/              # 事件总线
-│   │   ├── market/                 # 行情处理：接收、清洗、标准化、分发行情数据，多数据源融合
+│   │   ├── normalizer/             # 标准化：QuoteNormalizer（行情）、TraderNormalizer（回报）
 │   │   ├── strategy/               # 策略引擎：加载、运行、管理策略插件，沙箱隔离，资源限制
 │   │   ├── cms/                    # 合规管理：实时交易合规校验（限仓、限购、日内频次）
 │   │   ├── ems/                    # 执行管理：订单路由、拆单、算法执行、通道管理、故障切换
@@ -79,9 +79,6 @@ qtrade/
 │       ├── config_service/         # 配置管理服务实现
 │       ├── log_service/
 │       └── ...
-├── api/                            # 【接入层】仅提供查询与配置提交功能，无任何交易操作权限
-│   ├── gateway/                    # API 网关：统一接入入口，认证，限流，路由，协议转换
-│   └── console/                    # 前端控制台：可视化查看（持仓/订单/绩效/日志/监控），配置提交
 ├── config/                         # 【示例配置】本地开发默认 JSON（--config 传入，非编译产物）
 │   ├── engine.json                 # 交易引擎
 │   └── config_service.json         # 配置管理服务
@@ -110,7 +107,7 @@ qtrade/
    ```
    Ctrl+C 退出支撑服务。
 
-3. 尚未创建的目录（如 `api/`、`history_market_service/`）可在对应里程碑落地时补齐。
+3. 尚未创建的目录（如 `history_market_service/`）可在对应里程碑落地时补齐。**接入层（网关/控制台）为外部独立项目，不在本仓库。**
 
 4. 策略代码**由独立仓库维护**，本仓库仅保留 `demo/strategy/` 作为开发示例；策略独立仓库规范见 **§7.2**。
 
@@ -124,17 +121,19 @@ qtrade/
 
 - **定义**（§1.3.1）：行情解析 → EventBus → 策略 → CMS → RiskManager → OMS 内存更新 → EMS 入队
 
-- **同线程禁止**：同步阻塞、磁盘 fsync、网络 I/O、调用支撑服务 client
+- **发单主链**（§1.3.4）：A 段结束后 **紧接 C 段**（EMS 出队 → 适配器 → 交易所）；A+C 为完整发单路径，**分开计量 SLA**
 
-- **B 段（异步）**：OMS WAL、合规日志、快照由专用 I/O 线程批量写入，不得阻塞 A 段
+- **同线程禁止**：同步阻塞、磁盘 fsync、**等待交易所/远程 ack**、调用支撑服务 client（C 段 RTT 不计入 A 段 50μs）
+
+- **B 段（异步）**：OMS WAL、合规日志、快照；自 OMS 变更**并行**触发，专用 I/O 线程，**不得阻塞 A 段**；不在 A→C 主链中间
 
 - **控制面**：本地快照 + gRPC `WatchConfig` 增量；冷启动 `GetConfig` 拉全量（独立控制线程/启动阶段，不在策略回调内）
 
-### 3.2 非热路径（C/D 段及支撑服务）
+### 3.2 C 段出站与 D 段旁路
 
-- **定义**：回测、报表、日志检索、事后审计、批量查询、配置管理等
+- **C 段**：EMS → 执行适配器 → 交易所/券商，**单独 SLA**，与 A 段分别压测（见《架构》§1.3.4）
 
-- **约束**：gRPC、HTTP；D 段旁路背压策略见《架构》§8.1（A 段永不因旁路满而阻塞）
+- **D 段及非热路径**：回测、报表、日志检索、事后审计、批量查询等；Outbound 旁路上报；背压策略见《架构》§8.1（A 段永不因旁路满而阻塞）
 
 ---
 
@@ -149,7 +148,8 @@ qtrade/
 |交易引擎 → 支撑服务（D 段）|`client/` 异步接口 + Protobuf|Outbound 线程 fire-and-forget；内部传输可插拔，MVP 可 stub|
 |引擎 ↔ config-service|gRPC + Protobuf|引擎仅作 Client：`GetConfig` + `WatchConfig`|
 |支撑服务之间|gRPC + Protobuf|同步 / 异步均可|
-|接入层 ↔ 外部系统|HTTP(S)/WebSocket|RESTful 风格，网关做协议转换|
+|接入层 ↔ 外部系统|HTTP(S)/WebSocket|**外部独立项目**；RESTful 北向，网关转 gRPC 调本仓库支撑服务|
+|外部接入层 → QTrade 支撑服务|gRPC + Protobuf|config / history / observability 等（`src/service/`）|
 
 ### 4.2 旁路上报与配置订阅规范
 
@@ -181,7 +181,7 @@ qtrade/
 |--------|------|------|
 | `XxxQuoteApi` / `XxxTraderApi` | **Target Api**（`qtrade_sdk::*Api`） | 引擎主动调用 → 转发至厂商 Api |
 | `XxxQuoteSpi` / `XxxTraderSpi` | **Adaptee Spi**（厂商 `*Spi`，接入 SDK 后） | 厂商回调 → 结构体转换 → 调用引擎注册的 Target `*Spi` |
-| 引擎内 `MarketHandler` 等 | **Target Spi**（`qtrade_sdk::*Spi`） | 实现 `On*` 回调，经 `RegisterSpi` 注入适配器 |
+| 引擎内 `QuoteNormalizer` / `TraderNormalizer` | **Target 接入** | 接适配器回调；语义标准化后进 EventBus / OMS |
 
 Spi 适配器**不**继承 `qtrade_sdk::*Spi`；`#include` 该头文件仅为使用 `QuoteSpi*` 与结构体类型。
 

@@ -35,10 +35,11 @@ enum class ModuleNumber : int32_t {
   kCompliance = 203,      /// 交易合规模块(cms)
   kExecution = 204,       /// 交易执行模块(ems)
   kOrder = 205,           /// 订单管理模块(oms)
-  kMarket = 206,          /// 行情处理模块
-  kPosition = 207,        /// 持仓管理模块
-  kRisk = 208,            /// 风险管理模块
-  kStrategyEngine = 209,  /// 策略引擎模块
+  kQuoteNormalizer = 206,   /// 行情标准化模块（QuoteNormalizer）
+  kPosition = 207,          /// 持仓管理模块
+  kRisk = 208,              /// 风险管理模块
+  kStrategyEngine = 209,    /// 策略引擎模块
+  kTraderNormalizer = 210,  /// 交易标准化模块（TraderNormalizer）
 
   /// 支撑服务层（BBB=300-399）
   kServiceCommon = 300,  /// 支撑服务通用错误码段
@@ -116,9 +117,9 @@ struct ModuleErrorCodeRange {
   static constexpr int32_t kOrderStart = MakeErrorCode(ModuleNumber::kOrder, kRangeStart);
   static constexpr int32_t kOrderEnd = MakeErrorCode(ModuleNumber::kOrder, kRangeEnd);
 
-  /// 行情处理模块（错误码范围=10206000~10206999）
-  static constexpr int32_t kMarketStart = MakeErrorCode(ModuleNumber::kMarket, kRangeStart);
-  static constexpr int32_t kMarketEnd = MakeErrorCode(ModuleNumber::kMarket, kRangeEnd);
+  /// 行情标准化模块 QuoteNormalizer（错误码范围=10206000~10206999）
+  static constexpr int32_t kQuoteNormalizerStart = MakeErrorCode(ModuleNumber::kQuoteNormalizer, kRangeStart);
+  static constexpr int32_t kQuoteNormalizerEnd = MakeErrorCode(ModuleNumber::kQuoteNormalizer, kRangeEnd);
 
   /// 持仓管理模块（错误码范围=10207000~10207999）
   static constexpr int32_t kPositionStart = MakeErrorCode(ModuleNumber::kPosition, kRangeStart);
@@ -131,6 +132,10 @@ struct ModuleErrorCodeRange {
   /// 策略引擎模块（错误码范围=10209000~10209999）
   static constexpr int32_t kStrategyEngineStart = MakeErrorCode(ModuleNumber::kStrategyEngine, kRangeStart);
   static constexpr int32_t kStrategyEngineEnd = MakeErrorCode(ModuleNumber::kStrategyEngine, kRangeEnd);
+
+  /// 交易标准化模块 TraderNormalizer（错误码范围=10210000~10210999）
+  static constexpr int32_t kTraderNormalizerStart = MakeErrorCode(ModuleNumber::kTraderNormalizer, kRangeStart);
+  static constexpr int32_t kTraderNormalizerEnd = MakeErrorCode(ModuleNumber::kTraderNormalizer, kRangeEnd);
 
   // 支撑服务层（BBB=300~399）
   /// 支撑服务通用错误码段（错误码范围=10300000~10300999）

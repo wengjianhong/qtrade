@@ -1,12 +1,12 @@
-/// @file      market_handler.hpp
-/// @brief     行情处理器
-/// @details   负责行情数据的接收、分发以及转换
+/// @file      quote_normalizer.hpp
+/// @brief     行情标准化模块
+/// @details   跨柜台行情语义统一、校验过滤；标准化后投递 Lane-M（队列由 EventBus 承担）
 /// @author    wengjianhong
 /// @date      2026-05-19
 /// @copyright CC BY-NC-SA 4.0
 
-#ifndef QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
-#define QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
+#ifndef QTRADE_TRADING_ENGINE_NORMALIZER_QUOTE_NORMALIZER_HPP_
+#define QTRADE_TRADING_ENGINE_NORMALIZER_QUOTE_NORMALIZER_HPP_
 
 #include <qtrade_sdk/quote/quote_api.hpp>
 
@@ -16,12 +16,12 @@
 #include <mutex>
 #include <vector>
 
-namespace qtrade::engine::market {
+namespace qtrade::engine::normalizer {
 
-class MarketHandler {
+class QuoteNormalizer {
  public:
-  explicit MarketHandler(event_bus::MarketEventReactor& market_event_reactor);
-  ~MarketHandler();
+  explicit QuoteNormalizer(event_bus::MarketEventReactor& market_event_reactor);
+  ~QuoteNormalizer();
 
   void Start();
   void Stop();
@@ -42,6 +42,6 @@ class MarketHandler {
   void OnBar(const qtrade_sdk::quote::Bar& bar);
 };
 
-}  // namespace qtrade::engine::market
+}  // namespace qtrade::engine::normalizer
 
-#endif  // QTRADE_TRADING_ENGINE_MARKET_HANDLER_HPP_
+#endif  // QTRADE_TRADING_ENGINE_NORMALIZER_QUOTE_NORMALIZER_HPP_

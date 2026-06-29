@@ -47,11 +47,11 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  auto& market_handler = engine.GetMarketHandler();
+  auto& quote_normalizer = engine.GetQuoteNormalizer();
   auto& strategy_engine = engine.GetStrategyEngine();
 
   auto quote_api = qtrade::adapter::mock::quote::CreateMockQuoteApi();
-  market_handler.SetQuoteApi(std::move(quote_api));
+  quote_normalizer.SetQuoteApi(std::move(quote_api));
 
   auto strategy = qtrade::demo::CreateExampleStrategy();
   qtrade::strategy::StrategyConfig strategy_cfg;
@@ -76,12 +76,12 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  if (auto* source_ptr = market_handler.GetQuoteApi()) {
+  if (auto* source_ptr = quote_normalizer.GetQuoteApi()) {
     qtrade_sdk::quote::ConnectRequest source_cfg;
     source_cfg.name = "MockDataSource";
     source_cfg.connection_string = "mock://localhost";
     source_ptr->Connect(source_cfg);
-    market_handler.Subscribe({"IF2401", "IC2401"});
+    quote_normalizer.Subscribe({"IF2401", "IC2401"});
   }
 
   qtrade::common::UnblockShutdownSignals();

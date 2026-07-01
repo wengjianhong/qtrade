@@ -47,9 +47,8 @@ int main(int argc, char** argv) {
   }
 
   auto store = std::make_shared<qtrade::service::ConfigStore>();
-  if (const auto rc = qtrade::service::LoadConfigStoreFromJson(config_path, *store);
-      rc != qtrade::ErrorCode::kSuccess) {
-    spdlog::warn("[qtrade_config_service] config store load failed, starting with empty store");
+  if (const auto rc = qtrade::service::BootstrapConfigStore(config_path, *store); rc != qtrade::ErrorCode::kSuccess) {
+    spdlog::warn("[qtrade_config_service] config bootstrap failed, starting with empty store");
     store->LoadFromMap({}, 1);
   }
 

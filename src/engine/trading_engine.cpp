@@ -6,6 +6,8 @@
 /// @copyright CC BY-NC-SA 4.0
 #include "engine/trading_engine.hpp"
 
+#include <qtrade/config/v1/config.pb.h>
+
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
@@ -114,8 +116,8 @@ ErrorCode TradingEngine::InitConfigClient(const EngineOptions& options) {
     return rc;
   }
 
-  config_client_.SetOnUpdate([this](std::string_view key, std::string_view value) {
-    OnConfigUpdate(key, value);
+  config_client_.SetOnSnapshot([this](const qtrade::config::v1::ConfigSnapshot& snapshot) {
+    OnConfigSnapshot(snapshot);
   });
 
   if (const auto rc = config_client_.FetchSnapshot(); rc != ErrorCode::kSuccess) {
@@ -129,9 +131,11 @@ ErrorCode TradingEngine::InitConfigClient(const EngineOptions& options) {
   return ErrorCode::kSuccess;
 }
 
-void TradingEngine::OnConfigUpdate(std::string_view key, std::string_view value) {
-  spdlog::info("[TradingEngine] config update: {}={}", key, value);
-  log_client_.Emit("info", std::string(key) + "=" + std::string(value));
+void TradingEngine::OnConfigSnapshot(const qtrade::config::v1::ConfigSnapshot& snapshot) {
+  spdlog::info("[TradingEngine] config snapshot version={}, entries={}", snapshot.version(), snapshot.entries_size());
+  for (const auto& entry : snapshot.entries()) {
+    log_client_.Emit("info", entry.key() + "=" + entry.value());
+  }
 }
 
 ErrorCode TradingEngine::Start() {

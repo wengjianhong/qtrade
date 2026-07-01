@@ -2,6 +2,11 @@
   "grpc": {
     "listen": "0.0.0.0:50051"
   },
+  "repository": {
+    "enabled": false,
+    "backend": "sqlite3",
+    "conn_string": "dbname=config.db"
+  },
   "config": {
     "version": 1,
     "entries": {

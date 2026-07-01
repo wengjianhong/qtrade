@@ -19,8 +19,7 @@ namespace qtrade::client {
 
 struct ConfigClient::Impl {
   ConfigClientOptions options;                                    ///< 连接参数
-  UpdateHandler on_update;                                        ///< 配置 upsert 回调
-  DeleteHandler on_delete;                                        ///< 配置 delete 回调
+  SnapshotHandler on_snapshot;                                    ///< 全量快照回调
   std::shared_ptr<grpc::Channel> channel;                         ///< gRPC 通道
   std::unique_ptr<qtrade::config::v1::ConfigService::Stub> stub;  ///< gRPC 存根
   std::thread watch_thread;                                       ///< WatchConfig 控制线程
@@ -48,6 +47,13 @@ ErrorCode ConfigClient::Init(const ConfigClientOptions& options) {
   return ErrorCode::kSuccess;
 }
 
+void ConfigClient::ApplySnapshot(const qtrade::config::v1::ConfigSnapshot& snapshot) {
+  impl_->version.store(snapshot.version(), std::memory_order_release);
+  if (impl_->on_snapshot) {
+    impl_->on_snapshot(snapshot);
+  }
+}
+
 ErrorCode ConfigClient::FetchSnapshot() {
   if (!impl_->initialized || !impl_->stub) {
     return ErrorCode::kNotInitialized;
@@ -67,13 +73,7 @@ ErrorCode ConfigClient::FetchSnapshot() {
     return ErrorCode::kTimeout;
   }
 
-  impl_->version.store(response.version(), std::memory_order_release);
-  if (impl_->on_update) {
-    for (const auto& entry : response.entries()) {
-      impl_->on_update(entry.key(), entry.value());
-    }
-  }
-
+  ApplySnapshot(response);
   spdlog::info("[ConfigClient] snapshot loaded, version={}, entries={}", response.version(), response.entries_size());
   return ErrorCode::kSuccess;
 }
@@ -103,26 +103,15 @@ ErrorCode ConfigClient::StartWatch() {
       request.set_since_version(impl_->version.load(std::memory_order_acquire));
 
       grpc::ClientContext context;
-      qtrade::config::v1::ConfigDelta delta;
-      std::unique_ptr<grpc::ClientReader<qtrade::config::v1::ConfigDelta>> reader(
-        impl_->stub->WatchConfig(&context, request));
+      qtrade::config::v1::ConfigSnapshot snapshot;
+      std::unique_ptr<grpc::ClientReader<qtrade::config::v1::ConfigSnapshot>> reader(
+          impl_->stub->WatchConfig(&context, request));
 
-      while (impl_->watch_running.load(std::memory_order_acquire) && reader->Read(&delta)) {
+      while (impl_->watch_running.load(std::memory_order_acquire) && reader->Read(&snapshot)) {
         backoff_ms = 500;
-        impl_->version.store(delta.version(), std::memory_order_release);
-
-        if (impl_->on_update) {
-          for (const auto& entry : delta.upserts()) {
-            impl_->on_update(entry.key(), entry.value());
-          }
-        }
-        if (impl_->on_delete) {
-          for (const auto& key : delta.deletes()) {
-            impl_->on_delete(key);
-          }
-        }
-
-        spdlog::debug("[ConfigClient] applied delta version={}", delta.version());
+        ApplySnapshot(snapshot);
+        spdlog::debug("[ConfigClient] applied snapshot version={}, entries={}", snapshot.version(),
+                      snapshot.entries_size());
       }
 
       const grpc::Status status = reader->Finish();
@@ -155,9 +144,7 @@ void ConfigClient::Shutdown() {
   impl_->initialized = false;
 }
 
-void ConfigClient::SetOnUpdate(UpdateHandler handler) { impl_->on_update = std::move(handler); }
-
-void ConfigClient::SetOnDelete(DeleteHandler handler) { impl_->on_delete = std::move(handler); }
+void ConfigClient::SetOnSnapshot(SnapshotHandler handler) { impl_->on_snapshot = std::move(handler); }
 
 std::uint64_t ConfigClient::Version() const { return impl_->version.load(std::memory_order_acquire); }
 

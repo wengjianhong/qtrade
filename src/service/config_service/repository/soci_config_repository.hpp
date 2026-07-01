@@ -8,17 +8,13 @@
 
 #include "service/config_service/repository/config_repository.hpp"
 
-#include <memory>
-
-namespace cpp_utils::database {
-class Connection;
-}
+#include <cpputils/database/database.hpp>
 
 namespace qtrade::service {
 
 class SociConfigRepository final : public IConfigRepository {
  public:
-  explicit SociConfigRepository(cpp_utils::database::ConnectionOptions db_options);
+  explicit SociConfigRepository(const DbRepositoryOptions& options);
   ~SociConfigRepository() override;
 
   ErrorCode EnsureSchema() override;
@@ -28,7 +24,10 @@ class SociConfigRepository final : public IConfigRepository {
                  std::uint64_t version) override;
 
  private:
-  std::unique_ptr<cpp_utils::database::Connection> connection_;
+  [[nodiscard]] bool IsReady() const;
+
+  std::unique_ptr<cpp_utils::database::IConnectionPool> pool_;
+  std::unique_ptr<cpp_utils::database::IConnection> connection_;
 };
 
 }  // namespace qtrade::service

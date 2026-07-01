@@ -23,5 +23,5 @@ target_link_libraries(qtrade_common PUBLIC
     spdlog::spdlog
     qtrade_proto
     nlohmann_json::nlohmann_json
-    cpp-utils
+    cpputils::cpputils
 )

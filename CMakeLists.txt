@@ -25,11 +25,9 @@ add_compile_options(-fPIC -Wall -Wextra -Wpedantic -O2)
 find_package(Threads REQUIRED)
 find_package(spdlog 1.16.0 REQUIRED)
 find_package(nlohmann_json 3.11.0 REQUIRED)
+find_package(cpputils 0.1.0 REQUIRED CONFIG)
 
-# cpp-utils（SOCI 封装）
-include(${CMAKE_SOURCE_DIR}/cmake/cpputils.cmake)
-
-# 工程路径与构建脚本（构建逻辑集中在 cmake/，src/ 仅保留源码）
+# Project paths and build scripts
 include(${CMAKE_SOURCE_DIR}/cmake/qtrade_paths.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/lib/qtrade_proto.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/lib/qtrade_common.cmake)

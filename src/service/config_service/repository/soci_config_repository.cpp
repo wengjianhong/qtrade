@@ -5,8 +5,7 @@
 /// @copyright CC BY-NC-SA 4.0
 #include "service/config_service/repository/soci_config_repository.hpp"
 
-#include "include/database/connection.hpp"
-#include "include/database/error.hpp"
+#include <cpputils/database/database.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -66,17 +65,44 @@ ErrorCode MapDbError(cpp_utils::database::Error error) {
 
 }  // namespace
 
-SociConfigRepository::SociConfigRepository(cpp_utils::database::ConnectionOptions db_options)
-  : connection_(std::make_unique<cpp_utils::database::Connection>(std::move(db_options))) {
-  if (const auto rc = connection_->Connect(); rc != cpp_utils::database::Error::kSuccess) {
-    spdlog::error("[SociConfigRepository] connect failed: {}", connection_->LastError());
+SociConfigRepository::SociConfigRepository(const DbRepositoryOptions& options) {
+  if (options.use_pool) {
+    pool_ = cpp_utils::database::CreateConnectionPool();
+    cpp_utils::database::ConnectionPoolOptions pool_opts{options.connection, options.pool_size};
+    pool_opts.lease_timeout = options.pool_lease_timeout;
+    if (const auto rc = pool_->Open(pool_opts); rc != cpp_utils::database::Error::kSuccess) {
+      spdlog::error("[SociConfigRepository] open pool failed");
+      pool_.reset();
+      return;
+    }
+    connection_ = pool_->Acquire();
+    if (!connection_) {
+      spdlog::error("[SociConfigRepository] acquire connection from pool failed");
+    }
+    return;
+  }
+
+  auto owned = std::make_unique<cpp_utils::database::Connection>(options.connection);
+  if (const auto rc = owned->Connect(); rc != cpp_utils::database::Error::kSuccess) {
+    spdlog::error("[SociConfigRepository] connect failed: {}", owned->LastError());
+  }
+  connection_ = std::move(owned);
+}
+
+SociConfigRepository::~SociConfigRepository() {
+  connection_.reset();
+  if (pool_) {
+    pool_->Close();
+    pool_.reset();
   }
 }
 
-SociConfigRepository::~SociConfigRepository() = default;
+bool SociConfigRepository::IsReady() const {
+  return connection_ != nullptr && connection_->IsConnected();
+}
 
 ErrorCode SociConfigRepository::EnsureSchema() {
-  if (!connection_->IsConnected()) {
+  if (!IsReady()) {
     return ErrorCode::kSystemError;
   }
   const auto rc = connection_->Execute(kEnsureSchemaSql);
@@ -89,7 +115,7 @@ ErrorCode SociConfigRepository::EnsureSchema() {
 ErrorCode SociConfigRepository::Load(const ConfigScope& scope,
                                      std::map<std::string, std::string>& entries,
                                      std::uint64_t& version) {
-  if (!connection_->IsConnected()) {
+  if (!IsReady()) {
     return ErrorCode::kSystemError;
   }
 
@@ -148,7 +174,7 @@ ErrorCode SociConfigRepository::Load(const ConfigScope& scope,
 ErrorCode SociConfigRepository::Save(const ConfigScope& scope,
                                      const std::map<std::string, std::string>& entries,
                                      std::uint64_t version) {
-  if (!connection_->IsConnected()) {
+  if (!IsReady()) {
     return ErrorCode::kSystemError;
   }
 

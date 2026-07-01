@@ -33,7 +33,8 @@ class ConfigGrpcAsyncHandler {
 
   /// @brief 绑定 AsyncService、CQ 与配置存储
   void Init(qtrade::config::v1::ConfigService::AsyncService* async_service,
-            grpc::ServerCompletionQueue* cq, std::shared_ptr<ConfigStore> store);
+            grpc::ServerCompletionQueue* cq,
+            std::shared_ptr<ConfigStore> store);
 
   /// @brief 注册版本监听并预投递 RPC 接收
   void Start();
@@ -48,15 +49,13 @@ class ConfigGrpcAsyncHandler {
 
   [[nodiscard]] std::shared_ptr<ConfigStore> Store() const { return store_; }
   [[nodiscard]] grpc::ServerCompletionQueue* CompletionQueue() const { return cq_; }
-  [[nodiscard]] qtrade::config::v1::ConfigService::AsyncService* AsyncService() const {
-    return async_service_;
-  }
+  [[nodiscard]] qtrade::config::v1::ConfigService::AsyncService* AsyncService() const { return async_service_; }
 
  private:
   qtrade::config::v1::ConfigService::AsyncService* async_service_ = nullptr;
+  std::unique_ptr<detail::WatchSessionRegistry> watch_registry_;
   grpc::ServerCompletionQueue* cq_ = nullptr;
   std::shared_ptr<ConfigStore> store_;
-  std::unique_ptr<detail::WatchSessionRegistry> watch_registry_;
   bool started_ = false;
 };
 

@@ -119,7 +119,7 @@ qtrade/
 
 ### 3.1 A 段热路径（强制约束）
 
-- **定义**（§1.3.1）：行情解析 → EventBus → 策略 → CMS → RiskManager → OMS 内存更新 → EMS 入队
+- **定义**（§1.3.1）：Lane-M → 策略 → CMS → Risk → OMS → EMS 入队（完整路径 **§8.2①**）
 
 - **发单主链**（§1.3.4）：A 段结束后 **紧接 C 段**（EMS 出队 → 适配器 → 交易所）；A+C 为完整发单路径，**分开计量 SLA**
 
@@ -181,7 +181,7 @@ qtrade/
 |--------|------|------|
 | `XxxQuoteApi` / `XxxTraderApi` | **Target Api**（`qtrade_sdk::*Api`） | 引擎主动调用 → 转发至厂商 Api |
 | `XxxQuoteSpi` / `XxxTraderSpi` | **Adaptee Spi**（厂商 `*Spi`，接入 SDK 后） | 厂商回调 → 结构体转换 → 调用引擎注册的 Target `*Spi` |
-| 引擎内 `QuoteNormalizer` / `TraderNormalizer` | **Target 接入** | 接适配器回调；语义标准化后进 EventBus / OMS |
+| 引擎内 `QuoteNormalizer` / `TraderNormalizer` | **Normalizer** | 适配器回调；仅标准化 + `Publish*`（回报业务见 `ReturnHandler`，§3.1） |
 
 Spi 适配器**不**继承 `qtrade_sdk::*Spi`；`#include` 该头文件仅为使用 `QuoteSpi*` 与结构体类型。
 

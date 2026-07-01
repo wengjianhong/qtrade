@@ -24,7 +24,10 @@
 #include <qtrade/error_code/error_codes.hpp>
 
 #include <string>
-#include <string_view>
+
+namespace qtrade::config::v1 {
+class ConfigSnapshot;
+}
 
 namespace qtrade::engine {
 
@@ -95,10 +98,9 @@ class TradingEngine {
   /// @return ErrorCode::kSuccess 表示成功
   ErrorCode InitConfigClient(const EngineOptions& options);
 
-  /// @brief 配置增量回调：写入本地快照并旁路日志
-  /// @param key 配置键
-  /// @param value 配置值
-  void OnConfigUpdate(std::string_view key, std::string_view value);
+  /// @brief 配置全量快照回调：替换本地配置视图并旁路日志
+  /// @param snapshot 含 version 与 entries 的全量快照
+  void OnConfigSnapshot(const qtrade::config::v1::ConfigSnapshot& snapshot);
 
   bool initialized_ = false;                    ///< 是否已完成 Init
   bool running_ = false;                        ///< 是否已 Start

@@ -8,26 +8,24 @@
 
 #include "service/config_service/config_store.hpp"
 
+#include <qtrade/config/v1/config.grpc.pb.h>
 #include <qtrade/error_code/error_codes.hpp>
 
 #include <memory>
 #include <string>
 
-namespace grpc {
-class Server;
+namespace qtrade::common::grpc_async {
+class GrpcAsyncServer;
 }
 
 namespace qtrade::service {
 
-class ConfigGrpcService;
+class ConfigGrpcAsyncHandler;
 
-/// @brief 启动/停止 config-service gRPC 监听
+/// @brief 启动/停止 config-service gRPC 监听（Async + CQ）
 class ConfigServer {
  public:
-  /// @brief 构造 ConfigServer（未启动）
   ConfigServer();
-
-  /// @brief 析构并 Shutdown
   ~ConfigServer();
 
   ConfigServer(const ConfigServer&) = delete;
@@ -49,17 +47,18 @@ class ConfigServer {
   [[nodiscard]] bool IsRunning() const { return running_; }
 
  private:
-  std::unique_ptr<grpc::Server> server_;        ///< gRPC 服务器实例
-  std::shared_ptr<ConfigStore> store_;          ///< 配置存储
-  std::unique_ptr<ConfigGrpcService> service_;  ///< gRPC 服务实现
-  bool running_ = false;                        ///< 是否已 Start
+  qtrade::config::v1::ConfigService::AsyncService async_service_;
+  std::unique_ptr<qtrade::common::grpc_async::GrpcAsyncServer> grpc_server_;
+  std::unique_ptr<ConfigGrpcAsyncHandler> handler_;
+  std::shared_ptr<ConfigStore> store_;
+  bool running_ = false;
 };
 
 /// @brief 从 JSON 配置文件加载 entries 到 ConfigStore
-/// @param json_path 配置文件路径（含 grpc.listen 与 config.entries）
-/// @param store 输出：加载后的 ConfigStore
-/// @return ErrorCode::kSuccess 表示成功
 ErrorCode LoadConfigStoreFromJson(const std::string& json_path, ConfigStore& store);
+
+/// @brief 启动引导：优先从 repository 加载，失败或未启用时回退 JSON；空库可用 JSON 种子写入 DB
+ErrorCode BootstrapConfigStore(const std::string& json_path, ConfigStore& store);
 
 }  // namespace qtrade::service
 

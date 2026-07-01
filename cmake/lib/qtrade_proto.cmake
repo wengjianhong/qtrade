@@ -64,8 +64,11 @@ else()
   add_library(qtrade_proto INTERFACE)
 endif()
 
-# 生成头文件目录对依赖方公开（#include <qtrade/config/v1/config.pb.h>）
-target_include_directories(qtrade_proto PUBLIC ${QTRADE_PROTO_GEN_DIR})
+# Generated headers: #include <qtrade/config/v1/config.pb.h>
+target_include_directories(qtrade_proto PUBLIC
+    $<BUILD_INTERFACE:${QTRADE_PROTO_GEN_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 # gRPC / Protobuf 系统头文件（标记 SYSTEM 抑制第三方告警）
 target_include_directories(qtrade_proto SYSTEM PUBLIC

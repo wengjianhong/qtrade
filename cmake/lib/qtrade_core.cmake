@@ -17,7 +17,8 @@ list(APPEND CORE_SRC_FILES
 # Build Core Library
 add_library(qtrade_core STATIC ${CORE_SRC_FILES})
 target_include_directories(qtrade_core PUBLIC
-    ${QTRADE_INCLUDE_DIR}
+    $<BUILD_INTERFACE:${QTRADE_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_include_directories(qtrade_core PRIVATE
     ${QTRADE_SRC_DIR}

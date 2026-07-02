@@ -39,10 +39,12 @@ class IConfigRepository {
 
   virtual ErrorCode EnsureSchema() = 0;
 
-  virtual ErrorCode Load(const ConfigScope& scope, std::map<std::string, std::string>& entries,
+  virtual ErrorCode Load(const ConfigScope& scope,
+                         std::map<std::string, std::string>& entries,
                          std::uint64_t& version) = 0;
 
-  virtual ErrorCode Save(const ConfigScope& scope, const std::map<std::string, std::string>& entries,
+  virtual ErrorCode Save(const ConfigScope& scope,
+                         const std::map<std::string, std::string>& entries,
                          std::uint64_t version) = 0;
 };
 

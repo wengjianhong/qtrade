@@ -35,13 +35,11 @@ class WatchSessionRegistry {
 
 class GetConfigCallData final : public qtrade::common::grpc_async::CallDataBase {
  public:
-  GetConfigCallData(ConfigGrpcAsyncHandler* handler, qtrade::config::v1::ConfigService::AsyncService* service,
-                    grpc::ServerCompletionQueue* cq, std::shared_ptr<ConfigStore> store)
-      : handler_(handler),
-        service_(service),
-        cq_(cq),
-        store_(std::move(store)),
-        responder_(&ctx_) {
+  GetConfigCallData(ConfigGrpcAsyncHandler* handler,
+                    qtrade::config::v1::ConfigService::AsyncService* service,
+                    grpc::ServerCompletionQueue* cq,
+                    std::shared_ptr<ConfigStore> store)
+    : handler_(handler), service_(service), cq_(cq), store_(std::move(store)), responder_(&ctx_) {
     Proceed(true);
   }
 
@@ -84,15 +82,12 @@ class GetConfigCallData final : public qtrade::common::grpc_async::CallDataBase 
 
 class WatchConfigCallData final : public qtrade::common::grpc_async::CallDataBase {
  public:
-  WatchConfigCallData(ConfigGrpcAsyncHandler* handler, qtrade::config::v1::ConfigService::AsyncService* service,
-                      grpc::ServerCompletionQueue* cq, std::shared_ptr<ConfigStore> store,
+  WatchConfigCallData(ConfigGrpcAsyncHandler* handler,
+                      qtrade::config::v1::ConfigService::AsyncService* service,
+                      grpc::ServerCompletionQueue* cq,
+                      std::shared_ptr<ConfigStore> store,
                       WatchSessionRegistry* registry)
-      : handler_(handler),
-        service_(service),
-        cq_(cq),
-        store_(std::move(store)),
-        registry_(registry),
-        writer_(&ctx_) {
+    : handler_(handler), service_(service), cq_(cq), store_(std::move(store)), registry_(registry), writer_(&ctx_) {
     Proceed(true);
   }
 
@@ -218,7 +213,8 @@ ConfigGrpcAsyncHandler::ConfigGrpcAsyncHandler() = default;
 ConfigGrpcAsyncHandler::~ConfigGrpcAsyncHandler() { Shutdown(); }
 
 void ConfigGrpcAsyncHandler::Init(qtrade::config::v1::ConfigService::AsyncService* async_service,
-                                  grpc::ServerCompletionQueue* cq, std::shared_ptr<ConfigStore> store) {
+                                  grpc::ServerCompletionQueue* cq,
+                                  std::shared_ptr<ConfigStore> store) {
   async_service_ = async_service;
   cq_ = cq;
   store_ = std::move(store);

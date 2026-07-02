@@ -97,9 +97,7 @@ SociConfigRepository::~SociConfigRepository() {
   }
 }
 
-bool SociConfigRepository::IsReady() const {
-  return connection_ != nullptr && connection_->IsConnected();
-}
+bool SociConfigRepository::IsReady() const { return connection_ != nullptr && connection_->IsConnected(); }
 
 ErrorCode SociConfigRepository::EnsureSchema() {
   if (!IsReady()) {

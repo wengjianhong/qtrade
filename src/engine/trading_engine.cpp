@@ -54,9 +54,9 @@ ErrorCode ParseEngineOptionsFromJson(const std::string& json_path, EngineOptions
 }  // namespace
 
 TradingEngine::TradingEngine()
-    : strategy_engine_(event_lanes_),
-      quote_normalizer_(event_lanes_.Market()),
-      trader_normalizer_(event_lanes_.Return()) {}
+  : strategy_engine_(event_lanes_),
+    quote_normalizer_(event_lanes_.Market()),
+    trader_normalizer_(event_lanes_.Return()) {}
 
 TradingEngine::~TradingEngine() { Stop(); }
 
@@ -84,8 +84,7 @@ ErrorCode TradingEngine::Init(const EngineOptions& options) {
     return rc;
   }
 
-  const std::string monitor_endpoint =
-      options_.monitor_endpoint.empty() ? "stub://local" : options_.monitor_endpoint;
+  const std::string monitor_endpoint = options_.monitor_endpoint.empty() ? "stub://local" : options_.monitor_endpoint;
   if (const auto rc = monitor_client_.Init(monitor_endpoint); rc != ErrorCode::kSuccess) {
     spdlog::warn("[TradingEngine] monitor_client init failed, code={}", static_cast<int>(rc));
     log_client_.Shutdown();
@@ -94,8 +93,7 @@ ErrorCode TradingEngine::Init(const EngineOptions& options) {
 
   if (!options_.config_server_address.empty()) {
     if (const auto rc = InitConfigClient(options_); rc != ErrorCode::kSuccess) {
-      spdlog::warn("[TradingEngine] config_client init failed, code={} (using local defaults)",
-                   static_cast<int>(rc));
+      spdlog::warn("[TradingEngine] config_client init failed, code={} (using local defaults)", static_cast<int>(rc));
     }
   } else {
     spdlog::info("[TradingEngine] config_server_address empty, skipping config_client");
@@ -116,9 +114,8 @@ ErrorCode TradingEngine::InitConfigClient(const EngineOptions& options) {
     return rc;
   }
 
-  config_client_.SetOnSnapshot([this](const qtrade::config::v1::ConfigSnapshot& snapshot) {
-    OnConfigSnapshot(snapshot);
-  });
+  config_client_.SetOnSnapshot(
+    [this](const qtrade::config::v1::ConfigSnapshot& snapshot) { OnConfigSnapshot(snapshot); });
 
   if (const auto rc = config_client_.FetchSnapshot(); rc != ErrorCode::kSuccess) {
     spdlog::warn("[TradingEngine] GetConfig failed, continuing with local snapshot");

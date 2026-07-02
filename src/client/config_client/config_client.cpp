@@ -105,13 +105,13 @@ ErrorCode ConfigClient::StartWatch() {
       grpc::ClientContext context;
       qtrade::config::v1::ConfigSnapshot snapshot;
       std::unique_ptr<grpc::ClientReader<qtrade::config::v1::ConfigSnapshot>> reader(
-          impl_->stub->WatchConfig(&context, request));
+        impl_->stub->WatchConfig(&context, request));
 
       while (impl_->watch_running.load(std::memory_order_acquire) && reader->Read(&snapshot)) {
         backoff_ms = 500;
         ApplySnapshot(snapshot);
-        spdlog::debug("[ConfigClient] applied snapshot version={}, entries={}", snapshot.version(),
-                      snapshot.entries_size());
+        spdlog::debug(
+          "[ConfigClient] applied snapshot version={}, entries={}", snapshot.version(), snapshot.entries_size());
       }
 
       const grpc::Status status = reader->Finish();

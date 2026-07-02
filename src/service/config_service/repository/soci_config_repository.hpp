@@ -18,9 +18,11 @@ class SociConfigRepository final : public IConfigRepository {
   ~SociConfigRepository() override;
 
   ErrorCode EnsureSchema() override;
-  ErrorCode Load(const ConfigScope& scope, std::map<std::string, std::string>& entries,
+  ErrorCode Load(const ConfigScope& scope,
+                 std::map<std::string, std::string>& entries,
                  std::uint64_t& version) override;
-  ErrorCode Save(const ConfigScope& scope, const std::map<std::string, std::string>& entries,
+  ErrorCode Save(const ConfigScope& scope,
+                 const std::map<std::string, std::string>& entries,
                  std::uint64_t version) override;
 
  private:

@@ -102,22 +102,22 @@ class TradingEngine {
   /// @param snapshot 含 version 与 entries 的全量快照
   void OnConfigSnapshot(const qtrade::config::v1::ConfigSnapshot& snapshot);
 
-  bool initialized_ = false;                    ///< 是否已完成 Init
-  bool running_ = false;                        ///< 是否已 Start
-  EngineOptions options_;                       ///< 启动选项副本
-  event_bus::EventLanes event_lanes_;           ///< Lane-M / Lane-R 事件通道
-  strategy::StrategyEngine strategy_engine_;    ///< 策略引擎
+  bool initialized_ = false;                        ///< 是否已完成 Init
+  bool running_ = false;                            ///< 是否已 Start
+  EngineOptions options_;                           ///< 启动选项副本
+  event_bus::EventLanes event_lanes_;               ///< Lane-M / Lane-R 事件通道
+  strategy::StrategyEngine strategy_engine_;        ///< 策略引擎
   normalizer::QuoteNormalizer quote_normalizer_;    ///< 行情标准化（QuoteNormalizer）
   normalizer::TraderNormalizer trader_normalizer_;  ///< 交易标准化（TraderNormalizer）
-  cms::ComplianceManager compliance_;           ///< 合规模块
-  ems::ExecutionManager execution_manager_;     ///< 执行管理模块
-  oms::OrderManager order_manager_;             ///< 订单管理模块
-  account::AccountManager account_manager_;     ///< 账户管理模块
-  position::PositionManager position_manager_;  ///< 持仓管理模块
-  risk::RiskManager risk_manager_;              ///< 风险管理模块
-  client::ConfigClient config_client_;          ///< 控制面 gRPC 客户端
-  client::LogClient log_client_;                ///< D 段日志旁路客户端
-  client::MonitorClient monitor_client_;        ///< D 段监控旁路客户端
+  cms::ComplianceManager compliance_;               ///< 合规模块
+  ems::ExecutionManager execution_manager_;         ///< 执行管理模块
+  oms::OrderManager order_manager_;                 ///< 订单管理模块
+  account::AccountManager account_manager_;         ///< 账户管理模块
+  position::PositionManager position_manager_;      ///< 持仓管理模块
+  risk::RiskManager risk_manager_;                  ///< 风险管理模块
+  client::ConfigClient config_client_;              ///< 控制面 gRPC 客户端
+  client::LogClient log_client_;                    ///< D 段日志旁路客户端
+  client::MonitorClient monitor_client_;            ///< D 段监控旁路客户端
 };
 
 }  // namespace qtrade::engine
